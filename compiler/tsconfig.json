@@ -25,7 +25,8 @@
     "skipLibCheck": true,
 
     "paths": {
-      "#parser": ["./src/parser/index.ts"]
+      "#ast": ["./src/ast/index.ts"],
+      "#tokeniser": ["./src/tokeniser/index.ts"]
     }
   }
 }

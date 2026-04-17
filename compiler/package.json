@@ -12,6 +12,7 @@
     "typescript": "^6.0.3"
   },
   "imports": {
-    "#parser": "./src/parser/index.ts"
+    "#ast": "./src/ast/index.ts",
+    "#tokeniser": "./src/tokeniser/index.ts"
   }
 }
