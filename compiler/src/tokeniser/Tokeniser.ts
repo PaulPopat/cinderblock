@@ -12,7 +12,7 @@ export class Tokeniser {
   }
 
   #isValid(subject: string) {
-    return !!subject.match(/^([a-zA-Z0-9_@$#]+|[^\sa-zA-Z0-9]+)$/gm);
+    return !!subject.match(/^([a-zA-Z0-9_@$#]+|[^\sa-zA-Z0-9_@$#]+)$/gm);
   }
 
   get tokens() {
