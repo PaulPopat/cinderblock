@@ -1,0 +1,17 @@
+{
+  "name": "@cinderblock/compiler",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "author": "Paul Popat",
+  "scripts": {
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "typescript": "^6.0.3"
+  },
+  "imports": {
+    "#parser": "./src/parser/index.ts"
+  }
+}
