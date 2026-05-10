@@ -1,0 +1,28 @@
+let namespace:segment:start 10i;
+
+
+let namespace:segment:end 20i;
+
+let app:main (string command)
+  use namespace
+
+  struct TestStruct (
+    int32 first,
+    string second
+  )
+
+  let test_func (TestStruct subject, float thing, int32 second): int32
+    side subject.second -> std:print;
+  
+    subject.second == "add"
+      ? subject.first + second
+      : subject.first - second;
+
+  let start segment:start, command;
+
+  let curried segment:end <- test_func;
+
+  start -> curried;
+
+
+"add" -> app:main;

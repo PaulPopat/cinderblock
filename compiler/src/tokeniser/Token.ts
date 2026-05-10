@@ -1,4 +1,4 @@
-import type { Location } from "./Location.ts";
+import type { Location } from "#utils";
 
 export class Token {
   readonly #data: string;

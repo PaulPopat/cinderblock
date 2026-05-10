@@ -13,6 +13,7 @@
   },
   "imports": {
     "#ast": "./src/ast/index.ts",
-    "#tokeniser": "./src/tokeniser/index.ts"
+    "#tokeniser": "./src/tokeniser/index.ts",
+    "#utils": "./src/utils/index.ts"
   }
 }

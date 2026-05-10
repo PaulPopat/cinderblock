@@ -1,4 +1,4 @@
-import { Location } from "./Location.ts";
+import { Location } from "#utils";
 import { Token } from "./Token.ts";
 import { TokenStore } from "./TokenStore.ts";
 
@@ -6,13 +6,21 @@ export class Tokeniser {
   readonly #file: string;
   readonly #text: string;
 
+  readonly #patterns = [
+    /^[a-zA-Z][a-zA-Z0-9_@$#:]*$/gm,
+    /^[^\s\na-zA-Z0-9_@$#'"]+$/gm,
+    /^"[^"]+"$/gm,
+    /^'[^']'$/gm,
+    /^'\\.'$/gm,
+  ];
+
   constructor(file: string, text: string) {
     this.#file = file;
     this.#text = text;
   }
 
   #isValid(subject: string) {
-    return !!subject.match(/^([a-zA-Z0-9_@$#]+|[^\sa-zA-Z0-9_@$#]+)$/gm);
+    return !!this.#patterns.find((p) => subject.match(p));
   }
 
   get tokens() {
@@ -49,9 +57,9 @@ export class Tokeniser {
           current = character;
         }
       }
-
-      finish(lineNumber + 1, 0);
     }
+
+    finish(lines.length, 0);
 
     return TokenStore.start(result);
   }
