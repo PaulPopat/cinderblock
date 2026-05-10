@@ -1,21 +1,18 @@
-import type { TokenStore } from "#tokeniser";
-import type { Location } from "#utils";
 import type { Entity } from "./Entity.ts";
 import { Entry } from "./Entry.ts";
-import type { EntryContext } from "./EntryContext.ts";
 import type { Extracted } from "./Extracted.ts";
 import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "./TokenWalker.ts";
 
 type EntityParseable = {
   priority: number;
-  applicable: (store: TokenStore) => boolean;
+  match: RegExp;
   parse: (walker: TokenWalker) => Extracted<Entity>;
 };
 
 type ExpressionParseable = {
   priority: number;
-  applicable: (store: TokenStore, existing?: Expression) => boolean;
+  match: RegExp;
   parse: (walker: TokenWalker, existing?: Expression) => Extracted<Expression>;
 };
 
@@ -39,7 +36,7 @@ export abstract class Expression extends Entry {
     return walker
       .while(
         "entities",
-        (s) => this.#entityParsers.find((a) => a.applicable(s)),
+        (s) => this.#entityParsers.find((a) => s.data.match(a.match)),
         (w, m) => m!.parse(w),
         "entity",
       )
@@ -48,7 +45,7 @@ export abstract class Expression extends Entry {
         (s) => s.data !== ";",
         (w, _, p): Extracted<Expression> => {
           const match = this.#expressionParsers.find((p) =>
-            p.applicable(w.store),
+            w.store.data.match(p.match),
           );
           if (!match) {
             throw new ParserError(`Unexpected symbol of ${w.data}`, w.store);
@@ -58,16 +55,5 @@ export abstract class Expression extends Entry {
         },
       )
       .finish(({ expression }) => expression);
-  }
-
-  readonly #entities: Array<Entity>;
-
-  constructor(ctx: EntryContext, entities: Array<Entity>) {
-    super(ctx);
-    this.#entities = entities;
-  }
-
-  get entities() {
-    return this.#entities;
   }
 }

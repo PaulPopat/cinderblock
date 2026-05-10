@@ -1,4 +1,3 @@
-import type { Location } from "#utils";
 import { Entity } from "./Entity.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
@@ -8,10 +7,10 @@ export class EntitySide extends Entity {
   static {
     Expression.RegisterEntity({
       priority: 100,
-      applicable: (s) => s.data === "let",
+      match: /^side$/gm,
       parse: (w) =>
         w
-          .expect("let")
+          .expect("side")
           .extract("block", (s) => Expression.Parse(s))
           .finish(({ block }, ctx) => new EntitySide(ctx, block)),
     });

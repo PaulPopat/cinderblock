@@ -8,7 +8,7 @@ export class EntityLet extends Entity {
   static {
     Expression.RegisterEntity({
       priority: 100,
-      applicable: (s) => s.data === "let",
+      match: /^let$/gm,
       parse: (w) =>
         w
           .expect("let")
@@ -21,7 +21,7 @@ export class EntityLet extends Entity {
                 .while(
                   "args",
                   (s) => s.data === ",",
-                  (s) => Arg.Parse(s),
+                  (s) => Arg.Parse(s.next),
                 )
                 .expect(")"),
           )

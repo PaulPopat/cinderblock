@@ -9,7 +9,7 @@ import type { TokenWalker } from "./TokenWalker.ts";
 
 type TypeParseable = {
   priority: number;
-  applicable: (store: TokenStore) => boolean;
+  match: RegExp;
   parse: (walker: TokenWalker) => Extracted<Type>;
 };
 
@@ -23,7 +23,7 @@ export abstract class Type extends Entry {
   }
 
   static Parse(walker: TokenWalker): Extracted<Type> {
-    const match = this.#parsers.find((p) => p.applicable(walker.store));
+    const match = this.#parsers.find((p) => walker.data.match(p.match));
     if (!match) {
       throw new ParserError(`Unexpected symbol of ${match}`, walker.store);
     }

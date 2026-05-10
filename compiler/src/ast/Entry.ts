@@ -11,4 +11,8 @@ export class Entry {
   get ctx() {
     return this.#ctx;
   }
+
+  get entities() {
+    return this.#ctx.entities;
+  }
 }
