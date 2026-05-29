@@ -2,18 +2,18 @@ import { Expression } from "./Expression.ts";
 import { ExpressionOperator } from "./ExpressionOperator.ts";
 import { ParserError } from "./ParserError.ts";
 
-export class ExpressionOperatorMultiply extends ExpressionOperator {
+export class ExpressionOperatorPipeLeft extends ExpressionOperator {
   static {
     Expression.RegisterExpression({
       priority: 100,
-      match: /^\*$/gm,
+      match: /^<-$/gm,
       parse: (w, e) => {
-        if (!e) throw new ParserError("Unexpected *", w.store);
+        if (!e) throw new ParserError("Unexpected <-", w.store);
         return w
-          .expect("*")
+          .expect("<-")
           .extract("right", Expression.Parse)
           .finish(
-            ({ right }, ctx) => new ExpressionOperatorMultiply(ctx, e, right),
+            ({ right }, ctx) => new ExpressionOperatorPipeLeft(ctx, e, right),
           );
       },
     });

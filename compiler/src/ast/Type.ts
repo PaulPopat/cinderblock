@@ -1,8 +1,4 @@
-import type { TokenStore } from "#tokeniser";
-import type { Location } from "#utils";
-import type { Entity } from "./Entity.ts";
 import { Entry } from "./Entry.ts";
-import type { EntryContext } from "./EntryContext.ts";
 import type { Extracted } from "./Extracted.ts";
 import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "./TokenWalker.ts";
@@ -10,7 +6,7 @@ import type { TokenWalker } from "./TokenWalker.ts";
 type TypeParseable = {
   priority: number;
   match: RegExp;
-  parse: (walker: TokenWalker) => Extracted<Type>;
+  parse: (walker: TokenWalker, previous?: Type) => Extracted<Type>;
 };
 
 export abstract class Type extends Entry {
@@ -22,23 +18,20 @@ export abstract class Type extends Entry {
     );
   }
 
-  static Parse(walker: TokenWalker): Extracted<Type> {
-    const match = this.#parsers.find((p) => walker.data.match(p.match));
-    if (!match) {
-      throw new ParserError(`Unexpected symbol of ${match}`, walker.store);
-    }
+  static Parse(walker: TokenWalker, ending: string): Extracted<Type> {
+    return walker
+      .reduce(
+        "type",
+        (s) => s.data !== ending,
+        (w, _, p): Extracted<Type> => {
+          const match = this.#parsers.find((p) => w.store.data.match(p.match));
+          if (!match) {
+            throw new ParserError(`Unexpected symbol of ${w.data}`, w.store);
+          }
 
-    return match.parse(walker);
-  }
-
-  readonly #entities: Array<Entity>;
-
-  constructor(ctx: EntryContext, entities: Array<Entity>) {
-    super(ctx);
-    this.#entities = entities;
-  }
-
-  get entities() {
-    return this.#entities;
+          return match.parse(w, p);
+        },
+      )
+      .finish(({ type }) => type);
   }
 }

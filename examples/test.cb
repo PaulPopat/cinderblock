@@ -3,17 +3,15 @@ let namespace:segment:start 10i;
 
 let namespace:segment:end 20i;
 
-let app:main (string command)
+let app:main (command: string)
   use namespace
 
   struct TestStruct (
-    int32 first,
-    string second
+    first: int32,
+    second: string
   )
 
-  let test_func (TestStruct subject, float thing, int32 second): int32
-    side subject.second -> std:print;
-  
+  let test_func (subject: TestStruct, thing: float, second: int32): int32
     subject.second == "add"
       ? subject.first + second
       : subject.first - second;

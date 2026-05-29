@@ -1,19 +1,38 @@
-import type { Location } from "#utils";
+import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
+import { ParserError } from "./ParserError.ts";
 
 export class ExpressionTernary extends Expression {
+  static {
+    Expression.RegisterExpression({
+      priority: 1,
+      match: /^\?$/gm,
+      parse: (w, predicate) => {
+        if (!predicate) throw new ParserError("Unexpected ?", w.store);
+        return w
+          .expect("?")
+          .extract("positive", Expression.Parse)
+          .expect(":")
+          .extract("negative", Expression.Parse)
+          .finish(
+            ({ positive, negative }, ctx) =>
+              new ExpressionTernary(ctx, predicate, positive, negative),
+          );
+      },
+    });
+  }
+
   readonly #predicate: Expression;
   readonly #positive: Expression;
   readonly #negative: Expression;
 
   constructor(
-    start: Location,
-    end: Location,
+    ctx: EntryContext,
     predicate: Expression,
     positive: Expression,
     negative: Expression,
   ) {
-    super(start, end);
+    super(ctx);
     this.#predicate = predicate;
     this.#positive = positive;
     this.#negative = negative;

@@ -1,18 +1,17 @@
 import type { EntryContext } from "./EntryContext.ts";
-import { Expression } from "./Expression.ts";
+import { Type } from "./Type.ts";
 
-export class ExpressionReference extends Expression {
+export class TypeReference extends Type {
   static {
-    Expression.RegisterExpression({
+    Type.RegisterType({
       priority: 1,
       match: /^[a-zA-Z][a-zA-Z0-9_@$#:]*$/gm,
       parse: (w) =>
         w
           .text("value")
-          .finish(({ value }, ctx) => new ExpressionReference(ctx, value)),
+          .finish(({ value }, ctx) => new TypeReference(ctx, value)),
     });
   }
-
   readonly #name: string;
 
   constructor(ctx: EntryContext, name: string) {
