@@ -158,7 +158,7 @@ export class TokenWalker<
 
   reduce<TKey extends string, TResult extends Entry, TWhile>(
     name: TKey,
-    predicate: (store: TokenStore) => TWhile,
+    predicate: (store: TokenStore, previous?: TResult) => TWhile,
     extractor: (
       store: TokenWalker,
       whileResult: TWhile,
@@ -170,7 +170,7 @@ export class TokenWalker<
     let whileResult: TWhile;
     let newStore: TokenStore = this.#store;
 
-    while ((whileResult = predicate(newStore))) {
+    while ((whileResult = predicate(newStore, result))) {
       [result, newStore] = extractor(
         new TokenWalker({}, newStore, newStore.location, this.#entities),
         whileResult,

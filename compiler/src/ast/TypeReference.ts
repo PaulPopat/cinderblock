@@ -6,6 +6,7 @@ export class TypeReference extends Type {
     Type.RegisterType({
       priority: 1,
       match: /^[a-zA-Z][a-zA-Z0-9_@$#:]*$/gm,
+      chainable: false,
       parse: (w) =>
         w
           .text("value")

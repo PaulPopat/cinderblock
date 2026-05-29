@@ -6,6 +6,7 @@ export class TypePrimitiveChar extends TypePrimitive {
     Type.RegisterType({
       priority: 150,
       match: /^char+$/gm,
+      chainable: false,
       parse: (w) =>
         w.expect("char").finish(({}, ctx) => new TypePrimitiveChar(ctx)),
     });

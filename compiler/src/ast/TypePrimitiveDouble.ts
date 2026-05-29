@@ -6,6 +6,7 @@ export class TypePrimitiveDouble extends TypePrimitive {
     Type.RegisterType({
       priority: 150,
       match: /^double+$/gm,
+      chainable: false,
       parse: (w) =>
         w.expect("double").finish(({}, ctx) => new TypePrimitiveDouble(ctx)),
     });

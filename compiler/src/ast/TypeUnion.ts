@@ -8,16 +8,17 @@ export class TypeUnion extends Type {
     Type.RegisterType({
       priority: 100,
       match: /^\|$/gm,
+      chainable: true,
       parse: (w, left) => {
         if (!left) throw new ParserError("Unexpected |", w.store);
         return w
           .expect("|")
-          .extract("right", (w) => Type.Parse(w, "|"))
+          .extract("right", (w) => Type.Parse(w))
           .finish(
             ({ right }, ctx) =>
               new TypeUnion(ctx, [
                 ...(left instanceof TypeUnion ? left.parts : [left]),
-                right,
+                ...(right instanceof TypeUnion ? right.parts : [right]),
               ]),
           );
       },

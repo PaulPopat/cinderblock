@@ -6,8 +6,9 @@ import { Type } from "./Type.ts";
 export class Arg extends Entry {
   static Parse(walker: TokenWalker) {
     return walker
-      .extract("type", (w) => Type.Parse(w))
       .text("name")
+      .expect(":")
+      .extract("type", (w) => Type.Parse(w))
       .finish(({ type, name }, ctx) => new Arg(ctx, type, name));
   }
 

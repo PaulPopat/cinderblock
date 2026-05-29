@@ -7,16 +7,17 @@ export class TypeIntersection extends Type {
     Type.RegisterType({
       priority: 100,
       match: /^\&$/gm,
+      chainable: true,
       parse: (w, left) => {
         if (!left) throw new ParserError("Unexpected &", w.store);
         return w
           .expect("&")
-          .extract("right", (w) => Type.Parse(w, "&"))
+          .extract("right", (w) => Type.Parse(w))
           .finish(
             ({ right }, ctx) =>
               new TypeIntersection(ctx, [
                 ...(left instanceof TypeIntersection ? left.parts : [left]),
-                right,
+                ...(right instanceof TypeIntersection ? right.parts : [right]),
               ]),
           );
       },

@@ -6,6 +6,7 @@ export class TypePrimitiveInt extends TypePrimitive {
     Type.RegisterType({
       priority: 150,
       match: /^int+$/gm,
+      chainable: false,
       parse: (w) =>
         w.expect("int").finish(({}, ctx) => new TypePrimitiveInt(ctx)),
     });

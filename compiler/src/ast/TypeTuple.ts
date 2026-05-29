@@ -7,6 +7,7 @@ export class TypeTuple extends Type {
     Type.RegisterType({
       priority: 100,
       match: /^\($/gm,
+      chainable: false,
       parse: (w) =>
         w
           .while("parts", (s) => s.data === "(" || s.data === ",", Arg.Parse)

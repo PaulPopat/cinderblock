@@ -6,6 +6,7 @@ export class TypePrimitiveFloat extends TypePrimitive {
     Type.RegisterType({
       priority: 150,
       match: /^float+$/gm,
+      chainable: false,
       parse: (w) =>
         w.expect("float").finish(({}, ctx) => new TypePrimitiveFloat(ctx)),
     });

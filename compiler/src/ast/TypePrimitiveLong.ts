@@ -6,6 +6,7 @@ export class TypePrimitiveLong extends TypePrimitive {
     Type.RegisterType({
       priority: 150,
       match: /^long+$/gm,
+      chainable: false,
       parse: (w) =>
         w.expect("long").finish(({}, ctx) => new TypePrimitiveLong(ctx)),
     });

@@ -6,6 +6,7 @@ import type { TokenWalker } from "./TokenWalker.ts";
 type TypeParseable = {
   priority: number;
   match: RegExp;
+  chainable: boolean;
   parse: (walker: TokenWalker, previous?: Type) => Extracted<Type>;
 };
 
@@ -18,11 +19,12 @@ export abstract class Type extends Entry {
     );
   }
 
-  static Parse(walker: TokenWalker, ending: string): Extracted<Type> {
+  static Parse(walker: TokenWalker): Extracted<Type> {
     return walker
       .reduce(
         "type",
-        (s) => s.data !== ending,
+        (s, p) =>
+          !p || this.#parsers.find((p) => s.data.match(p.match))?.chainable,
         (w, _, p): Extracted<Type> => {
           const match = this.#parsers.find((p) => w.store.data.match(p.match));
           if (!match) {
