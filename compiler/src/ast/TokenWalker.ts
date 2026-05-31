@@ -9,24 +9,27 @@ export class TokenWalker<
   TContext extends Record<never, never> = Record<never, never>,
 > {
   static start(store: TokenStore) {
-    return new TokenWalker({}, store, store.location, [[]]);
+    return new TokenWalker({}, store, store.location, [[]], undefined);
   }
 
   readonly #data: TContext;
   readonly #store: TokenStore;
   readonly #start: Location;
   readonly #entities: Array<Array<Entry>>;
+  readonly #namespace: string | undefined;
 
   private constructor(
     data: TContext,
     store: TokenStore,
     start: Location,
     entities: Array<Array<Entry>>,
+    namespace: string | undefined,
   ) {
     this.#data = data;
     this.#store = store;
     this.#start = start;
     this.#entities = entities;
+    this.#namespace = namespace;
   }
 
   get next() {
@@ -35,6 +38,7 @@ export class TokenWalker<
       this.#store.next,
       this.#start,
       this.#entities,
+      this.#namespace,
     );
   }
 
@@ -63,6 +67,7 @@ export class TokenWalker<
       this.#store.next,
       this.#start,
       this.#entities,
+      this.#namespace,
     );
   }
 
@@ -80,6 +85,7 @@ export class TokenWalker<
         this.#store,
         this.#store.location,
         mode === "entity" ? [[], ...this.#entities] : this.#entities,
+        this.#namespace,
       ),
     );
 
@@ -90,6 +96,7 @@ export class TokenWalker<
       mode === "entity"
         ? [[result, ...(this.#entities[0] ?? [])], ...this.#entities.slice(1)]
         : this.#entities,
+      this.#namespace,
     );
   }
 
@@ -103,7 +110,10 @@ export class TokenWalker<
     return extractor(this);
   }
 
-  text<TKey extends string>(name: TKey) {
+  text<TKey extends string>(
+    name: TKey,
+    mode: "namespace" | undefined = undefined,
+  ) {
     type NewContext = TContext & {
       [key in TKey]: string;
     };
@@ -115,6 +125,11 @@ export class TokenWalker<
       this.#store.next,
       this.#start,
       this.#entities,
+      mode === "namespace"
+        ? [this.#namespace, this.data]
+            .filter((n) => typeof n === "string")
+            .join(":")
+        : this.#namespace,
     );
   }
 
@@ -136,6 +151,7 @@ export class TokenWalker<
           newStore,
           newStore.location,
           mode === "entity" ? [[], result, ...this.#entities] : this.#entities,
+          this.#namespace,
         ),
         whileResult,
       );
@@ -153,6 +169,7 @@ export class TokenWalker<
             ...this.#entities.slice(1),
           ]
         : this.#entities,
+      this.#namespace,
     );
   }
 
@@ -172,7 +189,13 @@ export class TokenWalker<
 
     while ((whileResult = predicate(newStore, result))) {
       [result, newStore] = extractor(
-        new TokenWalker({}, newStore, newStore.location, this.#entities),
+        new TokenWalker(
+          {},
+          newStore,
+          newStore.location,
+          this.#entities,
+          this.#namespace,
+        ),
         whileResult,
         result,
       );
@@ -183,6 +206,7 @@ export class TokenWalker<
       newStore,
       this.#start,
       this.#entities,
+      this.#namespace,
     );
   }
 
@@ -194,6 +218,7 @@ export class TokenWalker<
         start: this.#start,
         end: this.#store.location,
         entities: this.#entities.flat(),
+        namespace: this.#namespace,
       }),
       this.#store,
     ];

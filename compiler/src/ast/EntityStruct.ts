@@ -19,18 +19,28 @@ export class EntityStruct extends Entity {
             (s) => Arg.Parse(s.next),
           )
           .expect(")")
-          .finish(({ args }, ctx) => new EntityStruct(ctx, args)),
+          .finish(({ name, args }, ctx) => new EntityStruct(ctx, name, args)),
     });
   }
 
+  readonly #name: string;
   readonly #args: Array<Arg>;
 
-  constructor(ctx: EntryContext, args: Array<Arg>) {
+  constructor(ctx: EntryContext, name: string, args: Array<Arg>) {
     super(ctx);
+    this.#name = name;
     this.#args = args;
+  }
+
+  get name() {
+    return this.#name;
   }
 
   get args() {
     return this.#args;
+  }
+
+  get fullName() {
+    return [this.ctx.namespace, this.#name].join(":");
   }
 }

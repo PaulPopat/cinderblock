@@ -1,3 +1,4 @@
+import { ContextManager } from "./ContextManager.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { Type } from "./Type.ts";
 
@@ -14,13 +15,19 @@ export class TypeReference extends Type {
     });
   }
   readonly #name: string;
+  readonly #manager: ContextManager;
 
   constructor(ctx: EntryContext, name: string) {
     super(ctx);
     this.#name = name;
+    this.#manager = new ContextManager(ctx);
   }
 
   get name() {
     return this.#name;
+  }
+
+  get struct() {
+    return this.#manager.resolveStruct(this.#name);
   }
 }

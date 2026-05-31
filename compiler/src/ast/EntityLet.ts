@@ -12,7 +12,7 @@ export class EntityLet extends Entity {
       parse: (w) =>
         w
           .expect("let")
-          .text("name")
+          .text("name", "namespace")
           .if(
             (s) => s.data === "(",
             (walker) =>
@@ -71,5 +71,9 @@ export class EntityLet extends Entity {
 
   get contents() {
     return this.#contents;
+  }
+
+  get fullName() {
+    return [this.ctx.namespace, this.#name].join(":");
   }
 }
