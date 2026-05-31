@@ -1,17 +1,16 @@
-let namespace:segment:start 10i;
+let namespace:segment:start 10;
 
 
-let namespace:segment:end 20i;
+let namespace:segment:end 20;
 
-let app:main (command: string)
-  use namespace
+let app:main (string command)
+  use namespace;
 
-  struct TestStruct (
-    first: int32,
-    second: string
-  )
+  struct TestStruct
+    int first
+    string second;
 
-  let test_func (subject: TestStruct, thing: float, second: int32): int32
+  let test_func (TestStruct subject, float thing, int second): int
     subject.second == "add"
       ? subject.first + second
       : subject.first - second;
@@ -22,5 +21,7 @@ let app:main (command: string)
 
   start -> curried;
 
-
-"add" -> app:main;
+let app:switch (instruction: string | int)
+  instruction ~
+    (string value) value,
+    (int _) "This is an int";

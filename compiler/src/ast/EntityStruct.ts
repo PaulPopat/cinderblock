@@ -12,13 +12,12 @@ export class EntityStruct extends Entity {
         e
           .expect("struct")
           .text("name")
-          .expect("(")
           .while(
             "args",
-            (s) => s.data === ",",
-            (s) => Arg.Parse(s.next),
+            (s) => s.data !== ";",
+            (s) => Arg.Parse(s),
           )
-          .expect(")")
+          .expect(";")
           .finish(({ name, args }, ctx) => new EntityStruct(ctx, name, args)),
     });
   }

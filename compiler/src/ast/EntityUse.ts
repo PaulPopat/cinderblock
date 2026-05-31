@@ -11,6 +11,7 @@ export class EntityUse extends Entity {
         e
           .expect("use")
           .text("namespace")
+          .expect(";")
           .finish(({ namespace }, ctx) => new EntityUse(ctx, namespace)),
     });
   }
