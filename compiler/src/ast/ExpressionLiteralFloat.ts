@@ -1,6 +1,7 @@
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
+import { TypePrimitiveFloat } from "./TypePrimitiveFloat.ts";
 
 export class ExpressionLiteralFloat extends ExpressionLiteral {
   static {
@@ -26,5 +27,9 @@ export class ExpressionLiteralFloat extends ExpressionLiteral {
 
   get value() {
     return this.#value;
+  }
+
+  get resolution() {
+    return new TypePrimitiveFloat(this.ctx);
   }
 }

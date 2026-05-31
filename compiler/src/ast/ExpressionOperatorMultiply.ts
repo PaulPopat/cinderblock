@@ -18,4 +18,8 @@ export class ExpressionOperatorMultiply extends ExpressionOperator {
       },
     });
   }
+
+  get resolution() {
+    return this.left.resolution;
+  }
 }

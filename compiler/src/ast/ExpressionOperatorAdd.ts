@@ -16,4 +16,8 @@ export class ExpressionOperatorAdd extends ExpressionOperator {
       },
     });
   }
+
+  get resolution() {
+    return this.left.resolution;
+  }
 }

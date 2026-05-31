@@ -18,4 +18,8 @@ export class ExpressionOperatorSubtract extends ExpressionOperator {
       },
     });
   }
+
+  get resolution() {
+    return this.left.resolution;
+  }
 }

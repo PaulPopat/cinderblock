@@ -1,6 +1,7 @@
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
+import { TypeUnion } from "./TypeUnion.ts";
 
 export class ExpressionTernary extends Expression {
   static {
@@ -48,5 +49,12 @@ export class ExpressionTernary extends Expression {
 
   get negative() {
     return this.#negative;
+  }
+
+  get resolution() {
+    return new TypeUnion(this.ctx, [
+      this.#positive.resolution,
+      this.#negative.resolution,
+    ]);
   }
 }

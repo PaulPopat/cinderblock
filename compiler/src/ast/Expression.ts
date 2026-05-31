@@ -3,6 +3,7 @@ import { Entry } from "./Entry.ts";
 import type { Extracted } from "./Extracted.ts";
 import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "./TokenWalker.ts";
+import type { Type } from "./Type.ts";
 
 type EntityParseable = {
   priority: number;
@@ -56,4 +57,6 @@ export abstract class Expression extends Entry {
       )
       .finish(({ expression }) => expression);
   }
+
+  abstract get resolution(): Type;
 }

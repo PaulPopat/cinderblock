@@ -18,4 +18,8 @@ export class ExpressionOperatorDivide extends ExpressionOperator {
       },
     });
   }
+
+  get resolution() {
+    return this.left.resolution;
+  }
 }

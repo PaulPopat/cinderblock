@@ -30,4 +30,8 @@ export class ExpressionReference extends Expression {
   get let() {
     return this.#manager.resolveLet(this.#name);
   }
+
+  get resolution() {
+    return this.let.type;
+  }
 }

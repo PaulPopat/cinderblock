@@ -1,6 +1,7 @@
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
+import { TypePrimitiveLong } from "./TypePrimitiveLong.ts";
 
 export class ExpressionLiteralLong extends ExpressionLiteral {
   static {
@@ -26,5 +27,9 @@ export class ExpressionLiteralLong extends ExpressionLiteral {
 
   get value() {
     return this.#value;
+  }
+
+  get resolution() {
+    return new TypePrimitiveLong(this.ctx);
   }
 }

@@ -3,6 +3,7 @@ import { Expression } from "./Expression.ts";
 import { Entity } from "./Entity.ts";
 import { Type } from "./Type.ts";
 import type { EntryContext } from "./EntryContext.ts";
+import { TypePipeable } from "./TypePipeable.ts";
 
 export class EntityLet extends Entity {
   static {
@@ -20,7 +21,7 @@ export class EntityLet extends Entity {
                 .expect("(")
                 .while(
                   "args",
-                  (s) => s.data === ",",
+                  (s) => s.data === "," || s.data === "(",
                   (s) => Arg.Parse(s.next),
                 )
                 .expect(")"),
@@ -75,5 +76,13 @@ export class EntityLet extends Entity {
 
   get fullName() {
     return [this.ctx.namespace, this.#name].join(":");
+  }
+
+  get type() {
+    const result = this.#returns ?? this.#contents.resolution;
+    if (this.#args.length)
+      return new TypePipeable(this.ctx, this.#args, result);
+
+    return result;
   }
 }

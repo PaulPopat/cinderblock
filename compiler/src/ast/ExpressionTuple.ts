@@ -1,6 +1,8 @@
+import { Arg } from "./Arg.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
+import { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionTuple extends Expression {
   static {
@@ -32,5 +34,12 @@ export class ExpressionTuple extends Expression {
 
   get parts() {
     return this.#parts;
+  }
+
+  get resolution() {
+    return new TypeTuple(
+      this.ctx,
+      this.#parts.map((p, i) => new Arg(this.ctx, p.resolution, "_" + i)),
+    );
   }
 }
