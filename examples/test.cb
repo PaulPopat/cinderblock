@@ -22,6 +22,7 @@ let app:main (string command)
   start -> curried;
 
 let app:switch (instruction: string | int)
-  instruction ~
-    (string value) value,
-    (int _) "This is an int";
+  let handle_string (string value) value;
+  let handle_int (int _) "This is an int";
+
+  instruction, handle_string, handle_int -> case;
