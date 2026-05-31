@@ -11,7 +11,7 @@ export class Tokeniser {
     /^[^\s\na-zA-Z0-9_@$#'"]+$/gm,
     /^"[^"]+"$/gm,
     /^'[^']'$/gm,
-    /^'\\[^']'$/gm,
+    /^'\\.'$/gm,
   ];
 
   constructor(file: string, text: string) {
