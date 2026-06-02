@@ -1,8 +1,10 @@
 import { ContextManager } from "./ContextManager.ts";
+import type { EntityStruct } from "./EntityStruct.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { Type } from "./Type.ts";
+import { TypeTuple } from "./TypeTuple.ts";
 
-export class TypeReference extends Type {
+export class TypeReference extends TypeTuple {
   static {
     Type.RegisterType({
       priority: 1,
@@ -15,12 +17,14 @@ export class TypeReference extends Type {
     });
   }
   readonly #name: string;
-  readonly #manager: ContextManager;
+  readonly #struct: EntityStruct;
 
   constructor(ctx: EntryContext, name: string) {
-    super(ctx);
+    const manager = new ContextManager(ctx);
+    const struct = manager.resolveStruct(name);
+    super(ctx, struct.args);
     this.#name = name;
-    this.#manager = new ContextManager(ctx);
+    this.#struct = struct;
   }
 
   get name() {
@@ -28,6 +32,6 @@ export class TypeReference extends Type {
   }
 
   get struct() {
-    return this.#manager.resolveStruct(this.#name);
+    return this.#struct;
   }
 }

@@ -1,4 +1,3 @@
-import type { Location } from "#utils";
 import type { EntryContext } from "./EntryContext.ts";
 
 export class Entry {
