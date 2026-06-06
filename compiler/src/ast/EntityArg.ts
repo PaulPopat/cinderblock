@@ -1,17 +1,20 @@
-import { Entry } from "./Entry.ts";
+import { Names } from "../utils/index.ts";
+import { Entity } from "./Entity.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { TokenWalker } from "./TokenWalker.ts";
 import { Type } from "./Type.ts";
+import { TypeArg } from "./TypeArg.ts";
 
-export class Arg extends Entry {
+export class EntityArg extends Entity {
   static Parse(walker: TokenWalker) {
     return walker
       .text("name")
       .expect(":")
       .extract("type", (w) => Type.Parse(w))
-      .finish(({ type, name }, ctx) => new Arg(ctx, type, name));
+      .finish(({ type, name }, ctx) => new EntityArg(ctx, type, name));
   }
 
+  readonly #id = Names.Next;
   readonly #type: Type;
   readonly #name: string;
 
@@ -21,11 +24,23 @@ export class Arg extends Entry {
     this.#name = name;
   }
 
+  get id() {
+    return this.#id;
+  }
+
   get type() {
     return this.#type;
   }
 
   get name() {
     return this.#name;
+  }
+
+  get fullName() {
+    return this.#name;
+  }
+
+  get typeArg() {
+    return new TypeArg(this.ctx, this.#type, this.#name);
   }
 }

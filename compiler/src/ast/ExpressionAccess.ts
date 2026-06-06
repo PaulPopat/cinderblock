@@ -1,4 +1,3 @@
-import { Arg } from "./Arg.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { LinkerError } from "./LinkerError.ts";
@@ -10,7 +9,7 @@ export class ExpressionAccess extends Expression {
     Expression.RegisterExpression({
       priority: 100,
       match: /^\.$/gm,
-      parse: (w, left) => {
+      parse: (w, _, left) => {
         if (!left) throw new ParserError("Unexpected .", w.store);
         return w
           .expect(".")

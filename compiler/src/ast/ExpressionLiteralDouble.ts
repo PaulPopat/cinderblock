@@ -7,7 +7,7 @@ export class ExpressionLiteralDouble extends ExpressionLiteral {
   static {
     Expression.RegisterExpression({
       priority: 150,
-      match: /^d[0-9]+\.[0-9]+$/gm,
+      match: /^[0-9]+\.[0-9]+d$/gm,
       parse: (w) =>
         w
           .text("value")

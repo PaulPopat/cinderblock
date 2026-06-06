@@ -1,4 +1,4 @@
-import { Arg } from "./Arg.ts";
+import { TypeArg } from "./TypeArg.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { Type } from "./Type.ts";
 
@@ -14,7 +14,7 @@ export class TypePipeable extends Type {
           .while(
             "args",
             (s) => s.data === "," || s.data === "(",
-            (s) => Arg.Parse(s.next),
+            (s) => TypeArg.Parse(s.next),
           )
           .expect(":")
           .extract("returns", (w) => Type.Parse(w))
@@ -24,10 +24,10 @@ export class TypePipeable extends Type {
     });
   }
 
-  readonly #args: Array<Arg>;
+  readonly #args: Array<TypeArg>;
   readonly #returns: Type;
 
-  constructor(ctx: EntryContext, args: Array<Arg>, returns: Type) {
+  constructor(ctx: EntryContext, args: Array<TypeArg>, returns: Type) {
     super(ctx);
     this.#args = args;
     this.#returns = returns;

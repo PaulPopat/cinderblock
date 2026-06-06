@@ -1,5 +1,4 @@
 import { ContextManager } from "./ContextManager.ts";
-import type { EntityStruct } from "./EntityStruct.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { Type } from "./Type.ts";
 import { TypeTuple } from "./TypeTuple.ts";
@@ -17,14 +16,12 @@ export class TypeReference extends TypeTuple {
     });
   }
   readonly #name: string;
-  readonly #struct: EntityStruct;
+  readonly #manager: ContextManager;
 
   constructor(ctx: EntryContext, name: string) {
-    const manager = new ContextManager(ctx);
-    const struct = manager.resolveStruct(name);
-    super(ctx, struct.args);
+    super(ctx, []);
     this.#name = name;
-    this.#struct = struct;
+    this.#manager = new ContextManager(ctx);
   }
 
   get name() {
@@ -32,6 +29,10 @@ export class TypeReference extends TypeTuple {
   }
 
   get struct() {
-    return this.#struct;
+    return this.#manager.resolveStruct(this.#name);
+  }
+
+  override get args() {
+    return this.struct.args;
   }
 }

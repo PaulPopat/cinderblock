@@ -7,7 +7,7 @@ export class ExpressionLiteralInt extends ExpressionLiteral {
   static {
     Expression.RegisterExpression({
       priority: 150,
-      match: /i?[0-9]+$/gm,
+      match: /[0-9]+i?$/gm,
       parse: (w) =>
         w
           .text("value")

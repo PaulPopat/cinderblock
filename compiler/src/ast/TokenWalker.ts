@@ -73,7 +73,7 @@ export class TokenWalker<
 
   extract<TKey extends string, TResult extends Entry>(
     name: TKey,
-    extractor: (walker: TokenWalker) => Extracted<TResult>,
+    extractor: (walker: TokenWalker, soFar: TContext) => Extracted<TResult>,
     mode: "part" | "entity" = "part",
   ) {
     type NewContext = TContext & {
@@ -87,6 +87,7 @@ export class TokenWalker<
         mode === "entity" ? [[], ...this.#entities] : this.#entities,
         this.#namespace,
       ),
+      this.#data,
     );
 
     return new TokenWalker<NewContext>(
@@ -173,6 +174,16 @@ export class TokenWalker<
     );
   }
 
+  withEntity(entity: Entry) {
+    return new TokenWalker<TContext>(
+      this.#data,
+      this.#store.next,
+      this.#start,
+      [...this.#entities, [entity]],
+      this.#namespace,
+    );
+  }
+
   reduce<TKey extends string, TResult extends Entry, TWhile>(
     name: TKey,
     predicate: (store: TokenStore, previous?: TResult) => TWhile,
@@ -213,14 +224,15 @@ export class TokenWalker<
   finish<TResult>(
     handler: (data: TContext, ctx: EntryContext) => TResult,
   ): Extracted<TResult> {
-    return [
-      handler(this.#data, {
-        start: this.#start,
-        end: this.#store.location,
-        entities: this.#entities.flat(),
-        namespace: this.#namespace,
-      }),
-      this.#store,
-    ];
+    return [handler(this.#data, this.entryContext), this.#store];
+  }
+
+  get entryContext() {
+    return {
+      start: this.#start,
+      end: this.#store.location,
+      entities: this.#entities.flat(),
+      namespace: this.#namespace,
+    };
   }
 }

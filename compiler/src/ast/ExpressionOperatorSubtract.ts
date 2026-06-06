@@ -7,11 +7,11 @@ export class ExpressionOperatorSubtract extends ExpressionOperator {
     Expression.RegisterExpression({
       priority: 100,
       match: /^-$/gm,
-      parse: (w, e) => {
+      parse: (w, lookFor, e) => {
         if (!e) throw new ParserError("Unexpected -", w.store);
         return w
           .expect("-")
-          .extract("right", Expression.Parse)
+          .extract("right", (w) => Expression.Parse(w, lookFor))
           .finish(
             ({ right }, ctx) => new ExpressionOperatorSubtract(ctx, e, right),
           );

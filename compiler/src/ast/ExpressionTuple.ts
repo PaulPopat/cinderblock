@@ -1,4 +1,4 @@
-import { Arg } from "./Arg.ts";
+import { TypeArg } from "./TypeArg.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
@@ -9,11 +9,11 @@ export class ExpressionTuple extends Expression {
     Expression.RegisterExpression({
       priority: 100,
       match: /^,$/gm,
-      parse: (w, left) => {
+      parse: (w, lookFor, left) => {
         if (!left) throw new ParserError("Unexpected ,", w.store);
         return w
           .expect("->")
-          .extract("right", Expression.Parse)
+          .extract("right", (w) => Expression.Parse(w, lookFor))
           .finish(
             ({ right }, ctx) =>
               new ExpressionTuple(ctx, [
@@ -39,7 +39,7 @@ export class ExpressionTuple extends Expression {
   get resolution() {
     return new TypeTuple(
       this.ctx,
-      this.#parts.map((p, i) => new Arg(this.ctx, p.resolution, "_" + i)),
+      this.#parts.map((p, i) => new TypeArg(this.ctx, p.resolution, "_" + i)),
     );
   }
 }

@@ -1,4 +1,4 @@
-import { Arg } from "./Arg.ts";
+import { TypeArg } from "./TypeArg.ts";
 import { Entity } from "./Entity.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
@@ -15,7 +15,7 @@ export class EntityStruct extends Entity {
           .while(
             "args",
             (s) => s.data !== ";",
-            (s) => Arg.Parse(s),
+            (s) => TypeArg.Parse(s),
           )
           .expect(";")
           .finish(({ name, args }, ctx) => new EntityStruct(ctx, name, args)),
@@ -23,9 +23,9 @@ export class EntityStruct extends Entity {
   }
 
   readonly #name: string;
-  readonly #args: Array<Arg>;
+  readonly #args: Array<TypeArg>;
 
-  constructor(ctx: EntryContext, name: string, args: Array<Arg>) {
+  constructor(ctx: EntryContext, name: string, args: Array<TypeArg>) {
     super(ctx);
     this.#name = name;
     this.#args = args;

@@ -27,11 +27,11 @@ export class ExpressionReference extends Expression {
     return this.#name;
   }
 
-  get let() {
-    return this.#manager.resolveLet(this.#name);
+  get subject() {
+    return this.#manager.resolveConcrete(this.#name);
   }
 
   get resolution() {
-    return this.let.type;
+    return this.subject.type;
   }
 }

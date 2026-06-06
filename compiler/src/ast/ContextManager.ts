@@ -1,3 +1,4 @@
+import { EntityArg } from "./EntityArg.ts";
 import { EntityLet } from "./EntityLet.ts";
 import { EntityStruct } from "./EntityStruct.ts";
 import { EntityUse } from "./EntityUse.ts";
@@ -32,8 +33,9 @@ export class ContextManager {
     return result;
   }
 
-  resolveLet(name: string) {
+  resolveConcrete(name: string) {
     const possible = [
+      name,
       [this.#ctx.namespace, name].join(":"),
       ...this.#ctx.entities
         .filter((e) => e instanceof EntityUse)
@@ -41,14 +43,14 @@ export class ContextManager {
     ];
 
     const found = this.#ctx.entities
-      .filter((e) => e instanceof EntityLet)
+      .filter((e) => e instanceof EntityLet || e instanceof EntityArg)
       .filter((s) => possible.includes(s.fullName));
 
     if (found.length > 1)
-      throw new LinkerError("Ambigious let reference", this.#ctx.start);
+      throw new LinkerError("Ambigious reference", this.#ctx.start);
 
     const [result] = found;
-    if (!result) throw new LinkerError("Let not found", this.#ctx.start);
+    if (!result) throw new LinkerError("Reference not found", this.#ctx.start);
 
     return result;
   }

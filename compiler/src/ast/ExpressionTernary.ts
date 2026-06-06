@@ -8,13 +8,13 @@ export class ExpressionTernary extends Expression {
     Expression.RegisterExpression({
       priority: 1,
       match: /^\?$/gm,
-      parse: (w, predicate) => {
+      parse: (w, lookFor, predicate) => {
         if (!predicate) throw new ParserError("Unexpected ?", w.store);
         return w
           .expect("?")
-          .extract("positive", Expression.Parse)
+          .extract("positive", (w) => Expression.Parse(w, ":"))
           .expect(":")
-          .extract("negative", Expression.Parse)
+          .extract("negative", (w) => Expression.Parse(w, lookFor))
           .finish(
             ({ positive, negative }, ctx) =>
               new ExpressionTernary(ctx, predicate, positive, negative),

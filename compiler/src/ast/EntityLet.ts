@@ -1,9 +1,10 @@
-import { Arg } from "./Arg.ts";
+import { EntityArg } from "./EntityArg.ts";
 import { Expression } from "./Expression.ts";
 import { Entity } from "./Entity.ts";
 import { Type } from "./Type.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { TypePipeable } from "./TypePipeable.ts";
+import { Names } from "../utils/index.ts";
 
 export class EntityLet extends Entity {
   static {
@@ -22,7 +23,8 @@ export class EntityLet extends Entity {
                 .while(
                   "args",
                   (s) => s.data === "," || s.data === "(",
-                  (s) => Arg.Parse(s.next),
+                  (s) => EntityArg.Parse(s.next),
+                  "entity",
                 )
                 .expect(")"),
           )
@@ -39,15 +41,16 @@ export class EntityLet extends Entity {
     });
   }
 
+  readonly #id = Names.Next;
   readonly #name: string;
-  readonly #args: Array<Arg>;
+  readonly #args: Array<EntityArg>;
   readonly #returns: Type | undefined;
   readonly #contents: Expression;
 
   constructor(
     ctx: EntryContext,
     name: string,
-    args: Array<Arg>,
+    args: Array<EntityArg>,
     returns: Type | undefined,
     contents: Expression,
   ) {
@@ -56,6 +59,10 @@ export class EntityLet extends Entity {
     this.#args = args;
     this.#returns = returns;
     this.#contents = contents;
+  }
+
+  get id() {
+    return this.#id;
   }
 
   get name() {
@@ -81,7 +88,11 @@ export class EntityLet extends Entity {
   get type() {
     const result = this.#returns ?? this.#contents.resolution;
     if (this.#args.length)
-      return new TypePipeable(this.ctx, this.#args, result);
+      return new TypePipeable(
+        this.ctx,
+        this.#args.map((a) => a.typeArg),
+        result,
+      );
 
     return result;
   }

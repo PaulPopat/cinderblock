@@ -14,7 +14,11 @@ type EntityParseable = {
 type ExpressionParseable = {
   priority: number;
   match: RegExp;
-  parse: (walker: TokenWalker, existing?: Expression) => Extracted<Expression>;
+  parse: (
+    walker: TokenWalker,
+    lookFor: string,
+    existing?: Expression,
+  ) => Extracted<Expression>;
 };
 
 export abstract class Expression extends Entry {
@@ -33,7 +37,10 @@ export abstract class Expression extends Entry {
     );
   }
 
-  static Parse(walker: TokenWalker): Extracted<Expression> {
+  static Parse(
+    walker: TokenWalker,
+    lookFor: string = ";",
+  ): Extracted<Expression> {
     return walker
       .while(
         "entities",
@@ -43,7 +50,7 @@ export abstract class Expression extends Entry {
       )
       .reduce(
         "expression",
-        (s) => s.data !== ";",
+        (s) => s.data !== lookFor,
         (w, _, p): Extracted<Expression> => {
           const match = this.#expressionParsers.find((p) =>
             w.store.data.match(p.match),
@@ -52,7 +59,7 @@ export abstract class Expression extends Entry {
             throw new ParserError(`Unexpected symbol of ${w.data}`, w.store);
           }
 
-          return match.parse(w, p);
+          return match.parse(w, lookFor, p);
         },
       )
       .finish(({ expression }) => expression);
