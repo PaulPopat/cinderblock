@@ -5,18 +5,18 @@ import { LinkerError } from "./LinkerError.ts";
 import { ParserError } from "./ParserError.ts";
 import { TypeArray } from "./TypeArray.ts";
 
-export class ExpressionFind extends Expression {
+export class ExpressionArrayMap extends Expression {
   static {
     Expression.RegisterExpression({
       priority: 100,
-      match: /^\|!$/gm,
+      match: /^\|>$/gm,
       parse: (w, lookFor, e) => {
-        if (!e) throw new ParserError("Unexpected |!", w.store);
+        if (!e) throw new ParserError("Unexpected |>", w.store);
         const argType = e.resolution;
         if (!(argType instanceof TypeArray))
-          throw new LinkerError("May only find in arrays", w.location);
+          throw new LinkerError("May only map arrays", w.location);
         return w
-          .expect("|!")
+          .expect("|>")
           .extract("as", (w, {}) =>
             w
               .text("name")
@@ -26,7 +26,8 @@ export class ExpressionFind extends Expression {
             Expression.Parse(w.withEntity(as), lookFor),
           )
           .finish(
-            ({ as, routine }, ctx) => new ExpressionFind(ctx, e, as, routine),
+            ({ as, routine }, ctx) =>
+              new ExpressionArrayMap(ctx, e, as, routine),
           );
       },
     });
@@ -61,6 +62,6 @@ export class ExpressionFind extends Expression {
   }
 
   get resolution() {
-    return this.#as.type;
+    return new TypeArray(this.ctx, this.#routine.resolution);
   }
 }

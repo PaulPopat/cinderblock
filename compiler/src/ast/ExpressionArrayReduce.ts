@@ -5,9 +5,8 @@ import { ExpressionTuple } from "./ExpressionTuple.ts";
 import { LinkerError } from "./LinkerError.ts";
 import { ParserError } from "./ParserError.ts";
 import { TypeArray } from "./TypeArray.ts";
-import { TypeTuple } from "./TypeTuple.ts";
 
-export class ExpressionReduce extends Expression {
+export class ExpressionArrayReduce extends Expression {
   static {
     Expression.RegisterExpression({
       priority: 100,
@@ -50,7 +49,14 @@ export class ExpressionReduce extends Expression {
           )
           .finish(
             ({ as, current, routine }, ctx) =>
-              new ExpressionReduce(ctx, subject, initial, as, current, routine),
+              new ExpressionArrayReduce(
+                ctx,
+                subject,
+                initial,
+                as,
+                current,
+                routine,
+              ),
           );
       },
     });

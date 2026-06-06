@@ -5,18 +5,18 @@ import { LinkerError } from "./LinkerError.ts";
 import { ParserError } from "./ParserError.ts";
 import { TypeArray } from "./TypeArray.ts";
 
-export class ExpressionMap extends Expression {
+export class ExpressionArrayFilter extends Expression {
   static {
     Expression.RegisterExpression({
       priority: 100,
-      match: /^\|>$/gm,
+      match: /^\|~$/gm,
       parse: (w, lookFor, e) => {
-        if (!e) throw new ParserError("Unexpected |>", w.store);
+        if (!e) throw new ParserError("Unexpected |~", w.store);
         const argType = e.resolution;
         if (!(argType instanceof TypeArray))
-          throw new LinkerError("May only map arrays", w.location);
+          throw new LinkerError("May only filter arrays", w.location);
         return w
-          .expect("|>")
+          .expect("|~")
           .extract("as", (w, {}) =>
             w
               .text("name")
@@ -26,7 +26,7 @@ export class ExpressionMap extends Expression {
             Expression.Parse(w.withEntity(as), lookFor),
           )
           .finish(
-            ({ as, routine }, ctx) => new ExpressionMap(ctx, e, as, routine),
+            ({ as, routine }, ctx) => new ExpressionArrayFilter(ctx, e, as, routine),
           );
       },
     });
