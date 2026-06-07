@@ -39,6 +39,7 @@ export * from "./ExpressionOperatorSubtract.ts";
 export * from "./ExpressionReference.ts";
 export * from "./ExpressionTernary.ts";
 export * from "./ExpressionTuple.ts";
+export * from "./ExpressionTuplePart.ts";
 export * from "./Extracted.ts";
 export * from "./ParserError.ts";
 export * from "./TokenWalker.ts";

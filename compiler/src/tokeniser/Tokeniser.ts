@@ -61,6 +61,6 @@ export class Tokeniser {
 
     finish(lines.length, 0);
 
-    return TokenStore.start(result);
+    return result;
   }
 }

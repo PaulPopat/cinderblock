@@ -14,7 +14,6 @@ export class EntityArg extends Entity {
       .finish(({ type, name }, ctx) => new EntityArg(ctx, type, name));
   }
 
-  readonly #id = Names.Next;
   readonly #type: Type;
   readonly #name: string;
 
@@ -24,8 +23,8 @@ export class EntityArg extends Entity {
     this.#name = name;
   }
 
-  get id() {
-    return this.#id;
+  override get id() {
+    return Names.PropertyName(this.#name);
   }
 
   get type() {

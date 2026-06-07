@@ -41,7 +41,6 @@ export class EntityLet extends Entity {
     });
   }
 
-  readonly #id = Names.Next;
   readonly #name: string;
   readonly #args: Array<EntityArg>;
   readonly #returns: Type | undefined;
@@ -59,10 +58,6 @@ export class EntityLet extends Entity {
     this.#args = args;
     this.#returns = returns;
     this.#contents = contents;
-  }
-
-  get id() {
-    return this.#id;
   }
 
   get name() {

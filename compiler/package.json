@@ -14,6 +14,7 @@
   "imports": {
     "#ast": "./src/ast/index.ts",
     "#tokeniser": "./src/tokeniser/index.ts",
+    "#intermediary": "./src/intermediary/index.ts",
     "#utils": "./src/utils/index.ts"
   }
 }

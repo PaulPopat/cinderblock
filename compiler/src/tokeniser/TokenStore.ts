@@ -38,4 +38,8 @@ export class TokenStore {
   get raw() {
     return this.#tokens;
   }
+
+  with(tokens: Array<Token>) {
+    return new TokenStore([...this.#tokens, ...tokens], this.#index);
+  }
 }

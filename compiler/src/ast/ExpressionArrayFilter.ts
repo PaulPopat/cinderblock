@@ -26,7 +26,8 @@ export class ExpressionArrayFilter extends Expression {
             Expression.Parse(w.withEntity(as), lookFor),
           )
           .finish(
-            ({ as, routine }, ctx) => new ExpressionArrayFilter(ctx, e, as, routine),
+            ({ as, routine }, ctx) =>
+              new ExpressionArrayFilter(ctx, e, as, routine),
           );
       },
     });

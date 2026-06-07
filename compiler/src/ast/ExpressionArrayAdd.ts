@@ -1,8 +1,6 @@
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
-import { LinkerError } from "./LinkerError.ts";
 import { ParserError } from "./ParserError.ts";
-import { TypeArray } from "./TypeArray.ts";
 
 export class ExpressionArrayAdd extends Expression {
   static {
@@ -11,9 +9,6 @@ export class ExpressionArrayAdd extends Expression {
       match: /^\+\+$/gm,
       parse: (w, lookFor, e) => {
         if (!e) throw new ParserError("Unexpected ++", w.store);
-        const argType = e.resolution;
-        if (!(argType instanceof TypeArray))
-          throw new LinkerError("May only add to arrays", w.location);
 
         return w
           .expect("++")
