@@ -1,4 +1,3 @@
-import { Names } from "../utils/index.ts";
 import { Entity } from "./Entity.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { TokenWalker } from "./TokenWalker.ts";
@@ -21,10 +20,6 @@ export class EntityArg extends Entity {
     super(ctx);
     this.#type = type;
     this.#name = name;
-  }
-
-  override get id() {
-    return Names.PropertyName(this.#name);
   }
 
   get type() {

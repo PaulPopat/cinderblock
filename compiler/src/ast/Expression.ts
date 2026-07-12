@@ -1,3 +1,5 @@
+import type { Binary, Instruction } from "#binary";
+import { Names } from "#utils";
 import type { Entity } from "./Entity.ts";
 import { Entry } from "./Entry.ts";
 import type { Extracted } from "./Extracted.ts";
@@ -14,11 +16,7 @@ type EntityParseable = {
 type ExpressionParseable = {
   priority: number;
   match: RegExp;
-  parse: (
-    walker: TokenWalker,
-    lookFor: string,
-    existing?: Expression,
-  ) => Extracted<Expression>;
+  parse: (walker: TokenWalker, lookFor: string | Array<string>, existing?: Expression) => Extracted<Expression>;
 };
 
 export abstract class Expression extends Entry {
@@ -26,21 +24,15 @@ export abstract class Expression extends Entry {
   static #expressionParsers: Array<ExpressionParseable> = [];
 
   static RegisterEntity(entry: EntityParseable) {
-    this.#entityParsers = [...this.#entityParsers, entry].sort(
-      (a, b) => b.priority - a.priority,
-    );
+    this.#entityParsers = [...this.#entityParsers, entry].sort((a, b) => b.priority - a.priority);
   }
 
   static RegisterExpression(entry: ExpressionParseable) {
-    this.#expressionParsers = [...this.#expressionParsers, entry].sort(
-      (a, b) => b.priority - a.priority,
-    );
+    this.#expressionParsers = [...this.#expressionParsers, entry].sort((a, b) => b.priority - a.priority);
   }
 
-  static Parse(
-    walker: TokenWalker,
-    lookFor: string = ";",
-  ): Extracted<Expression> {
+  static Parse(walker: TokenWalker, lookFor: string | Array<string> = ";"): Extracted<Expression> {
+    if (typeof lookFor === "string") lookFor = [lookFor];
     return walker
       .while(
         "entities",
@@ -50,11 +42,9 @@ export abstract class Expression extends Entry {
       )
       .reduce(
         "expression",
-        (s) => s.data !== lookFor,
+        (s) => !lookFor.includes(s.data),
         (w, _, p): Extracted<Expression> => {
-          const match = this.#expressionParsers.find((p) =>
-            w.store.data.match(p.match),
-          );
+          const match = this.#expressionParsers.find((p) => w.store.data.match(p.match));
           if (!match) {
             throw new ParserError(`Unexpected symbol of ${w.data}`, w.store);
           }
@@ -66,4 +56,6 @@ export abstract class Expression extends Entry {
   }
 
   abstract get resolution(): Type;
+
+  abstract instructions(binary: Binary): Binary;
 }

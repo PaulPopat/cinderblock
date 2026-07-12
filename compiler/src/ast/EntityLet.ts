@@ -4,7 +4,6 @@ import { Entity } from "./Entity.ts";
 import { Type } from "./Type.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { TypePipeable } from "./TypePipeable.ts";
-import { Names } from "../utils/index.ts";
 
 export class EntityLet extends Entity {
   static {

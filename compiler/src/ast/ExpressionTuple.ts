@@ -46,6 +46,10 @@ export class ExpressionTuple extends Expression {
     return this.#parts;
   }
 
+  partOf(name: string) {
+    return this.#parts.find((p) => p.name === name);
+  }
+
   get resolution() {
     return new TypeTuple(
       this.ctx,

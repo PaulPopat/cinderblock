@@ -14,14 +14,8 @@ let app:main (string command)
       ? subject.first + second
       : subject.first - second;
 
-  let start segment:start, command;
+  let start first = segment:start, second = command;
 
-  let curried segment:end <- test_func;
+  let curried second = segment:end -> test_func;
 
-  start -> curried;
-
-let app:switch (instruction: string | int)
-  let handle_string (string value) value;
-  let handle_int (int _) "This is an int";
-
-  instruction, handle_string, handle_int -> case;
+  subject = start, thing = 20.0f -> curried;

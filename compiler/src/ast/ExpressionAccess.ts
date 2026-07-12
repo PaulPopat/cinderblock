@@ -1,3 +1,5 @@
+import { Binary, Instructions } from "#binary";
+import { Names } from "#utils";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { LinkerError } from "./LinkerError.ts";
@@ -38,14 +40,16 @@ export class ExpressionAccess extends Expression {
 
   get resolution() {
     const subjectType = this.#subject.resolution;
-    if (!(subjectType instanceof TypeTuple))
-      throw new LinkerError("Subject is not accessible", this.ctx.start);
+    if (!(subjectType instanceof TypeTuple)) throw new LinkerError("Subject is not accessible", this.ctx.start);
 
     const property = subjectType.args.find((a) => a.name === this.#name);
 
-    if (!property)
-      throw new LinkerError("Could not find property", this.ctx.start);
+    if (!property) throw new LinkerError("Could not find property", this.ctx.start);
 
     return property.type;
+  }
+
+  instructions(binary: Binary) {
+    return binary.including((b) => this.#subject.instructions(b)).with(Instructions["."](Names.PropertyName(this.#name)));
   }
 }

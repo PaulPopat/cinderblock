@@ -1,3 +1,4 @@
+import { Instructions } from "#binary";
 import { Expression } from "./Expression.ts";
 import { ExpressionOperator } from "./ExpressionOperator.ts";
 import { ParserError } from "./ParserError.ts";
@@ -12,14 +13,16 @@ export class ExpressionOperatorNotEquals extends ExpressionOperator {
         return w
           .expect("!=")
           .extract("right", (w) => Expression.Parse(w, lookFor))
-          .finish(
-            ({ right }, ctx) => new ExpressionOperatorNotEquals(ctx, e, right),
-          );
+          .finish(({ right }, ctx) => new ExpressionOperatorNotEquals(ctx, e, right));
       },
     });
   }
 
   get resolution() {
     return this.left.resolution;
+  }
+
+  get instructions() {
+    return [...this.left.instructions, ...this.right.instructions, Instructions["!="](this.left.id, this.right.id, this.id)];
   }
 }

@@ -1,3 +1,4 @@
+import { Instructions, Serialise } from "#binary";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
@@ -8,16 +9,7 @@ export class ExpressionLiteralString extends ExpressionLiteral {
     Expression.RegisterExpression({
       priority: 150,
       match: /^"([^"]|\\.)+"$/gm,
-      parse: (w) =>
-        w
-          .text("value")
-          .finish(
-            ({ value }, ctx) =>
-              new ExpressionLiteralString(
-                ctx,
-                value.slice(1, value.length - 1),
-              ),
-          ),
+      parse: (w) => w.text("value").finish(({ value }, ctx) => new ExpressionLiteralString(ctx, value.slice(1, value.length - 1))),
     });
   }
 
@@ -34,5 +26,9 @@ export class ExpressionLiteralString extends ExpressionLiteral {
 
   get resolution() {
     return new TypePrimitiveString(this.ctx);
+  }
+
+  get instructions() {
+    return [Instructions.PrimitiveString(this.id, Serialise.String(this.#value))];
   }
 }

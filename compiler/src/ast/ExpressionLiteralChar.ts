@@ -1,3 +1,4 @@
+import { Binary, Instructions, Serialise } from "#binary";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
@@ -8,13 +9,7 @@ export class ExpressionLiteralChar extends ExpressionLiteral {
     Expression.RegisterExpression({
       priority: 150,
       match: /^'([^']|\\.)'$/gm,
-      parse: (w) =>
-        w
-          .text("value")
-          .finish(
-            ({ value }, ctx) =>
-              new ExpressionLiteralChar(ctx, value.slice(1, value.length - 1)),
-          ),
+      parse: (w) => w.text("value").finish(({ value }, ctx) => new ExpressionLiteralChar(ctx, value.slice(1, value.length - 1))),
     });
   }
 
@@ -31,5 +26,9 @@ export class ExpressionLiteralChar extends ExpressionLiteral {
 
   get resolution() {
     return new TypePrimitiveChar(this.ctx);
+  }
+
+  instructions(binary: Binary) {
+    return binary.with(Instructions.Bool(Serialise.Char(this.#value)));
   }
 }

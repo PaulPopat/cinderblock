@@ -14,7 +14,10 @@
   "imports": {
     "#ast": "./src/ast/index.ts",
     "#tokeniser": "./src/tokeniser/index.ts",
-    "#intermediary": "./src/intermediary/index.ts",
+    "#binary": "./src/binary/index.ts",
     "#utils": "./src/utils/index.ts"
+  },
+  "prettier": {
+    "printWidth": 150
   }
 }

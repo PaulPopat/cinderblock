@@ -1,3 +1,4 @@
+import { Instructions } from "#binary";
 import { Expression } from "./Expression.ts";
 import { ExpressionOperator } from "./ExpressionOperator.ts";
 import { ParserError } from "./ParserError.ts";
@@ -19,5 +20,9 @@ export class ExpressionOperatorAdd extends ExpressionOperator {
 
   get resolution() {
     return this.left.resolution;
+  }
+
+  get instructions() {
+    return [...this.left.instructions, ...this.right.instructions, Instructions["+"](this.left.id, this.right.id, this.id)];
   }
 }

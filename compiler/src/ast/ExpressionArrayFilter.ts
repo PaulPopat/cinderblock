@@ -1,9 +1,11 @@
-import { EntityArg } from "./EntityArg.ts";
+import { Binary, Instructions } from "#binary";
+import { Names } from "#utils";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { LinkerError } from "./LinkerError.ts";
 import { ParserError } from "./ParserError.ts";
 import { TypeArray } from "./TypeArray.ts";
+import { TypePipeable } from "./TypePipeable.ts";
 
 export class ExpressionArrayFilter extends Expression {
   static {
@@ -13,39 +15,21 @@ export class ExpressionArrayFilter extends Expression {
       parse: (w, lookFor, e) => {
         if (!e) throw new ParserError("Unexpected |~", w.store);
         const argType = e.resolution;
-        if (!(argType instanceof TypeArray))
-          throw new LinkerError("May only filter arrays", w.location);
+        if (!(argType instanceof TypeArray)) throw new LinkerError("May only filter arrays", w.location);
         return w
           .expect("|~")
-          .extract("as", (w, {}) =>
-            w
-              .text("name")
-              .finish(({ name }, ctx) => new EntityArg(ctx, argType, name)),
-          )
-          .extract("routine", (w, { as }) =>
-            Expression.Parse(w.withEntity(as), lookFor),
-          )
-          .finish(
-            ({ as, routine }, ctx) =>
-              new ExpressionArrayFilter(ctx, e, as, routine),
-          );
+          .extract("routine", (w) => Expression.Parse(w, lookFor))
+          .finish(({ routine }, ctx) => new ExpressionArrayFilter(ctx, e, routine));
       },
     });
   }
 
   readonly #subject: Expression;
-  readonly #as: EntityArg;
   readonly #routine: Expression;
 
-  constructor(
-    ctx: EntryContext,
-    subject: Expression,
-    as: EntityArg,
-    routine: Expression,
-  ) {
+  constructor(ctx: EntryContext, subject: Expression, routine: Expression) {
     super(ctx);
     this.#subject = subject;
-    this.#as = as;
     this.#routine = routine;
   }
 
@@ -53,15 +37,35 @@ export class ExpressionArrayFilter extends Expression {
     return this.#subject;
   }
 
-  get as() {
-    return this.#as;
-  }
-
   get routine() {
     return this.#routine;
   }
 
   get resolution() {
-    return new TypeArray(this.ctx, this.#routine.resolution);
+    const subjectType = this.#subject.resolution;
+    if (!(subjectType instanceof TypeArray)) throw new LinkerError("Array expected", this.ctx.start);
+
+    const routineType = this.#routine.resolution;
+    if (!(routineType instanceof TypePipeable)) throw new LinkerError("Expected a pipeable", this.ctx.start);
+
+    return new TypeArray(this.ctx, subjectType);
+  }
+
+  instructions(binary: Binary) {
+    let starter = Binary.Start;
+    const matchGoTo = Instructions["++"]();
+    starter = starter.prefixed(matchGoTo, Instructions.Return());
+    const failGoTo = Instructions.Return();
+    starter = starter.prefixed(failGoTo);
+
+    const forEachGoTo = Instructions.CreateTuple();
+    starter = starter.with(forEachGoTo, Instructions.AssignKey(Names.PropertyName("item")));
+    starter = starter.including((b) => this.#routine.instructions(b));
+    starter = starter.with(Instructions["->"](), Instructions["?:"](matchGoTo, failGoTo), Instructions.Return());
+
+    return binary
+      .including((b) => this.#subject.instructions(b))
+      .with(Instructions.ForEach(forEachGoTo))
+      .concat(starter);
   }
 }

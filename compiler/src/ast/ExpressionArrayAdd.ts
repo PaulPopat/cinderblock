@@ -1,3 +1,4 @@
+import { Binary, Instructions } from "#binary";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
@@ -13,9 +14,7 @@ export class ExpressionArrayAdd extends Expression {
         return w
           .expect("++")
           .extract("addition", (w) => Expression.Parse(w, lookFor))
-          .finish(
-            ({ addition }, ctx) => new ExpressionArrayAdd(ctx, e, addition),
-          );
+          .finish(({ addition }, ctx) => new ExpressionArrayAdd(ctx, e, addition));
       },
     });
   }
@@ -39,5 +38,12 @@ export class ExpressionArrayAdd extends Expression {
 
   get resolution() {
     return this.#subject.resolution;
+  }
+
+  instructions(binary: Binary) {
+    return binary
+      .including((b) => this.#subject.instructions(b))
+      .including((b) => this.#addition.instructions(b))
+      .with(Instructions["++"]());
   }
 }
