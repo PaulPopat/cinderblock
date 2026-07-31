@@ -1,10 +1,7 @@
-import { Instructions, Serialise } from "#binary";
-import { Names } from "#utils";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { LinkerError } from "./LinkerError.ts";
 import { ParserError } from "./ParserError.ts";
-import { Type } from "./Type.ts";
 import { TypePipeable } from "./TypePipeable.ts";
 import { TypeUnion } from "./TypeUnion.ts";
 
@@ -56,28 +53,5 @@ export class ExpressionMap extends Expression {
         return type.returns;
       }),
     );
-  }
-
-  get instructions() {
-    this.resolution;
-    const closureName = this.id;
-    const subject = this.#subject.instructions;
-    const positive = [
-      Instructions.AddToClosure(closureName, Names.PropertyName(this.#expected.fullName), this.#subject.id),
-      Instructions.EnterClosure(closureName),
-      ...this.#positive.instructions,
-      Instructions.ExitClosure(this.#positive.id),
-    ];
-    const negative = [Instructions.EnterClosure(this.id), ...this.#negative.instructions, Instructions.ExitClosure(this.#negative.id)];
-
-    return [
-      ...subject,
-      Instructions.Is(this.#subject.id, Serialise.Type(this.#expected), this.id),
-      Instructions.DeclareClosure(closureName),
-      ...positive,
-      ...negative,
-      Instructions.EndClosure(closureName),
-      Instructions.If(this.id, positive[0]!, negative[0]!),
-    ];
   }
 }

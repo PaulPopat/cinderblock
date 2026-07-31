@@ -1,5 +1,3 @@
-import { Binary, Instructions } from "#binary";
-import { Names } from "#utils";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { LinkerError } from "./LinkerError.ts";
@@ -47,9 +45,5 @@ export class ExpressionAccess extends Expression {
     if (!property) throw new LinkerError("Could not find property", this.ctx.start);
 
     return property.type;
-  }
-
-  instructions(binary: Binary) {
-    return binary.including((b) => this.#subject.instructions(b)).with(Instructions["."](Names.PropertyName(this.#name)));
   }
 }

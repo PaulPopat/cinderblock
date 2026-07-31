@@ -1,5 +1,3 @@
-import { Binary, Instruction, Instructions } from "#binary";
-import { Names } from "#utils";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { LinkerError } from "./LinkerError.ts";
@@ -49,24 +47,5 @@ export class ExpressionArrayFind extends Expression {
     if (!(routineType instanceof TypePipeable)) throw new LinkerError("Expected a pipeable", this.ctx.start);
 
     return subjectType.contains;
-  }
-
-  instructions(binary: Binary) {
-    let starter = Binary.Start;
-    const matchGoTo = Instructions.Return();
-    starter = starter.prefixed(matchGoTo);
-    const failGoTo = Instructions.Pop();
-    starter = starter.prefixed(failGoTo, Instructions.Return());
-
-    const forEachGoTo = Instructions.CreateTuple();
-    starter = starter.with(forEachGoTo, Instructions.AssignKey(Names.PropertyName("item")));
-    starter = starter.including((b) => this.#routine.instructions(b));
-    starter = starter.with(Instructions["->"](), Instructions["?:"](matchGoTo, failGoTo), Instructions.Return());
-
-    return binary
-      .with(Instructions.Empty())
-      .including((b) => this.#subject.instructions(b))
-      .with(Instructions.ForEach(forEachGoTo))
-      .concat(starter);
   }
 }

@@ -1,4 +1,3 @@
-import { Instructions, Serialise } from "#binary";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
@@ -26,9 +25,5 @@ export class ExpressionLiteralLong extends ExpressionLiteral {
 
   get resolution() {
     return new TypePrimitiveLong(this.ctx);
-  }
-
-  get instructions() {
-    return [Instructions.PrimitiveLong(this.id, Serialise.Long(this.#value))];
   }
 }

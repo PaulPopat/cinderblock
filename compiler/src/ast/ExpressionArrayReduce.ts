@@ -1,4 +1,3 @@
-import { Binary, Instructions } from "#binary";
 import { Names } from "#utils";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
@@ -51,23 +50,5 @@ export class ExpressionArrayReduce extends Expression {
     if (!(argType instanceof TypeArray)) throw new LinkerError("May only map arrays", this.ctx.start);
 
     return initial.resolution;
-  }
-
-  instructions(binary: Binary) {
-    let starter = Binary.Start;
-
-    const forEachGoTo = Instructions.CreateTuple();
-    starter = starter.with(forEachGoTo, Instructions.AssignKey(Names.PropertyName("item")));
-    starter = starter.with(forEachGoTo, Instructions.AssignKey(Names.PropertyName("current")));
-    starter = starter.including((b) => this.#routine.instructions(b));
-    starter = starter.with(Instructions["->"](), Instructions.Return());
-
-    return binary
-      .including((b) => this.#subject.instructions(b))
-      .with(Instructions["."](Names.PropertyName("initial")))
-      .with(Instructions["."](Names.PropertyName("input")))
-      .with(Instructions.ForEach(forEachGoTo))
-      .with(Instructions.Pop())
-      .concat(starter);
   }
 }

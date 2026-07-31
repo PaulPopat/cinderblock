@@ -14,7 +14,6 @@
   "imports": {
     "#ast": "./src/ast/index.ts",
     "#tokeniser": "./src/tokeniser/index.ts",
-    "#binary": "./src/binary/index.ts",
     "#utils": "./src/utils/index.ts"
   },
   "prettier": {

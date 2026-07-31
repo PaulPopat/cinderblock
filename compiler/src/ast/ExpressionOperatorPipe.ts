@@ -1,4 +1,3 @@
-import { Instructions } from "#binary";
 import { Expression } from "./Expression.ts";
 import { ExpressionOperator } from "./ExpressionOperator.ts";
 import { LinkerError } from "./LinkerError.ts";
@@ -35,9 +34,5 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
     if (!remaining.length) return right.returns;
 
     return new TypePipeable(this.ctx, remaining, right.returns);
-  }
-
-  get instructions() {
-    return [...this.left.instructions, ...this.right.instructions, Instructions["->"](this.left.id, this.right.id, this.id)];
   }
 }

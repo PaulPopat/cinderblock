@@ -1,4 +1,3 @@
-import { Binary, Instructions, Serialise } from "#binary";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
@@ -26,9 +25,5 @@ export class ExpressionLiteralBool extends ExpressionLiteral {
 
   get resolution() {
     return new TypePrimitiveChar(this.ctx);
-  }
-
-  instructions(binary: Binary) {
-    return binary.with(Instructions.Bool(Serialise.Bool(this.#value)));
   }
 }

@@ -1,4 +1,3 @@
-import { Binary, Instructions, Serialise } from "#binary";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
@@ -26,9 +25,5 @@ export class ExpressionLiteralDouble extends ExpressionLiteral {
 
   get resolution() {
     return new TypePrimitiveDouble(this.ctx);
-  }
-
-  instructions(binary: Binary) {
-    return binary.with(Instructions.Double(Serialise.Double(this.#value)));
   }
 }

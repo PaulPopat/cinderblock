@@ -1,5 +1,3 @@
-import type { Binary, Instruction } from "#binary";
-import { Names } from "#utils";
 import type { Entity } from "./Entity.ts";
 import { Entry } from "./Entry.ts";
 import type { Extracted } from "./Extracted.ts";
@@ -56,6 +54,4 @@ export abstract class Expression extends Entry {
   }
 
   abstract get resolution(): Type;
-
-  abstract instructions(binary: Binary): Binary;
 }

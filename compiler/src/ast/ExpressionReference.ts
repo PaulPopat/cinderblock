@@ -1,10 +1,6 @@
-import { Instructions } from "#binary";
-import { Names } from "#utils";
 import { ContextManager } from "./ContextManager.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
-import { TypeArg } from "./TypeArg.ts";
-import { TypePipeable } from "./TypePipeable.ts";
 
 export class ExpressionReference extends Expression {
   static {
@@ -34,17 +30,5 @@ export class ExpressionReference extends Expression {
 
   get resolution() {
     return this.subject.type;
-  }
-
-  get instructions() {
-    if (this.resolution instanceof TypeArg) {
-      return [Instructions.SearchClosures(Names.PropertyName(this.#name), this.id)];
-    }
-
-    if (this.resolution instanceof TypePipeable) {
-      
-    }
-
-    return [];
   }
 }

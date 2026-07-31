@@ -1,4 +1,3 @@
-import { Binary, Instructions } from "#binary";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
@@ -38,12 +37,5 @@ export class ExpressionArrayAdd extends Expression {
 
   get resolution() {
     return this.#subject.resolution;
-  }
-
-  instructions(binary: Binary) {
-    return binary
-      .including((b) => this.#subject.instructions(b))
-      .including((b) => this.#addition.instructions(b))
-      .with(Instructions["++"]());
   }
 }
