@@ -1,6 +1,7 @@
 import { Expression } from "./Expression.ts";
 import { ExpressionOperator } from "./ExpressionOperator.ts";
 import { ParserError } from "./ParserError.ts";
+import { type Closure, type Variable, VariablePrimitive } from "#runner";
 
 export class ExpressionOperatorDivide extends ExpressionOperator {
   static {
@@ -19,5 +20,20 @@ export class ExpressionOperatorDivide extends ExpressionOperator {
 
   get resolution() {
     return this.left.resolution;
+  }
+
+  resolve(closure: Closure): Variable {
+    const left = this.left.resolve(closure);
+    const right = this.right.resolve(closure);
+
+    if (!(left instanceof VariablePrimitive)) {
+      throw new Error("Primitive required");
+    }
+
+    if (!(right instanceof VariablePrimitive)) {
+      throw new Error("Primitive required");
+    }
+
+    return left.divide(right);
   }
 }

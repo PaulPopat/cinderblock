@@ -1,3 +1,4 @@
+import { Closure, Variable, VariablePrimitiveInt } from "#runner";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
@@ -25,5 +26,9 @@ export class ExpressionLiteralInt extends ExpressionLiteral {
 
   get resolution() {
     return new TypePrimitiveInt(this.ctx);
+  }
+
+  resolve(closure: Closure): Variable {
+    return new VariablePrimitiveInt(Number.parseInt(this.#value));
   }
 }

@@ -1,3 +1,4 @@
+import { VariablePrimitive, type Closure, type Variable } from "#runner";
 import { Expression } from "./Expression.ts";
 import { ExpressionOperator } from "./ExpressionOperator.ts";
 import { ParserError } from "./ParserError.ts";
@@ -19,5 +20,20 @@ export class ExpressionOperatorAdd extends ExpressionOperator {
 
   get resolution() {
     return this.left.resolution;
+  }
+
+  resolve(closure: Closure): Variable {
+    const left = this.left.resolve(closure);
+    const right = this.right.resolve(closure);
+
+    if (!(left instanceof VariablePrimitive)) {
+      throw new Error("Primitive required");
+    }
+
+    if (!(right instanceof VariablePrimitive)) {
+      throw new Error("Primitive required");
+    }
+
+    return left.add(right);
   }
 }

@@ -1,3 +1,4 @@
+import { Frame, VariablePipeable, type Closure, type Variable } from "#runner";
 import { ContextManager } from "./ContextManager.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
@@ -30,5 +31,15 @@ export class ExpressionReference extends Expression {
 
   get resolution() {
     return this.subject.type;
+  }
+
+  resolve(closure: Closure): Variable {
+    const value = closure.search(this.subject.internalName);
+
+    if (value instanceof VariablePipeable && value.noArgs) {
+      return value.execute(new Frame({}));
+    }
+
+    return value;
   }
 }

@@ -1,3 +1,4 @@
+import { Frame, VariablePipeable, VariableTuple, type Closure, type Variable } from "#runner";
 import { Expression } from "./Expression.ts";
 import { ExpressionOperator } from "./ExpressionOperator.ts";
 import { LinkerError } from "./LinkerError.ts";
@@ -34,5 +35,20 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
     if (!remaining.length) return right.returns;
 
     return new TypePipeable(this.ctx, remaining, right.returns);
+  }
+
+  resolve(closure: Closure): Variable {
+    const left = this.left.resolve(closure);
+    const right = this.right.resolve(closure);
+
+    if (!(left instanceof VariableTuple)) {
+      throw new Error("Tuple required");
+    }
+
+    if (!(right instanceof VariablePipeable)) {
+      throw new Error("Pipeable required");
+    }
+
+    return right.execute(new Frame(left.export()));
   }
 }

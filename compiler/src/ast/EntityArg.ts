@@ -1,3 +1,4 @@
+import { Namer } from "#runner";
 import { Entity } from "./Entity.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { TokenWalker } from "./TokenWalker.ts";
@@ -15,6 +16,7 @@ export class EntityArg extends Entity {
 
   readonly #type: Type;
   readonly #name: string;
+  readonly #internalName = Namer.Next;
 
   constructor(ctx: EntryContext, type: Type, name: string) {
     super(ctx);
@@ -28,6 +30,10 @@ export class EntityArg extends Entity {
 
   get name() {
     return this.#name;
+  }
+
+  get internalName() {
+    return this.#internalName;
   }
 
   get fullName() {

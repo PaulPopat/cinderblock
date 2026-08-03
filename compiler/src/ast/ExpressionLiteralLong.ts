@@ -1,3 +1,4 @@
+import type { Closure, Variable } from "#runner";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
@@ -25,5 +26,9 @@ export class ExpressionLiteralLong extends ExpressionLiteral {
 
   get resolution() {
     return new TypePrimitiveLong(this.ctx);
+  }
+
+  resolve(closure: Closure): Variable {
+    throw new Error("Method not implemented.");
   }
 }

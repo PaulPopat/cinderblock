@@ -1,3 +1,4 @@
+import { VariableTuple, type Closure, type Variable } from "#runner";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { LinkerError } from "./LinkerError.ts";
@@ -45,5 +46,12 @@ export class ExpressionAccess extends Expression {
     if (!property) throw new LinkerError("Could not find property", this.ctx.start);
 
     return property.type;
+  }
+
+  resolve(closure: Closure): Variable {
+    const subject = this.#subject.resolve(closure);
+    if (!(subject instanceof VariableTuple)) throw new Error("Subject not tuple");
+
+    return subject.get(this.#name);
   }
 }

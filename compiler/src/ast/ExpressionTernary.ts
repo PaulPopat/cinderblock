@@ -1,3 +1,4 @@
+import { VariablePrimitiveBool, type Closure, type Variable } from "#runner";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
@@ -15,10 +16,7 @@ export class ExpressionTernary extends Expression {
           .extract("positive", (w) => Expression.Parse(w, ":"))
           .expect(":")
           .extract("negative", (w) => Expression.Parse(w, lookFor))
-          .finish(
-            ({ positive, negative }, ctx) =>
-              new ExpressionTernary(ctx, predicate, positive, negative),
-          );
+          .finish(({ positive, negative }, ctx) => new ExpressionTernary(ctx, predicate, positive, negative));
       },
     });
   }
@@ -27,12 +25,7 @@ export class ExpressionTernary extends Expression {
   readonly #positive: Expression;
   readonly #negative: Expression;
 
-  constructor(
-    ctx: EntryContext,
-    predicate: Expression,
-    positive: Expression,
-    negative: Expression,
-  ) {
+  constructor(ctx: EntryContext, predicate: Expression, positive: Expression, negative: Expression) {
     super(ctx);
     this.#predicate = predicate;
     this.#positive = positive;
@@ -52,9 +45,20 @@ export class ExpressionTernary extends Expression {
   }
 
   get resolution() {
-    return new TypeUnion(this.ctx, [
-      this.#positive.resolution,
-      this.#negative.resolution,
-    ]);
+    return new TypeUnion(this.ctx, [this.#positive.resolution, this.#negative.resolution]);
+  }
+
+  resolve(closure: Closure): Variable {
+    const predicate = this.#predicate.resolve(closure);
+
+    if (!(predicate instanceof VariablePrimitiveBool)) {
+      throw new Error("Boolean required");
+    }
+
+    if (predicate.value) {
+      return this.#positive.resolve(closure);
+    }
+
+    return this.#negative.resolve(closure);
   }
 }

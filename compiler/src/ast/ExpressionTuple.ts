@@ -4,6 +4,7 @@ import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
 import { TypeTuple } from "./TypeTuple.ts";
 import { ExpressionTuplePart } from "./ExpressionTuplePart.ts";
+import { VariableTuple, type Closure, type Variable } from "#runner";
 
 export class ExpressionTuple extends Expression {
   static {
@@ -15,16 +16,13 @@ export class ExpressionTuple extends Expression {
           .expect(",")
           .extract("right", (w) => Expression.Parse(w, lookFor))
           .finish(({ right }, ctx) => {
-            if (
-              !(left instanceof ExpressionTuplePart) &&
-              !(left instanceof ExpressionTuple)
-            )
+            if (!(left instanceof ExpressionTuplePart) && !(left instanceof ExpressionTuple)) {
               throw new ParserError("Unexpected ,", w.store);
-            if (
-              !(right instanceof ExpressionTuplePart) &&
-              !(right instanceof ExpressionTuple)
-            )
+            }
+
+            if (!(right instanceof ExpressionTuplePart) && !(right instanceof ExpressionTuple)) {
               throw new ParserError("Unexpected right", w.store);
+            }
 
             return new ExpressionTuple(ctx, [
               ...(left instanceof ExpressionTuple ? left.parts : [left]),
@@ -53,9 +51,19 @@ export class ExpressionTuple extends Expression {
   get resolution() {
     return new TypeTuple(
       this.ctx,
-      this.#parts.map(
-        (part) => new TypeArg(this.ctx, part.value.resolution, part.name),
-      ),
+      this.#parts.map((part) => new TypeArg(this.ctx, part.value.resolution, part.name)),
     );
+  }
+
+  resolve(closure: Closure): Variable {
+    const inputs = this.#parts.reduce(
+      (current, next) => ({
+        ...current,
+        [next.name]: next.value.resolve(closure),
+      }),
+      {} as Record<string, Variable>,
+    );
+
+    return new VariableTuple(inputs);
   }
 }

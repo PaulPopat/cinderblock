@@ -4,6 +4,7 @@ import { Entity } from "./Entity.ts";
 import { Type } from "./Type.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { TypePipeable } from "./TypePipeable.ts";
+import { Namer, VariablePipeable, type Closure, type Frame, type Variable } from "#runner";
 
 export class EntityLet extends Entity {
   static {
@@ -29,14 +30,10 @@ export class EntityLet extends Entity {
           )
           .if(
             (s) => s.data === ":",
-            (walker) =>
-              walker.expect(":").extract("returns", (s) => Type.Parse(s)),
+            (walker) => walker.expect(":").extract("returns", (s) => Type.Parse(s)),
           )
           .extract("block", (s) => Expression.Parse(s))
-          .finish(
-            ({ name, args, returns, block }, ctx) =>
-              new EntityLet(ctx, name, args ?? [], returns, block),
-          ),
+          .finish(({ name, args, returns, block }, ctx) => new EntityLet(ctx, name, args ?? [], returns, block)),
     });
   }
 
@@ -44,14 +41,9 @@ export class EntityLet extends Entity {
   readonly #args: Array<EntityArg>;
   readonly #returns: Type | undefined;
   readonly #contents: Expression;
+  readonly #internalName = Namer.Next;
 
-  constructor(
-    ctx: EntryContext,
-    name: string,
-    args: Array<EntityArg>,
-    returns: Type | undefined,
-    contents: Expression,
-  ) {
+  constructor(ctx: EntryContext, name: string, args: Array<EntityArg>, returns: Type | undefined, contents: Expression) {
     super(ctx);
     this.#name = name;
     this.#args = args;
@@ -61,6 +53,10 @@ export class EntityLet extends Entity {
 
   get name() {
     return this.#name;
+  }
+
+  get internalName() {
+    return this.#internalName;
   }
 
   get args() {
@@ -89,5 +85,17 @@ export class EntityLet extends Entity {
       );
 
     return result;
+  }
+
+  execute(closure: Closure, args: Frame): Variable {
+    closure = closure.withFrame(args);
+    for (const entity of this.#contents.entities) {
+      if (!(entity instanceof EntityLet)) continue;
+
+      const c = closure.withVariable(entity.internalName, new VariablePipeable((a) => entity.execute(c, a), !entity.args.length));
+      closure = c;
+    }
+
+    return this.#contents.resolve(closure);
   }
 }

@@ -1,3 +1,4 @@
+import { VariableArray, type Closure, type Variable } from "#runner";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
@@ -37,5 +38,17 @@ export class ExpressionArrayAdd extends Expression {
 
   get resolution() {
     return this.#subject.resolution;
+  }
+
+  resolve(closure: Closure): Variable {
+    const left = this.#subject.resolve(closure);
+    const right = this.#addition.resolve(closure);
+
+    if (!(left instanceof VariableArray)) throw new Error("Invalid left");
+    if (right instanceof VariableArray) {
+      return new VariableArray([...left.data, ...right.data]);
+    }
+
+    return new VariableArray([...left.data, right]);
   }
 }

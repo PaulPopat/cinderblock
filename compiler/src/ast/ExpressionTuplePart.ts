@@ -3,6 +3,7 @@ import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
 import { TypeTuple } from "./TypeTuple.ts";
+import type { Closure, Variable } from "#runner";
 
 export class ExpressionTuplePart extends Expression {
   static {
@@ -37,8 +38,10 @@ export class ExpressionTuplePart extends Expression {
   }
 
   get resolution() {
-    return new TypeTuple(this.ctx, [
-      new TypeArg(this.ctx, this.#value.resolution, this.#name),
-    ]);
+    return new TypeTuple(this.ctx, [new TypeArg(this.ctx, this.#value.resolution, this.#name)]);
+  }
+
+  resolve(closure: Closure): Variable {
+    throw new Error("Not implemented");
   }
 }
