@@ -18,7 +18,7 @@ export class EntityStruct extends Entity {
             (s) => TypeArg.Parse(s),
           )
           .expect(";")
-          .finish(({ name, args }, ctx) => new EntityStruct(ctx, name, args)),
+          .finish(({ name, args }, ctx) => new EntityStruct(ctx, [e.entryContext.namespace, name].filter((w) => w).join(":"), args)),
     });
   }
 
@@ -40,6 +40,6 @@ export class EntityStruct extends Entity {
   }
 
   get fullName() {
-    return [this.ctx.namespace, this.#name].join(":");
+    return this.#name;
   }
 }

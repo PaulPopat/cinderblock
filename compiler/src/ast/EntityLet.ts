@@ -32,8 +32,11 @@ export class EntityLet extends Entity {
             (s) => s.data === ":",
             (walker) => walker.expect(":").extract("returns", (s) => Type.Parse(s)),
           )
-          .extract("block", (s) => Expression.Parse(s))
-          .finish(({ name, args, returns, block }, ctx) => new EntityLet(ctx, name, args ?? [], returns, block)),
+          .extract("block", (s) => Expression.ParseBlock(s))
+          .finish(
+            ({ name, args, returns, block }, ctx) =>
+              new EntityLet(ctx, [w.entryContext.namespace, name].filter((w) => w).join(":"), args ?? [], returns, block),
+          ),
     });
   }
 
@@ -72,7 +75,7 @@ export class EntityLet extends Entity {
   }
 
   get fullName() {
-    return [this.ctx.namespace, this.#name].join(":");
+    return this.#name;
   }
 
   get type() {

@@ -1,3 +1,4 @@
+import { Location } from "#utils";
 import type { Token } from "./Token.ts";
 
 export class TokenStore {
@@ -24,7 +25,9 @@ export class TokenStore {
   }
 
   get location() {
-    return this.current.location;
+    const current = this.#tokens[this.#index];
+    if (!current) return new Location("", -1, -1);
+    return current.location;
   }
 
   get done() {

@@ -7,7 +7,7 @@ export class ExpressionOperatorOr extends ExpressionOperator {
   static {
     Expression.RegisterExpression({
       priority: 100,
-      match: /^||$/gm,
+      match: /^\|\|$/gm,
       parse: (w, lookFor, e) => {
         if (!e) throw new ParserError("Unexpected ||", w.store);
         return w

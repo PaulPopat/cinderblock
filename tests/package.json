@@ -1,5 +1,5 @@
 {
-  "name": "cinderblock",
+  "name": "@cinderblock/tests",
   "version": "1.0.0",
   "type": "module",
   "description": "",
@@ -11,10 +11,9 @@
     "@types/node": "^25.6.0",
     "typescript": "^6.0.3"
   },
-  "workspaces": [
-    "compiler",
-    "tests"
-  ],
+  "dependencies": {
+    "@cinderblock/compiler": "*"
+  },
   "prettier": {
     "printWidth": 150
   }

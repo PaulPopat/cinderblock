@@ -9,9 +9,9 @@ export class Tokeniser {
   readonly #patterns = [
     /^[a-zA-Z][a-zA-Z0-9_@$#:]*$/gm,
     /^[^\s\na-zA-Z0-9_@$#'"]+$/gm,
-    /^"[^"]+"$/gm,
-    /^'[^']'$/gm,
-    /^'\\.'$/gm,
+    /^"[^"]*"?$/gm,
+    /^'[^']?'?$/gm,
+    /^'\\.?'?$/gm,
   ];
 
   constructor(file: string, text: string) {

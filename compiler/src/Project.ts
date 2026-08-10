@@ -18,8 +18,8 @@ export class Project {
       .filter((f) => f.endsWith(".cb"))
       .map((f) => [f, fs.readFileSync(path.resolve(this.#root, f), "utf8")] as const)
       .reduce((store, [key, value]) => store.with(new Tokeniser(key, value).tokens), TokenStore.start([]));
-    const [expression] = Expression.Parse(TokenWalker.start(store));
+    const entities = Expression.GetEntities(TokenWalker.start(store));
 
-    return new App(expression.entities.filter((e) => e instanceof EntityLet));
+    return new App(entities.filter((e) => e instanceof EntityLet));
   }
 }

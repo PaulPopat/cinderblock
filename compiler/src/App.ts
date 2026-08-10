@@ -50,6 +50,6 @@ export class App {
 
     const subject = this.#lets.find((l) => l.fullName === name);
     if (!subject) throw new Error("Subject not found");
-    return subject?.execute(new Closure([]), frame);
+    return subject.execute(new Closure([]), frame).export();
   }
 }

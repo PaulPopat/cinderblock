@@ -11,8 +11,8 @@ export class Inline {
 
   get app() {
     const store = TokenStore.start([]).with(new Tokeniser("inline", this.#code).tokens);
-    const [expression] = Expression.Parse(TokenWalker.start(store));
+    const [entities] = Expression.GetEntities(TokenWalker.start(store));
 
-    return new App(expression.entities.filter((e) => e instanceof EntityLet));
+    return new App(entities.filter((e) => e instanceof EntityLet));
   }
 }

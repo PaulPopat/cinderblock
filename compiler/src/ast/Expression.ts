@@ -33,6 +33,24 @@ export abstract class Expression extends Entry {
   static Parse(walker: TokenWalker, lookFor: string | Array<string> = ";"): Extracted<Expression> {
     if (typeof lookFor === "string") lookFor = [lookFor];
     return walker
+      .reduce(
+        "expression",
+        (s) => !lookFor.includes(s.data),
+        (w, _, p): Extracted<Expression> => {
+          const match = this.#expressionParsers.find((p) => w.store.data.match(p.match));
+          if (!match) {
+            throw new ParserError(`Unexpected symbol of ${w.data}`, w.store);
+          }
+
+          return match.parse(w, lookFor, p);
+        },
+      )
+      .finish(({ expression }) => expression);
+  }
+
+  static ParseBlock(walker: TokenWalker, lookFor: string | Array<string> = ";"): Extracted<Expression> {
+    if (typeof lookFor === "string") lookFor = [lookFor];
+    return walker
       .while(
         "entities",
         (s) => this.#entityParsers.find((a) => s.data.match(a.match)),
@@ -51,7 +69,20 @@ export abstract class Expression extends Entry {
           return match.parse(w, lookFor, p);
         },
       )
+      .expect(";")
       .finish(({ expression }) => expression);
+  }
+
+  static GetEntities(walker: TokenWalker, lookFor: string | Array<string> = ";"): Extracted<Entity[]> {
+    if (typeof lookFor === "string") lookFor = [lookFor];
+    return walker
+      .while(
+        "entities",
+        (s) => this.#entityParsers.find((a) => s.data.match(a.match)),
+        (w, m) => m!.parse(w),
+        "entity",
+      )
+      .finish(({ entities }) => entities);
   }
 
   abstract get resolution(): Type;

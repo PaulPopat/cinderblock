@@ -5,9 +5,7 @@ import type { EntryContext } from "./EntryContext.ts";
 import type { Extracted } from "./Extracted.ts";
 import { ParserError } from "./ParserError.ts";
 
-export class TokenWalker<
-  TContext extends Record<never, never> = Record<never, never>,
-> {
+export class TokenWalker<TContext extends Record<never, never> = Record<never, never>> {
   static start(store: TokenStore) {
     return new TokenWalker({}, store, store.location, [[]], undefined);
   }
@@ -18,13 +16,7 @@ export class TokenWalker<
   readonly #entities: Array<Array<Entry>>;
   readonly #namespace: string | undefined;
 
-  private constructor(
-    data: TContext,
-    store: TokenStore,
-    start: Location,
-    entities: Array<Array<Entry>>,
-    namespace: string | undefined,
-  ) {
+  private constructor(data: TContext, store: TokenStore, start: Location, entities: Array<Array<Entry>>, namespace: string | undefined) {
     this.#data = data;
     this.#store = store;
     this.#start = start;
@@ -33,13 +25,7 @@ export class TokenWalker<
   }
 
   get next() {
-    return new TokenWalker(
-      this.#data,
-      this.#store.next,
-      this.#start,
-      this.#entities,
-      this.#namespace,
-    );
+    return new TokenWalker(this.#data, this.#store.next, this.#start, this.#entities, this.#namespace);
   }
 
   get location() {
@@ -56,19 +42,10 @@ export class TokenWalker<
 
   expect(expected: string) {
     if (this.#store.data !== expected) {
-      throw new ParserError(
-        `Expected ${expected} but found ${this.#store.data}`,
-        this.#store,
-      );
+      throw new ParserError(`Expected ${expected} but found ${this.#store.data}`, this.#store);
     }
 
-    return new TokenWalker(
-      this.#data,
-      this.#store.next,
-      this.#start,
-      this.#entities,
-      this.#namespace,
-    );
+    return new TokenWalker(this.#data, this.#store.next, this.#start, this.#entities, this.#namespace);
   }
 
   extract<TKey extends string, TResult extends Entry>(
@@ -80,13 +57,7 @@ export class TokenWalker<
       [key in TKey]: TResult;
     };
     const [result, newStore] = extractor(
-      new TokenWalker(
-        {},
-        this.#store,
-        this.#store.location,
-        mode === "entity" ? [[], ...this.#entities] : this.#entities,
-        this.#namespace,
-      ),
+      new TokenWalker({}, this.#store, this.#store.location, mode === "entity" ? [[], ...this.#entities] : this.#entities, this.#namespace),
       this.#data,
     );
 
@@ -94,27 +65,20 @@ export class TokenWalker<
       { ...this.#data, [name]: result } as NewContext,
       newStore,
       this.#start,
-      mode === "entity"
-        ? [[result, ...(this.#entities[0] ?? [])], ...this.#entities.slice(1)]
-        : this.#entities,
+      mode === "entity" ? [[result, ...(this.#entities[0] ?? [])], ...this.#entities.slice(1)] : this.#entities,
       this.#namespace,
     );
   }
 
   if<TResult extends Record<never, never>>(
     predicate: (store: TokenStore) => boolean,
-    extractor: (
-      walker: TokenWalker<TContext>,
-    ) => TokenWalker<TContext & TResult>,
+    extractor: (walker: TokenWalker<TContext>) => TokenWalker<TContext & TResult>,
   ): TokenWalker<TContext & Partial<TResult>> {
     if (!predicate(this.#store)) return this;
     return extractor(this);
   }
 
-  text<TKey extends string>(
-    name: TKey,
-    mode: "namespace" | undefined = undefined,
-  ) {
+  text<TKey extends string>(name: TKey, mode: "namespace" | undefined = undefined) {
     type NewContext = TContext & {
       [key in TKey]: string;
     };
@@ -126,11 +90,7 @@ export class TokenWalker<
       this.#store.next,
       this.#start,
       this.#entities,
-      mode === "namespace"
-        ? [this.#namespace, this.data]
-            .filter((n) => typeof n === "string")
-            .join(":")
-        : this.#namespace,
+      mode === "namespace" ? [this.#namespace, this.data].filter((n) => typeof n === "string").join(":") : this.#namespace,
     );
   }
 
@@ -145,15 +105,9 @@ export class TokenWalker<
     let whileResult: TWhile;
     let newStore: TokenStore = this.#store;
 
-    while ((whileResult = predicate(newStore))) {
+    while (!newStore.done && (whileResult = predicate(newStore))) {
       const [baseExtract, nextStore] = extractor(
-        new TokenWalker(
-          {},
-          newStore,
-          newStore.location,
-          mode === "entity" ? [[], result, ...this.#entities] : this.#entities,
-          this.#namespace,
-        ),
+        new TokenWalker({}, newStore, newStore.location, mode === "entity" ? [[], result, ...this.#entities] : this.#entities, this.#namespace),
         whileResult,
       );
       result = [...result, baseExtract];
@@ -164,66 +118,33 @@ export class TokenWalker<
       { ...this.#data, [name]: result } as NewContext,
       newStore,
       this.#start,
-      mode === "entity"
-        ? [
-            [...result, ...(this.#entities[0] ?? [])],
-            ...this.#entities.slice(1),
-          ]
-        : this.#entities,
+      mode === "entity" ? [[...result, ...(this.#entities[0] ?? [])], ...this.#entities.slice(1)] : this.#entities,
       this.#namespace,
     );
   }
 
   withEntity(entity: Entry) {
-    return new TokenWalker<TContext>(
-      this.#data,
-      this.#store.next,
-      this.#start,
-      [...this.#entities, [entity]],
-      this.#namespace,
-    );
+    return new TokenWalker<TContext>(this.#data, this.#store.next, this.#start, [...this.#entities, [entity]], this.#namespace);
   }
 
   reduce<TKey extends string, TResult extends Entry, TWhile>(
     name: TKey,
     predicate: (store: TokenStore, previous?: TResult) => TWhile,
-    extractor: (
-      store: TokenWalker,
-      whileResult: TWhile,
-      previous?: TResult,
-    ) => Extracted<TResult>,
+    extractor: (store: TokenWalker, whileResult: TWhile, previous?: TResult) => Extracted<TResult>,
   ) {
     type NewContext = TContext & { [key in TKey]: TResult };
     let result: TResult | undefined = undefined;
     let whileResult: TWhile;
     let newStore: TokenStore = this.#store;
 
-    while ((whileResult = predicate(newStore, result))) {
-      [result, newStore] = extractor(
-        new TokenWalker(
-          {},
-          newStore,
-          newStore.location,
-          this.#entities,
-          this.#namespace,
-        ),
-        whileResult,
-        result,
-      );
+    while (!newStore.done && (whileResult = predicate(newStore, result))) {
+      [result, newStore] = extractor(new TokenWalker({}, newStore, newStore.location, this.#entities, this.#namespace), whileResult, result);
     }
 
-    return new TokenWalker<NewContext>(
-      { ...this.#data, [name]: result } as NewContext,
-      newStore,
-      this.#start,
-      this.#entities,
-      this.#namespace,
-    );
+    return new TokenWalker<NewContext>({ ...this.#data, [name]: result } as NewContext, newStore, this.#start, this.#entities, this.#namespace);
   }
 
-  finish<TResult>(
-    handler: (data: TContext, ctx: EntryContext) => TResult,
-  ): Extracted<TResult> {
+  finish<TResult>(handler: (data: TContext, ctx: EntryContext) => TResult): Extracted<TResult> {
     return [handler(this.#data, this.entryContext), this.#store];
   }
 
