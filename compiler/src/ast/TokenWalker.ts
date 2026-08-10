@@ -90,7 +90,7 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
       this.#store.next,
       this.#start,
       this.#entities,
-      mode === "namespace" ? [this.#namespace, this.data].filter((n) => typeof n === "string").join(":") : this.#namespace,
+      mode === "namespace" ? [this.#namespace, this.data].filter((n) => typeof n === "string").join("_") : this.#namespace,
     );
   }
 

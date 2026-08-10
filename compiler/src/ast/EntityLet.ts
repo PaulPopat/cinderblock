@@ -19,7 +19,6 @@ export class EntityLet extends Entity {
             (s) => s.data === "(",
             (walker) =>
               walker
-                .expect("(")
                 .while(
                   "args",
                   (s) => s.data === "," || s.data === "(",
@@ -32,10 +31,11 @@ export class EntityLet extends Entity {
             (s) => s.data === ":",
             (walker) => walker.expect(":").extract("returns", (s) => Type.Parse(s)),
           )
+          .expect("=")
           .extract("block", (s) => Expression.ParseBlock(s))
           .finish(
             ({ name, args, returns, block }, ctx) =>
-              new EntityLet(ctx, [w.entryContext.namespace, name].filter((w) => w).join(":"), args ?? [], returns, block),
+              new EntityLet(ctx, [w.entryContext.namespace, name].filter((w) => w).join("_"), args ?? [], returns, block),
           ),
     });
   }

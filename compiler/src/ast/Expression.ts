@@ -15,7 +15,7 @@ type EntityParseable = {
 type ExpressionParseable = {
   priority: number;
   match: RegExp;
-  parse: (walker: TokenWalker, lookFor: string | Array<string>, existing?: Expression) => Extracted<Expression>;
+  parse: (walker: TokenWalker, lookFor: Array<string>, existing?: Expression) => Extracted<Expression>;
 };
 
 export abstract class Expression extends Entry {
@@ -30,8 +30,7 @@ export abstract class Expression extends Entry {
     this.#expressionParsers = [...this.#expressionParsers, entry].sort((a, b) => b.priority - a.priority);
   }
 
-  static Parse(walker: TokenWalker, lookFor: string | Array<string> = ";"): Extracted<Expression> {
-    if (typeof lookFor === "string") lookFor = [lookFor];
+  static Parse(walker: TokenWalker, lookFor: Array<string> = [";"]): Extracted<Expression> {
     return walker
       .reduce(
         "expression",
@@ -69,8 +68,7 @@ export abstract class Expression extends Entry {
           return match.parse(w, lookFor, p);
         },
       )
-      .expect(";")
-      .finish(({ expression }) => expression);
+      .next.finish(({ expression }) => expression);
   }
 
   static GetEntities(walker: TokenWalker, lookFor: string | Array<string> = ";"): Extracted<Entity[]> {

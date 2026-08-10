@@ -11,7 +11,7 @@ export class ExpressionOperatorGreaterThanOrEqualTo extends ExpressionOperator {
       parse: (w, lookFor, e) => {
         if (!e) throw new ParserError("Unexpected >=", w.store);
         return w
-          .expect(">")
+          .expect(">=")
           .extract("right", (w) => Expression.Parse(w, lookFor))
           .finish(({ right }, ctx) => new ExpressionOperatorGreaterThanOrEqualTo(ctx, e, right));
       },

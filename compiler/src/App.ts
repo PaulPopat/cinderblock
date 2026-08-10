@@ -44,12 +44,13 @@ export class App {
   }
 
   run(name: string, args: Record<string, any>) {
+    const subject = this.#lets.find((l) => l.fullName === name);
+    if (!subject) throw new Error("Subject not found");
+
     const frame = new Frame(
       Object.entries(args).reduce((current, [key, value]) => ({ ...current, [key]: this.variablise(value) }), {} as Record<string, Variable>),
     );
 
-    const subject = this.#lets.find((l) => l.fullName === name);
-    if (!subject) throw new Error("Subject not found");
     return subject.execute(new Closure([]), frame).export();
   }
 }

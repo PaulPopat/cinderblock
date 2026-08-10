@@ -16,7 +16,6 @@ export class EntityArg extends Entity {
 
   readonly #type: Type;
   readonly #name: string;
-  readonly #internalName = Namer.Next;
 
   constructor(ctx: EntryContext, type: Type, name: string) {
     super(ctx);
@@ -33,7 +32,7 @@ export class EntityArg extends Entity {
   }
 
   get internalName() {
-    return this.#internalName;
+    return this.#name;
   }
 
   get fullName() {

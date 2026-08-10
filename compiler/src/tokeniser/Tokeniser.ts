@@ -1,14 +1,16 @@
 import { Location } from "#utils";
 import { Token } from "./Token.ts";
-import { TokenStore } from "./TokenStore.ts";
+
+const allowedLiterals = ["[]", "(", ")", ":", "+", "++", "-", "/", "*", "!", "&&", "||", "==", "=", "!=", "<", "<=", ">", ">=", ".", "->"];
 
 export class Tokeniser {
   readonly #file: string;
   readonly #text: string;
 
   readonly #patterns = [
-    /^[a-zA-Z][a-zA-Z0-9_@$#:]*$/gm,
-    /^[^\s\na-zA-Z0-9_@$#'"]+$/gm,
+    /^[a-zA-Z0-9_@$#]+$/gm,
+    /^[0-9]+\.[0-9]*[a-z]?$/gm,
+    ...allowedLiterals.map((a) => new RegExp(["^", ...[...a].map((c) => "\\" + c), "$"].join(""))),
     /^"[^"]*"?$/gm,
     /^'[^']?'?$/gm,
     /^'\\.?'?$/gm,
@@ -43,11 +45,7 @@ export class Tokeniser {
     for (let lineNumber = 0; lineNumber < lines.length; lineNumber++) {
       const line = lines[lineNumber]!;
 
-      for (
-        let characterNumber = 0;
-        characterNumber < line.length;
-        characterNumber++
-      ) {
+      for (let characterNumber = 0; characterNumber < line.length; characterNumber++) {
         const character = line[characterNumber]!;
 
         if (this.#isValid(current + character)) {

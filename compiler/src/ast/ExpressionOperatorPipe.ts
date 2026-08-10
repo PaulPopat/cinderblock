@@ -49,6 +49,21 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
       throw new Error("Pipeable required");
     }
 
-    return right.execute(new Frame(left.export()));
+    const rightType = this.right.resolution;
+    if (!(rightType instanceof TypePipeable)) {
+      throw new LinkerError("Target not pipeable", this.ctx.start);
+    }
+
+    return right.execute(
+      new Frame(
+        left.entries.reduce(
+          (frame, [key, value]) => ({
+            ...frame,
+            [key]: value,
+          }),
+          {} as Record<string, Variable>,
+        ),
+      ),
+    );
   }
 }

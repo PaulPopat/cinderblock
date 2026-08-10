@@ -13,8 +13,7 @@ export class ExpressionTernary extends Expression {
         if (!predicate) throw new ParserError("Unexpected ?", w.store);
         return w
           .expect("?")
-          .extract("positive", (w) => Expression.Parse(w, ":"))
-          .expect(":")
+          .extract("positive", (w) => Expression.Parse(w, [":"]))
           .extract("negative", (w) => Expression.Parse(w, lookFor))
           .finish(({ positive, negative }, ctx) => new ExpressionTernary(ctx, predicate, positive, negative));
       },

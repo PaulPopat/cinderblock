@@ -34,6 +34,6 @@ export class ExpressionOperatorEquals extends ExpressionOperator {
       throw new Error("Primitive required");
     }
 
-    return left.divide(right);
+    return left.equals(right);
   }
 }

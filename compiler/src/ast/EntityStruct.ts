@@ -18,7 +18,7 @@ export class EntityStruct extends Entity {
             (s) => TypeArg.Parse(s),
           )
           .expect(";")
-          .finish(({ name, args }, ctx) => new EntityStruct(ctx, [e.entryContext.namespace, name].filter((w) => w).join(":"), args)),
+          .finish(({ name, args }, ctx) => new EntityStruct(ctx, [e.entryContext.namespace, name].filter((w) => w).join("_"), args)),
     });
   }
 

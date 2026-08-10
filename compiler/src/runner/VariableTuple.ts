@@ -23,4 +23,8 @@ export class VariableTuple extends Variable {
   export() {
     return Object.entries(this.#values).reduce((current, [key, val]) => ({ ...current, [key]: val.export() }), {} as Record<string, any>);
   }
+
+  get entries() {
+    return Object.entries(this.#values);
+  }
 }

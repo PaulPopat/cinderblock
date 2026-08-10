@@ -3,19 +3,20 @@ import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
 import { TypeTuple } from "./TypeTuple.ts";
-import type { Closure, Variable } from "#runner";
+import { VariableTuple, type Closure, type Variable } from "#runner";
+import { ExpressionReference } from "./ExpressionReference.ts";
 
 export class ExpressionTuplePart extends Expression {
   static {
     Expression.RegisterExpression({
       priority: 100,
-      match: /^:$/gm,
-      parse: (w, _, left) => {
-        if (!left) throw new ParserError("Unexpected :", w.store);
+      match: /^=$/gm,
+      parse: (w, lookFor, left) => {
+        if (!(left instanceof ExpressionReference)) throw new ParserError("Unexpected =", w.store);
         return w
-          .expect(":")
-          .text("name")
-          .finish(({ name }, ctx) => new ExpressionTuplePart(ctx, name, left));
+          .expect("=")
+          .extract("value", (w) => Expression.Parse(w, [...lookFor, ","]))
+          .finish(({ value }, ctx) => new ExpressionTuplePart(ctx, left.name, value));
       },
     });
   }
@@ -42,6 +43,8 @@ export class ExpressionTuplePart extends Expression {
   }
 
   resolve(closure: Closure): Variable {
-    throw new Error("Not implemented");
+    return new VariableTuple({
+      [this.#name]: this.#value.resolve(closure),
+    });
   }
 }
