@@ -6,15 +6,16 @@ export class TypeTuple extends Type {
   static {
     Type.RegisterType({
       priority: 100,
-      match: /^\($/gm,
+      match: /^\{$/gm,
       chainable: false,
       parse: (w) =>
         w
           .while(
             "parts",
-            (s) => s.data === "(" || s.data === ",",
-            TypeArg.Parse,
+            (s) => s.data === "{" || s.data === ",",
+            (w) => TypeArg.Parse(w.next),
           )
+          .expect("}")
           .finish(({ parts }, ctx) => new TypeTuple(ctx, parts)),
     });
   }

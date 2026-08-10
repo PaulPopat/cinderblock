@@ -14,6 +14,7 @@ export class ContextManager {
 
   resolveStruct(name: string) {
     const possible = [
+      name,
       [this.#ctx.namespace, name].join("_"),
       ...this.#ctx.entities.filter((e) => e instanceof EntityUse).map((e) => [e.namespace, name].join("_")),
     ];

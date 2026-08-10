@@ -221,4 +221,43 @@ describe("syntax", () => {
     const result = code.app.run("test_let", {});
     assert.equal(result, "hello");
   });
+
+  test("struct reference", () => {
+    const code = new Inline(`
+      struct mystruct value: int;
+      let pipeable (test: mystruct) = test.value + 2;
+      let test_let = (test = value = 2) -> pipeable;
+    `);
+    const result = code.app.run("test_let", {});
+    assert.equal(result, 4);
+  });
+
+  test("tuple arg", () => {
+    const code = new Inline(`
+      let pipeable (test: {value: int}) = test.value + 2;
+      let test_let = (test = value = 2) -> pipeable;
+    `);
+    const result = code.app.run("test_let", {});
+    assert.equal(result, 4);
+  });
+
+  test("type union", () => {
+    const code = new Inline(`
+      let final (test: {value: int}) = test.value + 2;
+      let pipeable (test: {value: int} | {value: float}) = (test = test) -> final;
+      let test_let = (test = value = 2) -> pipeable;
+    `);
+    const result = code.app.run("test_let", {});
+    assert.equal(result, 4);
+  });
+
+  test("type intersection", () => {
+    const code = new Inline(`
+      let final (test: {value: int}) = test.value + 2;
+      let pipeable (test: {value: int} & {another: float}) = (test = test) -> final;
+      let test_let = (test = value = 2) -> pipeable;
+    `);
+    const result = code.app.run("test_let", {});
+    assert.equal(result, 4);
+  });
 });
