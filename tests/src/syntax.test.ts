@@ -18,9 +18,17 @@ describe("syntax", () => {
     assert.equal(result, "hello");
   });
 
+  test("returns an array", () => {
+    const code = new Inline(`
+      let test_let = ["hello", "world"]
+    `);
+    const result = code.app.run("test_let", {});
+    assert.deepStrictEqual(result, ["hello", "world"]);
+  });
+
   test("returns a tuple", () => {
     const code = new Inline(`
-      let test_let = test="hello", world=123;
+      let test_let = {test="hello", world=123};
     `);
     const result = code.app.run("test_let", {});
     assert.deepStrictEqual(result, { test: "hello", world: 123 });
@@ -28,7 +36,7 @@ describe("syntax", () => {
 
   test("accesses a tuple", () => {
     const code = new Inline(`
-      let internal_item = test="hello", world=123;
+      let internal_item = {test="hello", world=123};
       let test_let = internal_item.test;
     `);
     const result = code.app.run("test_let", {});
@@ -141,7 +149,7 @@ describe("syntax", () => {
 
   test("performs an in operation", () => {
     const code = new Inline(`
-      let something = hello = "world";
+      let something = {hello = "world"};
       let test_let = "hello" in something;
     `);
     const result = code.app.run("test_let", {});
@@ -150,7 +158,7 @@ describe("syntax", () => {
 
   test("performs an in operation that is false", () => {
     const code = new Inline(`
-      let something = hello = "world";
+      let something = {hello = "world"};
       let test_let = "test" in something;
     `);
     const result = code.app.run("test_let", {});
@@ -208,7 +216,7 @@ describe("syntax", () => {
   test("performs a pipe", () => {
     const code = new Inline(`
       let pipeable (test: int) = test + 2;
-      let test_let = (test = 2) -> pipeable;
+      let test_let = {test = 2} -> pipeable;
     `);
     const result = code.app.run("test_let", {});
     assert.equal(result, 4);
@@ -226,7 +234,7 @@ describe("syntax", () => {
     const code = new Inline(`
       struct mystruct value: int;
       let pipeable (test: mystruct) = test.value + 2;
-      let test_let = (test = value = 2) -> pipeable;
+      let test_let = {test = {value = 2}} -> pipeable;
     `);
     const result = code.app.run("test_let", {});
     assert.equal(result, 4);
@@ -235,7 +243,7 @@ describe("syntax", () => {
   test("tuple arg", () => {
     const code = new Inline(`
       let pipeable (test: {value: int}) = test.value + 2;
-      let test_let = (test = value = 2) -> pipeable;
+      let test_let = {test = {value = 2}} -> pipeable;
     `);
     const result = code.app.run("test_let", {});
     assert.equal(result, 4);
@@ -244,8 +252,8 @@ describe("syntax", () => {
   test("type union", () => {
     const code = new Inline(`
       let final (test: {value: int}) = test.value + 2;
-      let pipeable (test: {value: int} | {value: float}) = (test = test) -> final;
-      let test_let = (test = value = 2) -> pipeable;
+      let pipeable (test: {value: int} | {value: float}) = {test = test} -> final;
+      let test_let = {test = {value = 2}} -> pipeable;
     `);
     const result = code.app.run("test_let", {});
     assert.equal(result, 4);
@@ -254,8 +262,8 @@ describe("syntax", () => {
   test("type intersection", () => {
     const code = new Inline(`
       let final (test: {value: int}) = test.value + 2;
-      let pipeable (test: {value: int} & {another: float}) = (test = test) -> final;
-      let test_let = (test = value = 2) -> pipeable;
+      let pipeable (test: {value: int} & {another: float}) = {test = test} -> final;
+      let test_let = {test = {value = 2}} -> pipeable;
     `);
     const result = code.app.run("test_let", {});
     assert.equal(result, 4);

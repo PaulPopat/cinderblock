@@ -1,0 +1,37 @@
+let Tokens_TokenStore (data: Token[], index: int) =
+  use std;
+
+  let current = {subject = data, index = index} -> array_get;
+
+  let data = current.data;
+
+  let location = ({
+    subject = data,
+    index = index,
+    fallback = {
+      location = {
+        file = "",
+        line = -1,
+        character = -1
+      }
+    }
+  } -> array_get).location;
+
+  let done = {subject = data} -> array_length <= index;
+
+  let next = { data = data, index = index + 1 } -> TokenStore;
+
+  let raw = tokens;
+
+  let with (next: Token[]) =
+    { data = data ++ next, index = index } -> TokenStore;
+
+  {
+    current = current,
+    data = data,
+    location = location,
+    done = done,
+    next = next,
+    raw = raw,
+    with = with
+  };

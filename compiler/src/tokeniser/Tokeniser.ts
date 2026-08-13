@@ -1,7 +1,7 @@
 import { Location } from "#utils";
 import { Token } from "./Token.ts";
 
-const allowedLiterals = ["[]", "(", ")", ":", "+", "++", "-", "/", "*", "!", "&&", "||", "==", "=", "!=", "<", "<=", ">", ">=", ".", "->"];
+const allowedLiterals = ["[]", "[", "]", "(", ")", ":", "+", "++", "-", "/", "*", "!", "&&", "||", "==", "=", "!=", "<", "<=", ">", ">=", ".", "->"];
 
 export class Tokeniser {
   readonly #file: string;

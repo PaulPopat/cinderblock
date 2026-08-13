@@ -2,7 +2,7 @@ import { VariablePrimitiveBool, type Closure, type Variable } from "#runner";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
-import { TypePrimitiveChar } from "./TypePrimitiveChar.ts";
+import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 
 export class ExpressionLiteralBool extends ExpressionLiteral {
   static {
@@ -25,7 +25,7 @@ export class ExpressionLiteralBool extends ExpressionLiteral {
   }
 
   get resolution() {
-    return new TypePrimitiveChar(this.ctx);
+    return new TypePrimitiveBool(this.ctx);
   }
 
   resolve(closure: Closure): Variable {

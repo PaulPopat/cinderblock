@@ -1,7 +1,6 @@
 import { TypeArg } from "./TypeArg.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
-import { ParserError } from "./ParserError.ts";
 import { TypeTuple } from "./TypeTuple.ts";
 import { ExpressionTuplePart } from "./ExpressionTuplePart.ts";
 import { VariableTuple, type Closure, type Variable } from "#runner";
@@ -10,24 +9,22 @@ export class ExpressionTuple extends Expression {
   static {
     Expression.RegisterExpression({
       priority: 100,
-      match: /^,$/gm,
-      parse: (w, lookFor, left) => {
+      match: /^{$/gm,
+      parse: (w, lookFor) => {
         return w
-          .expect(",")
-          .extract("right", (w) => Expression.Parse(w, lookFor))
-          .finish(({ right }, ctx) => {
-            if (!(left instanceof ExpressionTuplePart) && !(left instanceof ExpressionTuple)) {
-              throw new ParserError("Unexpected ,", w.store);
-            }
-
-            if (!(right instanceof ExpressionTuplePart) && !(right instanceof ExpressionTuple)) {
-              throw new ParserError("Unexpected right", w.store);
-            }
-
-            return new ExpressionTuple(ctx, [
-              ...(left instanceof ExpressionTuple ? left.parts : [left]),
-              ...(right instanceof ExpressionTuple ? right.parts : [right]),
-            ]);
+          .while(
+            "value",
+            (w) => w.data === "{" || w.data === ",",
+            (s) =>
+              s.next
+                .text("name")
+                .expect("=")
+                .extract("value", (s) => Expression.Parse(s, [...lookFor, ",", "}"]))
+                .finish(({ name, value }, ctx) => new ExpressionTuplePart(ctx, name, value)),
+          )
+          .expect("}")
+          .finish(({ value }, ctx) => {
+            return new ExpressionTuple(ctx, value);
           });
       },
     });
