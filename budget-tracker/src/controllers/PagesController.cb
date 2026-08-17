@@ -4,6 +4,6 @@ controllers_PagesController_GetHome = {
   status = 200,
   body = {name = "home", data = {}} -> html_template,
   headers = {
-    "Content-Type": "text/html"
+    "Content-Type" = "text/html"
   }
 };
