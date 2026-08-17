@@ -25,6 +25,6 @@ export class VariablePipeable extends Variable {
       return this.#execute(new Frame({}));
     }
 
-    return (args: Record<string, unknown>) => this.#execute(framise(args));
+    return (args: Record<string, unknown>) => this.#execute(framise(args)).export();
   }
 }

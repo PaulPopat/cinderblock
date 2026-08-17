@@ -10,17 +10,15 @@ export class TypePipeable extends Type {
       chainable: false,
       parse: (w) =>
         w
-          .expect("(")
           .while(
             "args",
             (s) => s.data === "," || s.data === "(",
             (s) => TypeArg.Parse(s.next),
           )
+          .expect(")")
           .expect(":")
           .extract("returns", (w) => Type.Parse(w))
-          .finish(
-            ({ args, returns }, ctx) => new TypePipeable(ctx, args, returns),
-          ),
+          .finish(({ args, returns }, ctx) => new TypePipeable(ctx, args, returns)),
     });
   }
 

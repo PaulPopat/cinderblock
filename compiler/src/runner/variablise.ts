@@ -14,7 +14,7 @@ export function variablise(input: unknown): Variable {
     case "symbol":
       throw new Error("Type unsupported");
     case "function":
-      return new VariablePipeable((args) => input(args.export()));
+      return new VariablePipeable((args) => variablise(input(args.export())));
     case "boolean":
       return new VariablePrimitiveBool(input);
     case "number":
