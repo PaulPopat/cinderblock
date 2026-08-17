@@ -1,24 +1,23 @@
 {
-  "name": "@cinderblock/compiler",
+  "name": "@cinderblock/server",
   "version": "1.0.0",
   "type": "module",
   "description": "",
   "author": "Paul Popat",
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/node": "^25.6.0",
     "typescript": "^6.0.3"
   },
-  "imports": {
-    "#ast": "./src/ast/index.ts",
-    "#tokeniser": "./src/tokeniser/index.ts",
-    "#utils": "./src/utils/index.ts",
-    "#runner": "./src/runner/index.ts",
-    "#std": "./src/std/index.ts"
-  },
+  "imports": {},
   "exports": {
     ".": "./src/index.ts"
   },
   "prettier": {
     "printWidth": 150
+  },
+  "dependencies": {
+    "@cinderblock/compiler": "*",
+    "express": "^5.2.1"
   }
 }

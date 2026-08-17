@@ -13,7 +13,8 @@
   },
   "workspaces": [
     "compiler",
-    "tests"
+    "tests",
+    "server"
   ],
   "prettier": {
     "printWidth": 150

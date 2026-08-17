@@ -4,8 +4,9 @@ import { Entity } from "./Entity.ts";
 import { Type } from "./Type.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { TypePipeable } from "./TypePipeable.ts";
-import { Namer, VariablePipeable, type Closure, type Frame, type Variable } from "#runner";
+import { Closure, framise, Namer, VariablePipeable, type Frame, type Variable } from "#runner";
 import { EntryTag } from "./EntryTag.ts";
+import * as std from "#std";
 
 export class EntityLet extends Entity {
   static {
@@ -123,5 +124,9 @@ export class EntityLet extends Entity {
     }
 
     return this.#contents.resolve(closure);
+  }
+
+  invoke(args: Record<string, unknown>) {
+    return this.execute(new Closure([]), framise({ ...std, args })).export();
   }
 }

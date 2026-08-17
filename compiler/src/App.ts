@@ -1,5 +1,4 @@
 import type { EntityLet } from "#ast";
-import { Closure, framise } from "#runner";
 
 export class App {
   readonly #lets: Array<EntityLet>;
@@ -12,7 +11,7 @@ export class App {
     const subject = this.#lets.find((l) => l.fullName === name);
     if (!subject) throw new Error("Subject not found");
 
-    return subject.execute(new Closure([]), framise(args)).export();
+    return subject.invoke(args);
   }
 
   get all() {

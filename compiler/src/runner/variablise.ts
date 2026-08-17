@@ -1,4 +1,4 @@
-import type { Variable } from "./Variable.ts";
+import { Variable } from "./Variable.ts";
 import { VariableArray } from "./VariableArray.ts";
 import { VariablePipeable } from "./VariablePipeable.ts";
 import { VariablePrimitiveBool } from "./VariablePrimitiveBool.ts";
@@ -9,6 +9,7 @@ import { VariablePrimitiveString } from "./VariablePrimitiveString.ts";
 import { VariableTuple } from "./VariableTuple.ts";
 
 export function variablise(input: unknown): Variable {
+  if (input instanceof Variable) return input;
   switch (typeof input) {
     case "bigint":
     case "symbol":
