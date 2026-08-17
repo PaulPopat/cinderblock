@@ -31,7 +31,7 @@ export class EntityExternal extends Entity {
     return new TypePipeable(this.ctx, [], new TypePrimitiveUnknown(this.ctx));
   }
 
-  execute(_: Closure, args: Frame): Variable {
-    return variablise(this.#implementation(args.export()));
+  async execute(_: Closure, args: Frame): Promise<Variable> {
+    return variablise(await this.#implementation(args.export()));
   }
 }

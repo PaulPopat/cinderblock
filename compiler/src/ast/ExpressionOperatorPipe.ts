@@ -37,9 +37,9 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
     return new TypePipeable(this.ctx, remaining, right.returns);
   }
 
-  resolve(closure: Closure): Variable {
-    const left = this.left.resolve(closure);
-    const right = this.right.resolve(closure);
+  async resolve(closure: Closure): Promise<Variable> {
+    const left = await this.left.resolve(closure);
+    const right = await this.right.resolve(closure);
 
     if (!(left instanceof VariableTuple)) {
       throw new Error("Tuple required");

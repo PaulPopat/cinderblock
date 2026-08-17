@@ -28,7 +28,7 @@ export class ExpressionLiteralDouble extends ExpressionLiteral {
     return new TypePrimitiveDouble(this.ctx);
   }
 
-  resolve(closure: Closure): Variable {
+  async resolve(closure: Closure): Promise<Variable> {
     throw new Error("Method not implemented.");
   }
 }

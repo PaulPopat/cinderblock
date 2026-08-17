@@ -60,14 +60,8 @@ export class ExpressionTuple extends Expression {
     );
   }
 
-  resolve(closure: Closure): Variable {
-    const inputs = this.#parts.reduce(
-      (current, next) => ({
-        ...current,
-        [next.name]: next.value.resolve(closure),
-      }),
-      {} as Record<string, Variable>,
-    );
+  async resolve(closure: Closure): Promise<Variable> {
+    const inputs = Object.fromEntries(await Promise.all(this.#parts.map(async (next) => [next.name, await next.value.resolve(closure)] as const)));
 
     return new VariableTuple(inputs);
   }

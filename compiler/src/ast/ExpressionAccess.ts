@@ -48,8 +48,8 @@ export class ExpressionAccess extends Expression {
     return property.type;
   }
 
-  resolve(closure: Closure): Variable {
-    const subject = this.#subject.resolve(closure);
+  async resolve(closure: Closure): Promise<Variable> {
+    const subject = await this.#subject.resolve(closure);
     if (!(subject instanceof VariableTuple)) throw new Error("Subject not tuple");
 
     return subject.get(this.#name);

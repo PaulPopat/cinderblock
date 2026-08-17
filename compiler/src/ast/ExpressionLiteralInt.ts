@@ -28,7 +28,7 @@ export class ExpressionLiteralInt extends ExpressionLiteral {
     return new TypePrimitiveInt(this.ctx);
   }
 
-  resolve(closure: Closure): Variable {
+  async resolve(closure: Closure): Promise<Variable> {
     return new VariablePrimitiveInt(Number.parseInt(this.#value));
   }
 }

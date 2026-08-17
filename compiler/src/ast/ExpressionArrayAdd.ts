@@ -40,9 +40,9 @@ export class ExpressionArrayAdd extends Expression {
     return this.#subject.resolution;
   }
 
-  resolve(closure: Closure): Variable {
-    const left = this.#subject.resolve(closure);
-    const right = this.#addition.resolve(closure);
+  async resolve(closure: Closure): Promise<Variable> {
+    const left = await this.#subject.resolve(closure);
+    const right = await this.#addition.resolve(closure);
 
     if (!(left instanceof VariableArray)) throw new Error("Invalid left");
     if (right instanceof VariableArray) {

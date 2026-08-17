@@ -28,7 +28,7 @@ export class ExpressionLiteralChar extends ExpressionLiteral {
     return new TypePrimitiveChar(this.ctx);
   }
 
-  resolve(closure: Closure): Variable {
+  async resolve(closure: Closure): Promise<Variable> {
     throw new Error("Method not implemented.");
   }
 }

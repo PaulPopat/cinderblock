@@ -33,7 +33,7 @@ export class ExpressionReference extends Expression {
     return this.subject.type;
   }
 
-  resolve(closure: Closure): Variable {
+  async resolve(closure: Closure): Promise<Variable> {
     const value = closure.search(this.subject.internalName);
 
     if (value instanceof VariablePipeable && value.noArgs) {

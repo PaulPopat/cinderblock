@@ -1,10 +1,9 @@
 let
 [type="handler", method="GET", path="/users"]
-controllers_UsersController_GetUsers =
-  {
-    status = 200,
-    body = {} -> getUsers
-  };
+controllers_UsersController_GetUsers = {
+  status = 200,
+  body = {} -> getUsers
+};
 
 struct controllers_UsersController_PostUsersBody
   userId: string;

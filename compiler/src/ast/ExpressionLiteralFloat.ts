@@ -28,7 +28,7 @@ export class ExpressionLiteralFloat extends ExpressionLiteral {
     return new TypePrimitiveFloat(this.ctx);
   }
 
-  resolve(closure: Closure): Variable {
+  async resolve(closure: Closure): Promise<Variable> {
     return new VariablePrimitiveFloat(Number.parseFloat(this.#value));
   }
 }

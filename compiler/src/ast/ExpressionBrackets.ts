@@ -32,7 +32,7 @@ export class ExpressionBrackets extends Expression {
     return this.#subject.resolution;
   }
 
-  resolve(closure: Closure): Variable {
+  resolve(closure: Closure): Promise<Variable> {
     return this.#subject.resolve(closure);
   }
 }

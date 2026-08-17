@@ -47,8 +47,8 @@ export class ExpressionTernary extends Expression {
     return new TypeUnion(this.ctx, [this.#positive.resolution, this.#negative.resolution]);
   }
 
-  resolve(closure: Closure): Variable {
-    const predicate = this.#predicate.resolve(closure);
+  async resolve(closure: Closure): Promise<Variable> {
+    const predicate = await this.#predicate.resolve(closure);
 
     if (!(predicate instanceof VariablePrimitiveBool)) {
       throw new Error("Boolean required");

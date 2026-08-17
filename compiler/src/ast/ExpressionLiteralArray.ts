@@ -38,7 +38,7 @@ export class ExpressionLiteralArray extends ExpressionLiteral {
     return new TypeArray(this.ctx, this.#value[0]?.resolution ?? new TypePrimitiveBool(this.ctx));
   }
 
-  resolve(closure: Closure): Variable {
-    return new VariableArray(this.#value.map((v) => v.resolve(closure)));
+  async resolve(closure: Closure): Promise<Variable> {
+    return new VariableArray(await Promise.all(this.#value.map((v) => v.resolve(closure))));
   }
 }

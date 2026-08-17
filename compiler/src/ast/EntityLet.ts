@@ -114,7 +114,7 @@ export class EntityLet extends Entity {
     return result;
   }
 
-  execute(closure: Closure, args: Frame): Variable {
+  async execute(closure: Closure, args: Frame): Promise<Variable> {
     closure = closure.withFrame(args);
     for (const entity of this.#contents.entities) {
       if (entity instanceof EntityLet) {

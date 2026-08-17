@@ -8,12 +8,13 @@ export class App {
     this.#lets = lets;
   }
 
-  run(name: string | EntityLet, args: Record<string, unknown>) {
+  async run(name: string | EntityLet, args: Record<string, unknown>) {
     if (name instanceof EntityLet) name = name.fullName;
     const subject = this.#lets.find((l) => l.fullName === name);
     if (!subject) throw new Error("Subject not found");
 
-    return subject.execute(new Closure([]), framise(args)).export();
+    const result = await subject.execute(new Closure([]), framise(args));
+    return result.export();
   }
 
   get all() {

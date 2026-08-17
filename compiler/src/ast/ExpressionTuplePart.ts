@@ -26,9 +26,9 @@ export class ExpressionTuplePart extends Expression {
     return new TypeTuple(this.ctx, [new TypeArg(this.ctx, this.#value.resolution, this.#name)]);
   }
 
-  resolve(closure: Closure): Variable {
+  async resolve(closure: Closure): Promise<Variable> {
     return new VariableTuple({
-      [this.#name]: this.#value.resolve(closure),
+      [this.#name]: await this.#value.resolve(closure),
     });
   }
 }

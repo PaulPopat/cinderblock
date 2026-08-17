@@ -85,5 +85,5 @@ export abstract class Expression extends Entry {
 
   abstract get resolution(): Type;
 
-  abstract resolve(closure: Closure): Variable;
+  abstract resolve(closure: Closure): Promise<Variable>;
 }

@@ -3,16 +3,16 @@ import { framise } from "./framise.ts";
 import { Variable } from "./Variable.ts";
 
 export class VariablePipeable extends Variable {
-  readonly #execute: (args: Frame) => Variable;
+  readonly #execute: (args: Frame) => Promise<Variable>;
   readonly #noArgs: boolean;
 
-  constructor(execute: (args: Frame) => Variable, noArgs: boolean = false) {
+  constructor(execute: (args: Frame) => Promise<Variable>, noArgs: boolean = false) {
     super();
     this.#execute = execute;
     this.#noArgs = noArgs;
   }
 
-  execute(args: Frame): Variable {
+  execute(args: Frame): Promise<Variable> {
     return this.#execute(args);
   }
 
@@ -25,6 +25,6 @@ export class VariablePipeable extends Variable {
       return this.#execute(new Frame({}));
     }
 
-    return (args: Record<string, unknown>) => this.#execute(framise(args)).export();
+    return (args: Record<string, unknown>) => this.#execute(framise(args)).then((r) => r.export());
   }
 }
