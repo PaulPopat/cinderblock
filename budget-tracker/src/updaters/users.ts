@@ -1,3 +1,3 @@
-export async function addUser(props: any) {
+export async function users_addUser(props: any) {
   console.log(props);
 }

@@ -1,21 +1,25 @@
 let
 [type="handler", method="GET", path="/users"]
-controllers_UsersController_GetUsers = {
-  status = 200,
-  body = {} -> getUsers
-};
+controllers_UsersController_GetUsers =
+  use users;
+  {
+    status = 200,
+    body = {} -> getUsers
+  };
 
 struct controllers_UsersController_PostUsersBody
   userId: string;
 
 let
 [type="handler", method="POST", path="/users"]
-controllers_UsersController_PostUsers (body: PostUsersBody) = {
-  response = {
-    status = 200,
-    body = ({} -> getUsers) ++ body.userId
-  },
-  updates = {
-    addUser = { userId = body.userId }
-  }
-};
+controllers_UsersController_PostUsers (body: PostUsersBody) = 
+  use users;
+  {
+    response = {
+      status = 200,
+      body = ({} -> getUsers) ++ body.userId
+    },
+    updates = {
+      addUser = { userId = body.userId }
+    }
+  };

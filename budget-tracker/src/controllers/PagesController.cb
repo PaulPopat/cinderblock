@@ -1,0 +1,6 @@
+let
+[type="handler", method="GET", path="/"]
+controllers_PagesController_GetHome = {
+  status = 200,
+  body = {name = "home", data = {}} -> html_template
+};
