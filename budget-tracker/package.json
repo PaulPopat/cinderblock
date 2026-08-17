@@ -1,11 +1,13 @@
 {
-  "name": "@cinderblock/server",
+  "name": "@cinderblock/budget-tracker",
   "version": "1.0.0",
   "type": "module",
   "description": "",
   "author": "Paul Popat",
+  "scripts": {
+    "start": "node ./src/index.ts"
+  },
   "devDependencies": {
-    "@types/express": "^5.0.6",
     "@types/node": "^25.6.0",
     "typescript": "^6.0.3"
   },
@@ -17,7 +19,6 @@
     "printWidth": 150
   },
   "dependencies": {
-    "@cinderblock/compiler": "*",
-    "express": "^5.2.1"
+    "@cinderblock/server": "*"
   }
 }

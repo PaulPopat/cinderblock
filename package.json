@@ -14,7 +14,8 @@
   "workspaces": [
     "compiler",
     "tests",
-    "server"
+    "server",
+    "budget-tracker"
   ],
   "prettier": {
     "printWidth": 150

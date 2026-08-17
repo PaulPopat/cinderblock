@@ -40,6 +40,14 @@ describe("syntax", () => {
     assert.deepStrictEqual(result, { test: "hello", world: 123 });
   });
 
+  test("returns an empty tuple", () => {
+    const code = new Inline(`
+      let test_let = {};
+    `);
+    const result = code.app.run("test_let", {});
+    assert.deepStrictEqual(result, {});
+  });
+
   test("accesses a tuple", () => {
     const code = new Inline(`
       let internal_item = {test="hello", world=123};

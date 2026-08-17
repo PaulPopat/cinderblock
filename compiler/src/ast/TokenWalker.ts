@@ -6,8 +6,8 @@ import type { Extracted } from "./Extracted.ts";
 import { ParserError } from "./ParserError.ts";
 
 export class TokenWalker<TContext extends Record<never, never> = Record<never, never>> {
-  static start(store: TokenStore) {
-    return new TokenWalker({}, store, store.location, [[]], undefined);
+  static start(store: TokenStore, existing: Array<Entry>) {
+    return new TokenWalker({}, store, store.location, [existing, []], undefined);
   }
 
   readonly #data: TContext;

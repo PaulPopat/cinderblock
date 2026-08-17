@@ -1,10 +1,8 @@
-import { framise, VariableArray, type VariablePipeable } from "#runner";
-
 type ArrayMapProps = {
   subject: Array<unknown>;
-  selector: VariablePipeable;
+  selector: (props: { item: unknown; index: number }) => unknown;
 };
 
 export function std_array_map(props: ArrayMapProps) {
-  return new VariableArray(props.subject.map((item, index) => props.selector.execute(framise({ item, index }))));
+  return props.subject.map((item, index) => props.selector({ item, index }));
 }

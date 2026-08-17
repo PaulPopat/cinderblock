@@ -4,9 +4,9 @@ import { Entity } from "./Entity.ts";
 import { Type } from "./Type.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { TypePipeable } from "./TypePipeable.ts";
-import { Closure, framise, Namer, VariablePipeable, type Frame, type Variable } from "#runner";
+import { Closure, Namer, VariablePipeable, type Frame, type Variable } from "#runner";
 import { EntryTag } from "./EntryTag.ts";
-import * as std from "#std";
+import { EntityExternal } from "./EntityExternal.ts";
 
 export class EntityLet extends Entity {
   static {
@@ -117,16 +117,15 @@ export class EntityLet extends Entity {
   execute(closure: Closure, args: Frame): Variable {
     closure = closure.withFrame(args);
     for (const entity of this.#contents.entities) {
-      if (!(entity instanceof EntityLet)) continue;
-
-      const c = closure.withVariable(entity.internalName, new VariablePipeable((a) => entity.execute(c, a), !entity.args.length));
-      closure = c;
+      if (entity instanceof EntityLet) {
+        const c = closure.withVariable(entity.internalName, new VariablePipeable((a) => entity.execute(c, a), !entity.args.length));
+        closure = c;
+      } else if (entity instanceof EntityExternal) {
+        const c = closure.withVariable(entity.internalName, new VariablePipeable((a) => entity.execute(c, a), false));
+        closure = c;
+      }
     }
 
     return this.#contents.resolve(closure);
-  }
-
-  invoke(args: Record<string, unknown>) {
-    return this.execute(new Closure([]), framise({ ...std, args })).export();
   }
 }

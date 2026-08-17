@@ -6,7 +6,7 @@ import path from "node:path";
 
 export class Server extends Project {
   readonly #factories = new Lazy(async () => {
-    const base = "./src/factories";
+    const base = path.resolve(this.root, "factories");
     const entries = await fs.readdir(base);
 
     let result: Record<string, unknown> = {};
@@ -22,7 +22,7 @@ export class Server extends Project {
   });
 
   readonly #updaters = new Lazy(async () => {
-    const base = "./src/updaters";
+    const base = path.resolve(this.root, "updaters");
     const entries = await fs.readdir(base);
 
     let result: Record<string, unknown> = {};
@@ -37,34 +37,35 @@ export class Server extends Project {
     return result;
   });
 
-  start() {
+  async start() {
+    const app = this.app(await this.#factories.value);
+    const updaters = await this.#updaters.value;
+
     const server = express();
     server.use(express.json());
 
-    const handlers = this.app.withTag("type", "handler");
+    const handlers = app.withTag("type", "handler");
 
     for (const handler of handlers) {
       const method = handler.tags.find((t) => t.key === "method")?.value ?? "get";
       if (typeof method !== "string") throw new Error("Invalid method type");
 
-      const path = handler.tags.find((t) => t.key === "path");
+      const path = handler.tags.find((t) => t.key === "path")?.value;
       if (typeof path !== "string") throw new Error("Invalid path");
 
-      server.use(path, async (request, response, next) => {
-        if (request.method.toLowerCase() !== method) return next();
+      console.log(`Found handler for ${method}:${path}`);
 
-        const result = await handler.invoke({
-          ...(await this.#factories.value),
-          request: {
-            path: request.path,
-            method: request.method,
-            body: request.body,
-            headers: request.headers,
-          },
+      server.use(path, async (request, response, next) => {
+        if (request.method.toUpperCase() !== method) return next();
+
+        const result = await app.run(handler, {
+          path: request.path,
+          method: request.method,
+          body: request.body,
+          headers: request.headers,
         });
 
         const updates = "updates" in result ? result.updates : {};
-        const updaters = await this.#updaters.value;
         for (const [key, value] of Object.entries(updates)) {
           const updater = updaters[key];
           if (typeof updater !== "function") throw new Error("No updater found");

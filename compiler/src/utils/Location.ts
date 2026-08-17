@@ -1,4 +1,8 @@
 export class Location {
+  static get empty() {
+    return new Location("", -1, -1);
+  }
+
   readonly #file: string;
   readonly #line: number;
   readonly #character: number;

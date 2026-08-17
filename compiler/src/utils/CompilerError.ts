@@ -4,7 +4,14 @@ export abstract class CompilerError extends Error {
   readonly #location: Location;
 
   constructor(message: string, location: Location) {
-    super(message);
+    super(
+      [
+        ["Error", message].join(": "),
+        ["Files", location.file].join(": "),
+        ["Line", location.line].join(": "),
+        ["Character", location.character].join(": "),
+      ].join("\n"),
+    );
 
     this.#location = location;
   }

@@ -12,19 +12,27 @@ export class ExpressionTuple extends Expression {
       match: /^{$/gm,
       parse: (w, lookFor) => {
         return w
-          .while(
-            "value",
-            (w) => w.data === "{" || w.data === ",",
-            (s) =>
-              s.next
-                .text("name")
-                .expect("=")
-                .extract("value", (s) => Expression.Parse(s, [...lookFor, ",", "}"]))
-                .finish(({ name, value }, ctx) => new ExpressionTuplePart(ctx, name, value)),
+          .if(
+            (w) => w.next.data !== "}",
+            (w) =>
+              w.while(
+                "value",
+                (w) => w.data === "{" || w.data === ",",
+                (s) =>
+                  s.next
+                    .text("name")
+                    .expect("=")
+                    .extract("value", (s) => Expression.Parse(s, [...lookFor, ",", "}"]))
+                    .finish(({ name, value }, ctx) => new ExpressionTuplePart(ctx, name, value)),
+              ),
+          )
+          .if(
+            (w) => w.data === "{",
+            (w) => w.expect("{"),
           )
           .expect("}")
           .finish(({ value }, ctx) => {
-            return new ExpressionTuple(ctx, value);
+            return new ExpressionTuple(ctx, value ?? []);
           });
       },
     });

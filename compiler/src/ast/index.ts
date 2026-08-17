@@ -1,5 +1,6 @@
 export * from "./Entity.ts";
 export * from "./EntityArg.ts";
+export * from "./EntityExternal.ts";
 export * from "./EntityLet.ts";
 export * from "./EntityStruct.ts";
 export * from "./EntityUse.ts";
@@ -53,6 +54,7 @@ export * from "./TypePrimitiveFloat.ts";
 export * from "./TypePrimitiveInt.ts";
 export * from "./TypePrimitiveLong.ts";
 export * from "./TypePrimitiveString.ts";
+export * from "./TypePrimitiveUnknown.ts";
 export * from "./TypeReference.ts";
 export * from "./TypeTuple.ts";
 export * from "./TypeUnion.ts";
