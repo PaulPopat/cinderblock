@@ -1,4 +1,0 @@
-struct Location
-  file: string,
-  line: int,
-  character: int;

@@ -1,5 +1,6 @@
 export * from "./Closure.ts";
 export * from "./Frame.ts";
+export * from "./framise.ts";
 export * from "./Variable.ts";
 export * from "./Namer.ts";
 export * from "./VariablePipeable.ts";
@@ -11,3 +12,4 @@ export * from "./VariablePrimitiveFloat.ts";
 export * from "./VariablePrimitiveInt.ts";
 export * from "./VariablePrimitiveString.ts";
 export * from "./VariablePrimitiveNull.ts";
+export * from "./variablise.ts";

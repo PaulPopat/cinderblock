@@ -1,3 +1,0 @@
-struct Tokens_Token
-  data: string,
-  location: Location;

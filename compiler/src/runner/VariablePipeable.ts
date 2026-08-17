@@ -1,4 +1,5 @@
-import type { Frame } from "./Frame.ts";
+import { Frame } from "./Frame.ts";
+import { framise } from "./framise.ts";
 import { Variable } from "./Variable.ts";
 
 export class VariablePipeable extends Variable {
@@ -20,6 +21,10 @@ export class VariablePipeable extends Variable {
   }
 
   export() {
-    throw new Error("Cannot serialise a pipeable");
+    if (this.#noArgs) {
+      return this.#execute(new Frame({}));
+    }
+
+    return (args: Record<string, unknown>) => this.#execute(framise(args));
   }
 }

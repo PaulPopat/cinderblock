@@ -14,4 +14,8 @@ export class Frame {
   withVariable(name: string, value: Variable) {
     return new Frame({ ...this.#variables, [name]: value });
   }
+
+  export() {
+    return Object.fromEntries(Object.entries(this.#variables).map(([key, value]) => [key, value?.export()]));
+  }
 }
