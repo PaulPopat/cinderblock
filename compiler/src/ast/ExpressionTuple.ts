@@ -23,7 +23,7 @@ export class ExpressionTuple extends Expression {
                     .text("name")
                     .expect("=")
                     .extract("value", (s) => Expression.Parse(s, [...lookFor, ",", "}"]))
-                    .finish(({ name, value }, ctx) => new ExpressionTuplePart(ctx, name, value)),
+                    .finish(({ name, value }, ctx) => new ExpressionTuplePart(ctx, name.startsWith('"') ? JSON.parse(name) : name, value)),
               ),
           )
           .if(

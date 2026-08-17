@@ -3,283 +3,291 @@ import { Inline } from "@cinderblock/compiler";
 import assert from "node:assert";
 
 describe("syntax", () => {
-  test("it resolves a let", () => {
+  test("it resolves a let", async () => {
     const code = new Inline('let test_let = "hello";');
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, "hello");
   });
 
-  test("tags a let", () => {
+  test("tags a let", async () => {
     const code = new Inline('let [key="test value"] test_let = "hello";');
     const found = code.app.withTag("key", "test value");
     assert.equal(found.length, 1);
   });
 
-  test("it references another let", () => {
+  test("it references another let", async () => {
     const code = new Inline(`
       let internal_test = "hello";
       let test_let = internal_test;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, "hello");
   });
 
-  test("returns an array", () => {
+  test("returns an array", async () => {
     const code = new Inline(`
       let test_let = ["hello", "world"]
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.deepStrictEqual(result, ["hello", "world"]);
   });
 
-  test("returns a tuple", () => {
+  test("returns a tuple", async () => {
     const code = new Inline(`
       let test_let = {test="hello", world=123};
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.deepStrictEqual(result, { test: "hello", world: 123 });
   });
 
-  test("returns an empty tuple", () => {
+  test("returns a tuple with string property names", async () => {
+    const code = new Inline(`
+      let test_let = {"test-name"="hello", world=123};
+    `);
+    const result = await code.app.run("test_let", {});
+    assert.deepStrictEqual(result, { "test-name": "hello", world: 123 });
+  });
+
+  test("returns an empty tuple", async () => {
     const code = new Inline(`
       let test_let = {};
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.deepStrictEqual(result, {});
   });
 
-  test("accesses a tuple", () => {
+  test("accesses a tuple", async () => {
     const code = new Inline(`
       let internal_item = {test="hello", world=123};
       let test_let = internal_item.test;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, "hello");
   });
 
-  test("adds to an array", () => {
+  test("adds to an array", async () => {
     const code = new Inline(`
       let test_let (input: string[]) = input ++ "hello";
     `);
-    const result = code.app.run("test_let", { input: ["something"] });
+    const result = await code.app.run("test_let", { input: ["something"] });
     assert.deepStrictEqual(result, ["something", "hello"]);
   });
 
-  test("resolves a bool false", () => {
+  test("resolves a bool false", async () => {
     const code = new Inline(`
       let test_let = false;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, false);
   });
 
-  test("resolves a bool true", () => {
+  test("resolves a bool true", async () => {
     const code = new Inline(`
       let test_let = true;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, true);
   });
 
-  test("resolves a float", () => {
+  test("resolves a float", async () => {
     const code = new Inline(`
       let test_let = 123.123;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, 123.123);
   });
 
-  test("resolves a float indicated", () => {
+  test("resolves a float indicated", async () => {
     const code = new Inline(`
       let test_let = 123.123f;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, 123.123);
   });
 
-  test("resolves a int", () => {
+  test("resolves a int", async () => {
     const code = new Inline(`
       let test_let = 123;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, 123);
   });
 
-  test("resolves a int indicated", () => {
+  test("resolves a int indicated", async () => {
     const code = new Inline(`
       let test_let = 123i;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, 123);
   });
 
-  test("resolves a string", () => {
+  test("resolves a string", async () => {
     const code = new Inline(`
       let test_let = "hello world";
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, "hello world");
   });
 
-  test("performs an addition", () => {
+  test("performs an addition", async () => {
     const code = new Inline(`
       let test_let = 1 + 2;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, 3);
   });
 
-  test("performs a divide", () => {
+  test("performs a divide", async () => {
     const code = new Inline(`
       let test_let = 4 / 2;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, 2);
   });
 
-  test("performs an equality check", () => {
+  test("performs an equality check", async () => {
     const code = new Inline(`
       let test_let = 4 == 2;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, false);
   });
 
-  test("performs an greater than", () => {
+  test("performs an greater than", async () => {
     const code = new Inline(`
       let test_let = 4 > 2;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, true);
   });
 
-  test("performs an greater than or equal to", () => {
+  test("performs an greater than or equal to", async () => {
     const code = new Inline(`
       let test_let = 4 >= 4;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, true);
   });
 
-  test("performs an in operation", () => {
+  test("performs an in operation", async () => {
     const code = new Inline(`
       let something = {hello = "world"};
       let test_let = "hello" in something;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, true);
   });
 
-  test("performs an in operation that is false", () => {
+  test("performs an in operation that is false", async () => {
     const code = new Inline(`
       let something = {hello = "world"};
       let test_let = "test" in something;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, false);
   });
 
-  test("performs an less than", () => {
+  test("performs an less than", async () => {
     const code = new Inline(`
       let test_let = 4 < 2;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, false);
   });
 
-  test("performs an less than or equal to", () => {
+  test("performs an less than or equal to", async () => {
     const code = new Inline(`
       let test_let = 4 <= 4;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, true);
   });
 
-  test("performs a multiplication", () => {
+  test("performs a multiplication", async () => {
     const code = new Inline(`
       let test_let = 4 * 4;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, 16);
   });
 
-  test("performs a not equal", () => {
+  test("performs a not equal", async () => {
     const code = new Inline(`
       let test_let = 4 != 4;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, false);
   });
 
-  test("performs an or", () => {
+  test("performs an or", async () => {
     const code = new Inline(`
       let test_let = false || true;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, true);
   });
 
-  test("performs a subtract", () => {
+  test("performs a subtract", async () => {
     const code = new Inline(`
       let test_let = 4 - 2;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, 2);
   });
 
-  test("performs a pipe", () => {
+  test("performs a pipe", async () => {
     const code = new Inline(`
       let pipeable (test: int) = test + 2;
       let test_let = {test = 2} -> pipeable;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, 4);
   });
 
-  test("performs a ternary operation", () => {
+  test("performs a ternary operation", async () => {
     const code = new Inline(`
       let test_let = true ? "hello" : "world";
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, "hello");
   });
 
-  test("struct reference", () => {
+  test("struct reference", async () => {
     const code = new Inline(`
       struct mystruct value: int;
       let pipeable (test: mystruct) = test.value + 2;
       let test_let = {test = {value = 2}} -> pipeable;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, 4);
   });
 
-  test("tuple arg", () => {
+  test("tuple arg", async () => {
     const code = new Inline(`
       let pipeable (test: {value: int}) = test.value + 2;
       let test_let = {test = {value = 2}} -> pipeable;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, 4);
   });
 
-  test("type union", () => {
+  test("type union", async () => {
     const code = new Inline(`
       let final (test: {value: int}) = test.value + 2;
       let pipeable (test: {value: int} | {value: float}) = {test = test} -> final;
       let test_let = {test = {value = 2}} -> pipeable;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, 4);
   });
 
-  test("type intersection", () => {
+  test("type intersection", async () => {
     const code = new Inline(`
       let final (test: {value: int}) = test.value + 2;
       let pipeable (test: {value: int} & {another: float}) = {test = test} -> final;
       let test_let = {test = {value = 2}} -> pipeable;
     `);
-    const result = code.app.run("test_let", {});
+    const result = await code.app.run("test_let", {});
     assert.equal(result, 4);
   });
 });

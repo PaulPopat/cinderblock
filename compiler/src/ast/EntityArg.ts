@@ -1,4 +1,3 @@
-import { Namer } from "#runner";
 import { Entity } from "./Entity.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { TokenWalker } from "./TokenWalker.ts";
@@ -11,7 +10,7 @@ export class EntityArg extends Entity {
       .text("name")
       .expect(":")
       .extract("type", (w) => Type.Parse(w))
-      .finish(({ type, name }, ctx) => new EntityArg(ctx, type, name));
+      .finish(({ type, name }, ctx) => new EntityArg(ctx, type, name.startsWith('"') ? JSON.parse(name) : name));
   }
 
   readonly #type: Type;

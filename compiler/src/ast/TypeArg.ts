@@ -8,7 +8,7 @@ export class TypeArg extends Type {
       .text("name")
       .expect(":")
       .extract("type", (w) => Type.Parse(w))
-      .finish(({ type, name }, ctx) => new TypeArg(ctx, type, name));
+      .finish(({ type, name }, ctx) => new TypeArg(ctx, type, name.startsWith('"') ? JSON.parse(name) : name));
   }
 
   readonly #type: Type;
