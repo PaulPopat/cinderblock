@@ -1,5 +1,5 @@
 import type { EntityLet } from "#ast";
-import { Closure, Frame, framise, Variable, variablise } from "#runner";
+import { Closure, framise } from "#runner";
 
 export class App {
   readonly #lets: Array<EntityLet>;
@@ -13,5 +13,13 @@ export class App {
     if (!subject) throw new Error("Subject not found");
 
     return subject.execute(new Closure([]), framise(args)).export();
+  }
+
+  get all() {
+    return this.#lets;
+  }
+
+  withTag(key: string, value: unknown) {
+    return this.#lets.filter((l) => l.tags.some((t) => t.key === key && t.value === value));
   }
 }

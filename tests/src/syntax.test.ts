@@ -9,6 +9,12 @@ describe("syntax", () => {
     assert.equal(result, "hello");
   });
 
+  test("tags a let", () => {
+    const code = new Inline('let [key="test value"] test_let = "hello";');
+    const found = code.app.withTag("key", "test value");
+    assert.equal(found.length, 1);
+  });
+
   test("it references another let", () => {
     const code = new Inline(`
       let internal_test = "hello";

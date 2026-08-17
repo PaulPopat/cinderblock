@@ -5,6 +5,7 @@ import { Type } from "./Type.ts";
 import type { EntryContext } from "./EntryContext.ts";
 import { TypePipeable } from "./TypePipeable.ts";
 import { Namer, VariablePipeable, type Closure, type Frame, type Variable } from "#runner";
+import { EntryTag } from "./EntryTag.ts";
 
 export class EntityLet extends Entity {
   static {
@@ -14,6 +15,22 @@ export class EntityLet extends Entity {
       parse: (w) =>
         w
           .expect("let")
+          .if(
+            (s) => s.data === "[",
+            (s) =>
+              s
+                .while(
+                  "tags",
+                  (s) => s.data === "[" || s.data === ",",
+                  (s) =>
+                    s.next
+                      .text("key")
+                      .expect("=")
+                      .text("value")
+                      .finish(({ key, value }, ctx) => new EntryTag(ctx, key, JSON.parse(value))),
+                )
+                .expect("]"),
+          )
           .text("name", "namespace")
           .if(
             (s) => s.data === "(",
@@ -34,21 +51,23 @@ export class EntityLet extends Entity {
           .expect("=")
           .extract("block", (s) => Expression.ParseBlock(s))
           .finish(
-            ({ name, args, returns, block }, ctx) =>
-              new EntityLet(ctx, [w.entryContext.namespace, name].filter((w) => w).join("_"), args ?? [], returns, block),
+            ({ name, args, returns, block, tags }, ctx) =>
+              new EntityLet(ctx, [w.entryContext.namespace, name].filter((w) => w).join("_"), tags ?? [], args ?? [], returns, block),
           ),
     });
   }
 
   readonly #name: string;
+  readonly #tags: Array<EntryTag>;
   readonly #args: Array<EntityArg>;
   readonly #returns: Type | undefined;
   readonly #contents: Expression;
   readonly #internalName = Namer.Next;
 
-  constructor(ctx: EntryContext, name: string, args: Array<EntityArg>, returns: Type | undefined, contents: Expression) {
+  constructor(ctx: EntryContext, name: string, tags: Array<EntryTag>, args: Array<EntityArg>, returns: Type | undefined, contents: Expression) {
     super(ctx);
     this.#name = name;
+    this.#tags = tags;
     this.#args = args;
     this.#returns = returns;
     this.#contents = contents;
@@ -56,6 +75,10 @@ export class EntityLet extends Entity {
 
   get name() {
     return this.#name;
+  }
+
+  get tags() {
+    return this.#tags;
   }
 
   get internalName() {
