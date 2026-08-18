@@ -1,8 +1,8 @@
 type ArrayMapProps = {
-  subject: Array<unknown>;
+  _s: Array<unknown>;
   selector: (props: { item: unknown; index: number }) => unknown;
 };
 
 export function std_array_map(props: ArrayMapProps) {
-  return props.subject.map((item, index) => props.selector({ item, index }));
+  return props._s.map((item, index) => props.selector({ item, index }));
 }

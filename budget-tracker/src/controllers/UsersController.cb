@@ -1,25 +1,33 @@
 let
-[type="handler", method="GET", path="/users"]
-controllers_UsersController_GetUsers =
-  use users;
+[type="handler", method="GET", path="/users/:user_id"]
+controllers_UsersController_GetUsers (params: unknown) =
+    use users;
   {
     status = 200,
-    body = {} -> getUsers
+    body = params.user_id -> getUser
   };
 
 struct controllers_UsersController_PostUsersBody
-  userId: string;
+  email: string
+  password: string;
 
 let
 [type="handler", method="POST", path="/users"]
 controllers_UsersController_PostUsers (body: PostUsersBody) = 
-  use users;
+    use services_PasswordService;
+    use users;
+    use crypto;
+    let id = {} -> guid;
   {
     response = {
       status = 200,
-      body = ({} -> getUsers) ++ body.userId
+      body = { message = "success" }
     },
     updates = {
-      addUser = { userId = body.userId }
+      addUser = {
+        id = id,
+        email = body.email,
+        password = body.password -> HashPassword
+      }
     }
   };

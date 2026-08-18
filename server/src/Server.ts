@@ -63,6 +63,8 @@ export class Server extends Project {
           method: request.method,
           body: request.body,
           headers: request.headers,
+          params: request.params,
+          query: request.query,
         });
 
         const updates = "updates" in result ? result.updates : {};

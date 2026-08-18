@@ -12,7 +12,9 @@
     "@types/pug": "^2.0.10",
     "typescript": "^6.0.3"
   },
-  "imports": {},
+  "imports": {
+    "#integration/*": "./src/integrations/*.ts"
+  },
   "exports": {
     ".": "./src/index.ts"
   },
