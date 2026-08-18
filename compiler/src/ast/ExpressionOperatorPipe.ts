@@ -3,6 +3,7 @@ import { Expression } from "./Expression.ts";
 import { ExpressionOperator } from "./ExpressionOperator.ts";
 import { LinkerError } from "./LinkerError.ts";
 import { ParserError } from "./ParserError.ts";
+import { TypeArg } from "./TypeArg.ts";
 import { TypePipeable } from "./TypePipeable.ts";
 import { TypeTuple } from "./TypeTuple.ts";
 
@@ -27,10 +28,12 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
       throw new LinkerError("Target not pipeable", this.ctx.start);
     }
 
-    const input = this.left.resolution;
-    if (!(input instanceof TypeTuple)) throw new LinkerError("Expected a tuple", this.ctx.start);
+    let input = this.left.resolution;
+    if (!(input instanceof TypeTuple)) {
+      input = new TypeTuple(this.ctx, [new TypeArg(this.ctx, input, "_s")]);
+    }
 
-    const remaining = right.args.filter((r) => !input.args.find((a) => a.name === r.name));
+    const remaining = right.args.filter((r) => !(input as TypeTuple).args.find((a) => a.name === r.name));
 
     if (!remaining.length) return right.returns;
 
@@ -38,11 +41,11 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
   }
 
   async resolve(closure: Closure): Promise<Variable> {
-    const left = await this.left.resolve(closure);
+    let left = await this.left.resolve(closure);
     const right = await this.right.resolve(closure);
 
     if (!(left instanceof VariableTuple)) {
-      throw new Error("Tuple required");
+      left = new VariableTuple({ _s: left });
     }
 
     if (!(right instanceof VariablePipeable)) {
@@ -56,7 +59,7 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
 
     return right.execute(
       new Frame(
-        left.entries.reduce(
+        (left as VariableTuple).entries.reduce(
           (frame, [key, value]) => ({
             ...frame,
             [key]: value,

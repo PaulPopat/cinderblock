@@ -244,6 +244,15 @@ describe("syntax", () => {
     assert.equal(result, 4);
   });
 
+  test("performs a pipe of a basic", async () => {
+    const code = new Inline(`
+      let pipeable (_s: int) = _s + 2;
+      let test_let = 2 -> pipeable;
+    `);
+    const result = await code.app.run("test_let", {});
+    assert.equal(result, 4);
+  });
+
   test("performs a ternary operation", async () => {
     const code = new Inline(`
       let test_let = true ? "hello" : "world";
