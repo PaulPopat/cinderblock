@@ -1,25 +1,21 @@
 import { Entity } from "./Entity.ts";
-import type { EntryContext } from "./EntryContext.ts";
-import { Expression } from "./Expression.ts";
+import type { Entry } from "./Entry.ts";
+import type { TokenWalker } from "./TokenWalker.ts";
 
 export class EntityUse extends Entity {
   static {
-    Expression.RegisterEntity({
+    Entity.RegisterEntity({
       priority: 100,
       match: /^use$/gm,
-      parse: (e) =>
-        e
-          .expect("use")
-          .text("namespace")
-          .expect(";")
-          .finish(({ namespace }, ctx) => new EntityUse(ctx, namespace)),
+      factory: this,
     });
   }
 
   readonly #namespace: string;
 
-  constructor(ctx: EntryContext, namespace: string) {
-    super(ctx);
+  constructor(walker: TokenWalker, parent: Entry | undefined) {
+    const [{ namespace }, done] = walker.expect("use").text("namespace").expect(";").finish();
+    super(walker.location, done, parent);
     this.#namespace = namespace;
   }
 

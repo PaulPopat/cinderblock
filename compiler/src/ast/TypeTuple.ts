@@ -1,6 +1,9 @@
 import { TypeArg } from "./TypeArg.ts";
-import type { EntryContext } from "./EntryContext.ts";
 import { Type } from "./Type.ts";
+import type { Entry } from "./Entry.ts";
+import type { TokenWalker } from "./TokenWalker.ts";
+import type { Location } from "#utils";
+import type { TokenStore } from "#tokeniser";
 
 export class TypeTuple extends Type {
   static {
@@ -8,22 +11,25 @@ export class TypeTuple extends Type {
       priority: 100,
       match: /^\{$/gm,
       chainable: false,
-      parse: (w) =>
-        w
+      factory: (walker: TokenWalker, parent: Entry | undefined, left?: Type) => {
+        const [{ parts }, done] = walker
           .while(
             "parts",
             (s) => s.data === "{" || s.data === ",",
-            (w) => TypeArg.Parse(w.next),
+            (w) => TypeArg.Parse(w.next, parent),
           )
           .expect("}")
-          .finish(({ parts }, ctx) => new TypeTuple(ctx, parts)),
+          .finish();
+
+        return new TypeTuple(walker.location, done, parent, parts);
+      },
     });
   }
 
   readonly #args: Array<TypeArg>;
 
-  constructor(ctx: EntryContext, args: Array<TypeArg>) {
-    super(ctx);
+  constructor(location: Location, done: TokenStore, parent: Entry | undefined, args: Array<TypeArg>) {
+    super(location, done, parent);
     this.#args = args;
   }
 

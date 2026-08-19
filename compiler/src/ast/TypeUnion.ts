@@ -1,6 +1,8 @@
+import type { TokenStore } from "#tokeniser";
 import type { Location } from "#utils";
-import type { EntryContext } from "./EntryContext.ts";
+import type { Entry } from "./Entry.ts";
 import { ParserError } from "./ParserError.ts";
+import type { TokenWalker } from "./TokenWalker.ts";
 import { Type } from "./Type.ts";
 
 export class TypeUnion extends Type {
@@ -9,26 +11,25 @@ export class TypeUnion extends Type {
       priority: 100,
       match: /^\|$/gm,
       chainable: true,
-      parse: (w, left) => {
-        if (!left) throw new ParserError("Unexpected |", w.store);
-        return w
-          .expect("|")
-          .extract("right", (w) => Type.Parse(w))
-          .finish(
-            ({ right }, ctx) =>
-              new TypeUnion(ctx, [
-                ...(left instanceof TypeUnion ? left.parts : [left]),
-                ...(right instanceof TypeUnion ? right.parts : [right]),
-              ]),
-          );
+      factory: (walker: TokenWalker, parent: Entry | undefined, left?: Type) => {
+        if (!left) throw new ParserError("Unexpected &", walker.store);
+        const [{ right }, done] = walker
+          .expect("&")
+          .extract("right", (w) => Type.Parse(w, parent))
+          .finish();
+
+        return new TypeUnion(walker.location, done, parent, [
+          ...(left instanceof TypeUnion ? left.parts : [left]),
+          ...(right instanceof TypeUnion ? right.parts : [right]),
+        ]);
       },
     });
   }
 
   readonly #parts: Array<Type>;
 
-  constructor(ctx: EntryContext, parts: Array<Type>) {
-    super(ctx);
+  constructor(location: Location, done: TokenStore, parent: Entry | undefined, parts: Array<Type>) {
+    super(location, done, parent);
     this.#parts = parts;
   }
 

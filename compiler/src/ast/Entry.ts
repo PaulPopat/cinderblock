@@ -1,17 +1,43 @@
-import type { EntryContext } from "./EntryContext.ts";
+import type { TokenStore } from "#tokeniser";
+import type { Location } from "#utils";
+import type { TokenWalker } from "./TokenWalker.ts";
 
-export class Entry {
-  readonly #ctx: EntryContext;
+export abstract class Entry {
+  readonly #location: Location;
+  readonly #done: TokenStore;
+  readonly #parent: Entry | undefined;
 
-  constructor(ctx: EntryContext) {
-    this.#ctx = ctx;
+  constructor(location: Location, done: TokenStore, parent: Entry | undefined) {
+    this.#location = location;
+    this.#done = done;
+    this.#parent = parent;
   }
 
-  get ctx() {
-    return this.#ctx;
+  get parent() {
+    return this.#parent;
   }
 
-  get entities() {
-    return this.#ctx.entities;
+  get location() {
+    return this.#location;
+  }
+
+  get end() {
+    return this.#done.location;
+  }
+
+  get done() {
+    return this.#done;
+  }
+
+  resolveStruct(name: string): Entry | undefined {
+    return this.#parent?.resolveStruct(name);
+  }
+
+  resolveConcrete(name: string): Entry | undefined {
+    return this.#parent?.resolveConcrete(name);
+  }
+
+  get namespace(): string {
+    return this.#parent?.namespace ?? "";
   }
 }

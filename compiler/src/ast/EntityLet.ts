@@ -2,74 +2,77 @@ import { EntityArg } from "./EntityArg.ts";
 import { Expression } from "./Expression.ts";
 import { Entity } from "./Entity.ts";
 import { Type } from "./Type.ts";
-import type { EntryContext } from "./EntryContext.ts";
 import { TypePipeable } from "./TypePipeable.ts";
 import { Closure, Namer, VariablePipeable, type Frame, type Variable } from "#runner";
 import { EntryTag } from "./EntryTag.ts";
 import { EntityExternal } from "./EntityExternal.ts";
+import { TokenWalker } from "./TokenWalker.ts";
+import type { Entry } from "./Entry.ts";
+import { EntityUse } from "./EntityUse.ts";
+import { LinkerError } from "./LinkerError.ts";
+import { EntityStruct } from "./EntityStruct.ts";
 
 export class EntityLet extends Entity {
   static {
-    Expression.RegisterEntity({
+    Entity.RegisterEntity({
       priority: 100,
       match: /^let$/gm,
-      parse: (w) =>
-        w
-          .expect("let")
-          .if(
-            (s) => s.data === "[",
-            (s) =>
-              s
-                .while(
-                  "tags",
-                  (s) => s.data === "[" || s.data === ",",
-                  (s) =>
-                    s.next
-                      .text("key")
-                      .expect("=")
-                      .text("value")
-                      .finish(({ key, value }, ctx) => new EntryTag(ctx, key, JSON.parse(value))),
-                )
-                .expect("]"),
-          )
-          .text("name", "namespace")
-          .if(
-            (s) => s.data === "(",
-            (walker) =>
-              walker
-                .while(
-                  "args",
-                  (s) => s.data === "," || s.data === "(",
-                  (s) => EntityArg.Parse(s.next),
-                  "entity",
-                )
-                .expect(")"),
-          )
-          .if(
-            (s) => s.data === ":",
-            (walker) => walker.expect(":").extract("returns", (s) => Type.Parse(s)),
-          )
-          .expect("=")
-          .extract("block", (s) => Expression.ParseBlock(s))
-          .finish(
-            ({ name, args, returns, block, tags }, ctx) =>
-              new EntityLet(ctx, [w.entryContext.namespace, name].filter((w) => w).join("_"), tags ?? [], args ?? [], returns, block),
-          ),
+      factory: EntityLet,
     });
   }
 
   readonly #name: string;
   readonly #tags: Array<EntryTag>;
   readonly #args: Array<EntityArg>;
+  readonly #entities: Array<Entity>;
   readonly #returns: Type | undefined;
   readonly #contents: Expression;
   readonly #internalName = Namer.Next;
 
-  constructor(ctx: EntryContext, name: string, tags: Array<EntryTag>, args: Array<EntityArg>, returns: Type | undefined, contents: Expression) {
-    super(ctx);
+  constructor(walker: TokenWalker, parent: Entry | undefined) {
+    const [{ name, args, returns, contents, tags, entities }, done] = walker
+      .expect("let")
+      .if(
+        (s) => s.data === "[",
+        (s) =>
+          s
+            .while(
+              "tags",
+              (s) => s.data === "[" || s.data === ",",
+              (s) => new EntryTag(s.next, this),
+            )
+            .expect("]"),
+      )
+      .text("name")
+      .if(
+        (s) => s.data === "(",
+        (walker) =>
+          walker
+            .while(
+              "args",
+              (s) => s.data === "," || s.data === "(",
+              (s) => new EntityArg(walker, this),
+            )
+            .expect(")"),
+      )
+      .if(
+        (s) => s.data === ":",
+        (walker) => walker.expect(":").extract("returns", (s) => Type.Parse(s, this)),
+      )
+      .expect("=")
+      .while(
+        "entities",
+        (s) => Entity.HasParser(s),
+        (w) => Entity.Parse(w, this),
+      )
+      .extract("contents", (s) => Expression.Parse(s, this, [";"]))
+      .finish();
+
+    super(walker.location, done, parent);
     this.#name = name;
-    this.#tags = tags;
-    this.#args = args;
+    this.#tags = tags ?? [];
+    this.#args = args ?? [];
+    this.#entities = entities;
     this.#returns = returns;
     this.#contents = contents;
   }
@@ -99,14 +102,55 @@ export class EntityLet extends Entity {
   }
 
   get fullName() {
-    return this.#name;
+    return this.namespace;
+  }
+
+  get namespace(): string {
+    return [this.parent?.namespace, this.name].filter((r) => r).join("_");
+  }
+
+  possibleNames(name: string) {
+    return [
+      name,
+      [this.namespace, name].join("_"),
+      ...this.#entities.filter((e) => e instanceof EntityUse).map((e) => [e.namespace, name].join("_")),
+    ];
+  }
+
+  resolveConcrete(name: string): Entry | undefined {
+    const possible = this.possibleNames(name);
+
+    const found = this.#entities
+      .filter((e) => e instanceof EntityLet || e instanceof EntityArg || e instanceof EntityExternal)
+      .filter((s) => possible.includes(s.fullName));
+
+    if (found.length > 1) throw new LinkerError("Ambigious reference", this.location);
+    const [result] = found;
+    if (!result) throw new LinkerError("Reference not found", this.location);
+
+    return result;
+  }
+
+  resolveStruct(name: string): Entry | undefined {
+    const possible = this.possibleNames(name);
+
+    const found = this.#entities.filter((e) => e instanceof EntityStruct).filter((s) => possible.includes(s.fullName));
+
+    if (found.length > 1) throw new LinkerError("Ambigious struct reference", this.location);
+
+    const [result] = found;
+    if (!result) throw new LinkerError("Struct not found", this.location);
+
+    return result;
   }
 
   get type() {
     const result = this.#returns ?? this.#contents.resolution;
     if (this.#args.length)
       return new TypePipeable(
-        this.ctx,
+        this.location,
+        this.done,
+        this,
         this.#args.map((a) => a.typeArg),
         result,
       );
@@ -116,7 +160,7 @@ export class EntityLet extends Entity {
 
   async execute(closure: Closure, args: Frame): Promise<Variable> {
     closure = closure.withFrame(args);
-    for (const entity of this.#contents.entities) {
+    for (const entity of this.#entities) {
       if (entity instanceof EntityLet) {
         const c = closure.withVariable(entity.internalName, new VariablePipeable((a) => entity.execute(c, a), !entity.args.length));
         closure = c;

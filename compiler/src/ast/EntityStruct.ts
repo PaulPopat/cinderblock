@@ -1,32 +1,32 @@
 import { TypeArg } from "./TypeArg.ts";
 import { Entity } from "./Entity.ts";
-import type { EntryContext } from "./EntryContext.ts";
-import { Expression } from "./Expression.ts";
+import type { TokenWalker } from "./TokenWalker.ts";
+import type { Entry } from "./Entry.ts";
 
 export class EntityStruct extends Entity {
   static {
-    Expression.RegisterEntity({
+    Entity.RegisterEntity({
       priority: 100,
       match: /^struct$/gm,
-      parse: (e) =>
-        e
-          .expect("struct")
-          .text("name")
-          .while(
-            "args",
-            (s) => s.data !== ";",
-            (s) => TypeArg.Parse(s),
-          )
-          .expect(";")
-          .finish(({ name, args }, ctx) => new EntityStruct(ctx, [e.entryContext.namespace, name].filter((w) => w).join("_"), args)),
+      factory: EntityStruct,
     });
   }
 
   readonly #name: string;
   readonly #args: Array<TypeArg>;
 
-  constructor(ctx: EntryContext, name: string, args: Array<TypeArg>) {
-    super(ctx);
+  constructor(walker: TokenWalker, parent: Entry | undefined) {
+    const [{ name, args }, done] = walker
+      .expect("struct")
+      .text("name")
+      .while(
+        "args",
+        (s) => s.data !== ";",
+        (s) => TypeArg.Parse(s, this),
+      )
+      .expect(";")
+      .finish();
+    super(walker.location, done, parent);
     this.#name = name;
     this.#args = args;
   }
