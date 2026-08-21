@@ -1,22 +1,24 @@
-import { EntityLet, Expression, TokenWalker } from "#ast";
-import { framise } from "#runner";
+import { Entity, TokenWalker } from "#ast";
 import { Tokeniser, TokenStore } from "#tokeniser";
 import { App } from "./App.ts";
 
-export class Inline {
+export class Inline extends App {
   readonly #code: string;
 
   constructor(code: string) {
+    super();
     this.#code = code;
   }
 
-  get app() {
-    const store = TokenStore.start([]).with(new Tokeniser("inline", this.#code).tokens);
-    const [entities] = Expression.GetEntities(TokenWalker.start(store, []));
+  get entities() {
+    const [{ entities }] = TokenWalker.start(TokenStore.start([]).with(new Tokeniser("inline", this.#code).tokens))
+      .while(
+        "entities",
+        (s) => Entity.HasParser(s),
+        (w) => Entity.Parse(w, this),
+      )
+      .finish();
 
-    return new App(
-      entities.filter((e) => e instanceof EntityLet),
-      framise({}),
-    );
+    return entities;
   }
 }

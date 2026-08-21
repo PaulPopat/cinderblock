@@ -29,12 +29,8 @@ export abstract class Entry {
     return this.#done;
   }
 
-  resolveStruct(name: string): Entry | undefined {
-    return this.#parent?.resolveStruct(name);
-  }
-
-  resolveConcrete(name: string): Entry | undefined {
-    return this.#parent?.resolveConcrete(name);
+  find(name: string): Entry | undefined {
+    return this.#parent?.find(name);
   }
 
   get namespace(): string {

@@ -1,21 +1,26 @@
 import { VariablePrimitiveBool, VariablePrimitiveString, VariableTuple, type Closure, type Variable } from "#runner";
+import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionOperator } from "./ExpressionOperator.ts";
 import { ParserError } from "./ParserError.ts";
+import type { TokenWalker } from "./TokenWalker.ts";
 
 export class ExpressionOperatorIn extends ExpressionOperator {
   static {
     Expression.RegisterExpression({
       priority: 100,
       match: /^in$/gm,
-      parse: (w, lookFor, e) => {
-        if (!e) throw new ParserError("Unexpected in", w.store);
-        return w
-          .expect("in")
-          .extract("right", (w) => Expression.Parse(w, lookFor))
-          .finish(({ right }, ctx) => new ExpressionOperatorIn(ctx, e, right));
-      },
+      factory: this,
     });
+  }
+
+  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+    if (!existing) throw new ParserError("Unexpected in", walker.store);
+    const [{ right }, done] = walker
+      .expect("in")
+      .extract("right", (w) => Expression.Parse(w, parent, lookFor))
+      .finish();
+    super(walker.location, done, parent, existing, right);
   }
 
   get resolution() {

@@ -1,26 +1,26 @@
 import { type Closure, type Variable } from "#runner";
-import type { EntryContext } from "./EntryContext.ts";
+import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
+import type { TokenWalker } from "./TokenWalker.ts";
 
 export class ExpressionBrackets extends Expression {
   static {
     Expression.RegisterExpression({
       priority: 100,
       match: /^\($/gm,
-      parse: (w, lookFor) => {
-        return w
-          .expect("(")
-          .extract("subject", (w) => Expression.Parse(w, [...lookFor, ")"]))
-          .expect(")")
-          .finish(({ subject }, ctx) => new ExpressionBrackets(ctx, subject));
-      },
+      factory: this,
     });
   }
 
   readonly #subject: Expression;
 
-  constructor(ctx: EntryContext, subject: Expression) {
-    super(ctx);
+  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+    const [{ subject }, done] = walker
+      .expect("(")
+      .extract("subject", (w) => Expression.Parse(w, this, [...lookFor, ")"]))
+      .expect(")")
+      .finish();
+    super(walker.location, done, parent);
     this.#subject = subject;
   }
 

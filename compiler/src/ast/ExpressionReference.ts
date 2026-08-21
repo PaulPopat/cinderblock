@@ -1,24 +1,27 @@
 import { Frame, VariablePipeable, type Closure, type Variable } from "#runner";
-import { ContextManager } from "./ContextManager.ts";
-import type { EntryContext } from "./EntryContext.ts";
+import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
+import type { TokenWalker } from "./TokenWalker.ts";
+import { LinkerError } from "./LinkerError.ts";
+import { EntityLet } from "./EntityLet.ts";
+import { EntityArg } from "./EntityArg.ts";
+import { EntityExternal } from "./EntityExternal.ts";
 
 export class ExpressionReference extends Expression {
   static {
     Expression.RegisterExpression({
       priority: 1,
       match: /^[a-zA-Z_@$#:][a-zA-Z0-9_@$#:]*$/gm,
-      parse: (w) => w.text("value").finish(({ value }, ctx) => new ExpressionReference(ctx, value)),
+      factory: this,
     });
   }
 
   readonly #name: string;
-  readonly #manager: ContextManager;
 
-  constructor(ctx: EntryContext, name: string) {
-    super(ctx);
-    this.#name = name;
-    this.#manager = new ContextManager(ctx);
+  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+    const [{ value }, done] = walker.text("value").finish();
+    super(walker.location, done, parent);
+    this.#name = value;
   }
 
   get name() {
@@ -26,7 +29,10 @@ export class ExpressionReference extends Expression {
   }
 
   get subject() {
-    return this.#manager.resolveConcrete(this.#name);
+    const result = this.find(this.#name);
+    if (!(result instanceof EntityLet) || !(result instanceof EntityArg) || !(result instanceof EntityExternal))
+      throw new LinkerError("Unresolved reference", this.location);
+    return result;
   }
 
   get resolution() {

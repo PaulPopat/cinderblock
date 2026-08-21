@@ -5,7 +5,7 @@ import assert from "node:assert";
 describe("syntax", () => {
   test("it resolves a let", async () => {
     const code = new Inline('let test_let = "hello";');
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, "hello");
   });
 
@@ -20,7 +20,7 @@ describe("syntax", () => {
       let internal_test = "hello";
       let test_let = internal_test;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, "hello");
   });
 
@@ -28,7 +28,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = ["hello", "world"]
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.deepStrictEqual(result, ["hello", "world"]);
   });
 
@@ -36,7 +36,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = {test="hello", world=123};
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.deepStrictEqual(result, { test: "hello", world: 123 });
   });
 
@@ -44,7 +44,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = {"test-name"="hello", world=123};
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.deepStrictEqual(result, { "test-name": "hello", world: 123 });
   });
 
@@ -52,7 +52,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = {};
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.deepStrictEqual(result, {});
   });
 
@@ -61,7 +61,7 @@ describe("syntax", () => {
       let internal_item = {test="hello", world=123};
       let test_let = internal_item.test;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, "hello");
   });
 
@@ -69,7 +69,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let (input: string[]) = input ++ "hello";
     `);
-    const result = await code.app.run("test_let", { input: ["something"] });
+    const result = await code.run("test_let", { input: ["something"] });
     assert.deepStrictEqual(result, ["something", "hello"]);
   });
 
@@ -77,7 +77,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = false;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, false);
   });
 
@@ -85,7 +85,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = true;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, true);
   });
 
@@ -93,7 +93,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = 123.123;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, 123.123);
   });
 
@@ -101,7 +101,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = 123.123f;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, 123.123);
   });
 
@@ -109,7 +109,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = 123;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, 123);
   });
 
@@ -117,7 +117,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = 123i;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, 123);
   });
 
@@ -125,7 +125,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = "hello world";
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, "hello world");
   });
 
@@ -133,7 +133,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = 1 + 2;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, 3);
   });
 
@@ -141,7 +141,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = 4 / 2;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, 2);
   });
 
@@ -149,7 +149,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = 4 == 2;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, false);
   });
 
@@ -157,7 +157,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = 4 > 2;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, true);
   });
 
@@ -165,7 +165,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = 4 >= 4;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, true);
   });
 
@@ -174,7 +174,7 @@ describe("syntax", () => {
       let something = {hello = "world"};
       let test_let = "hello" in something;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, true);
   });
 
@@ -183,7 +183,7 @@ describe("syntax", () => {
       let something = {hello = "world"};
       let test_let = "test" in something;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, false);
   });
 
@@ -191,7 +191,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = 4 < 2;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, false);
   });
 
@@ -199,7 +199,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = 4 <= 4;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, true);
   });
 
@@ -207,7 +207,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = 4 * 4;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, 16);
   });
 
@@ -215,7 +215,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = 4 != 4;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, false);
   });
 
@@ -223,7 +223,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = false || true;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, true);
   });
 
@@ -231,7 +231,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = 4 - 2;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, 2);
   });
 
@@ -240,7 +240,7 @@ describe("syntax", () => {
       let pipeable (test: int) = test + 2;
       let test_let = {test = 2} -> pipeable;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, 4);
   });
 
@@ -249,7 +249,7 @@ describe("syntax", () => {
       let pipeable (_s: int) = _s + 2;
       let test_let = 2 -> pipeable;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, 4);
   });
 
@@ -257,7 +257,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let test_let = true ? "hello" : "world";
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, "hello");
   });
 
@@ -267,7 +267,7 @@ describe("syntax", () => {
       let pipeable (test: mystruct) = test.value + 2;
       let test_let = {test = {value = 2}} -> pipeable;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, 4);
   });
 
@@ -276,7 +276,7 @@ describe("syntax", () => {
       let pipeable (test: {value: int}) = test.value + 2;
       let test_let = {test = {value = 2}} -> pipeable;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, 4);
   });
 
@@ -286,7 +286,7 @@ describe("syntax", () => {
       let pipeable (test: {value: int} | {value: float}) = {test = test} -> final;
       let test_let = {test = {value = 2}} -> pipeable;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, 4);
   });
 
@@ -296,7 +296,7 @@ describe("syntax", () => {
       let pipeable (test: {value: int} & {another: float}) = {test = test} -> final;
       let test_let = {test = {value = 2}} -> pipeable;
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, 4);
   });
 });

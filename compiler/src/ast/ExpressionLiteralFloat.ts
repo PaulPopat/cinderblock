@@ -1,7 +1,8 @@
 import { Variable, VariablePrimitiveFloat, type Closure } from "#runner";
-import type { EntryContext } from "./EntryContext.ts";
+import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
+import type { TokenWalker } from "./TokenWalker.ts";
 import { TypePrimitiveFloat } from "./TypePrimitiveFloat.ts";
 
 export class ExpressionLiteralFloat extends ExpressionLiteral {
@@ -9,15 +10,16 @@ export class ExpressionLiteralFloat extends ExpressionLiteral {
     Expression.RegisterExpression({
       priority: 150,
       match: /[0-9]+\.[0-9]+f?$/gm,
-      parse: (w) => w.text("value").finish(({ value }, ctx) => new ExpressionLiteralFloat(ctx, value.replace("f", ""))),
+      factory: this,
     });
   }
 
   readonly #value: string;
 
-  constructor(ctx: EntryContext, value: string) {
-    super(ctx);
-    this.#value = value;
+  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+    const [{ value }, done] = walker.text("value").finish();
+    super(walker.location, done, parent);
+    this.#value = value.replace("f", "");
   }
 
   get value() {
@@ -25,7 +27,7 @@ export class ExpressionLiteralFloat extends ExpressionLiteral {
   }
 
   get resolution() {
-    return new TypePrimitiveFloat(this.ctx);
+    return new TypePrimitiveFloat(this.location, this.done, this);
   }
 
   async resolve(closure: Closure): Promise<Variable> {

@@ -1,7 +1,8 @@
 import type { Closure, Variable } from "#runner";
-import type { EntryContext } from "./EntryContext.ts";
+import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
+import type { TokenWalker } from "./TokenWalker.ts";
 import { TypePrimitiveLong } from "./TypePrimitiveLong.ts";
 
 export class ExpressionLiteralLong extends ExpressionLiteral {
@@ -9,15 +10,16 @@ export class ExpressionLiteralLong extends ExpressionLiteral {
     Expression.RegisterExpression({
       priority: 150,
       match: /^[0-9]+l$/gm,
-      parse: (w) => w.text("value").finish(({ value }, ctx) => new ExpressionLiteralLong(ctx, value.replace("l", ""))),
+      factory: this,
     });
   }
 
   readonly #value: string;
 
-  constructor(ctx: EntryContext, value: string) {
-    super(ctx);
-    this.#value = value;
+  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+    const [{ value }, done] = walker.text("value").finish();
+    super(walker.location, done, parent);
+    this.#value = value.replace("l", "");
   }
 
   get value() {
@@ -25,7 +27,7 @@ export class ExpressionLiteralLong extends ExpressionLiteral {
   }
 
   get resolution() {
-    return new TypePrimitiveLong(this.ctx);
+    return new TypePrimitiveLong(this.location, this.done, this);
   }
 
   async resolve(closure: Closure): Promise<Variable> {

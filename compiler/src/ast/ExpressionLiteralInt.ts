@@ -1,7 +1,8 @@
 import { Closure, Variable, VariablePrimitiveInt } from "#runner";
-import type { EntryContext } from "./EntryContext.ts";
+import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
+import type { TokenWalker } from "./TokenWalker.ts";
 import { TypePrimitiveInt } from "./TypePrimitiveInt.ts";
 
 export class ExpressionLiteralInt extends ExpressionLiteral {
@@ -9,15 +10,16 @@ export class ExpressionLiteralInt extends ExpressionLiteral {
     Expression.RegisterExpression({
       priority: 150,
       match: /[0-9]+i?$/gm,
-      parse: (w) => w.text("value").finish(({ value }, ctx) => new ExpressionLiteralInt(ctx, value.replace("i", ""))),
+      factory: this,
     });
   }
 
   readonly #value: string;
 
-  constructor(ctx: EntryContext, value: string) {
-    super(ctx);
-    this.#value = value;
+  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+    const [{ value }, done] = walker.text("value").finish();
+    super(walker.location, done, parent);
+    this.#value = value.replace("i", "");
   }
 
   get value() {
@@ -25,7 +27,7 @@ export class ExpressionLiteralInt extends ExpressionLiteral {
   }
 
   get resolution() {
-    return new TypePrimitiveInt(this.ctx);
+    return new TypePrimitiveInt(this.location, this.done, this);
   }
 
   async resolve(closure: Closure): Promise<Variable> {

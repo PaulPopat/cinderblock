@@ -1,7 +1,8 @@
 import { Closure, Variable, VariablePrimitiveString } from "#runner";
-import type { EntryContext } from "./EntryContext.ts";
+import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
+import type { TokenWalker } from "./TokenWalker.ts";
 import { TypePrimitiveString } from "./TypePrimitiveString.ts";
 
 export class ExpressionLiteralString extends ExpressionLiteral {
@@ -9,15 +10,16 @@ export class ExpressionLiteralString extends ExpressionLiteral {
     Expression.RegisterExpression({
       priority: 150,
       match: /^"([^"]|\\.)+"$/gm,
-      parse: (w) => w.text("value").finish(({ value }, ctx) => new ExpressionLiteralString(ctx, value.slice(1, value.length - 1))),
+      factory: this,
     });
   }
 
   readonly #value: string;
 
-  constructor(ctx: EntryContext, value: string) {
-    super(ctx);
-    this.#value = value;
+  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+    const [{ value }, done] = walker.text("value").finish();
+    super(walker.location, done, parent);
+    this.#value = value.slice(1, value.length - 1);
   }
 
   get value() {
@@ -25,7 +27,7 @@ export class ExpressionLiteralString extends ExpressionLiteral {
   }
 
   get resolution() {
-    return new TypePrimitiveString(this.ctx);
+    return new TypePrimitiveString(this.location, this.done, this);
   }
 
   async resolve(closure: Closure): Promise<Variable> {

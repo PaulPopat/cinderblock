@@ -1,7 +1,8 @@
 import { VariablePrimitiveBool, type Closure, type Variable } from "#runner";
-import type { EntryContext } from "./EntryContext.ts";
+import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
+import type { TokenWalker } from "./TokenWalker.ts";
 import { TypeUnion } from "./TypeUnion.ts";
 
 export class ExpressionTernary extends Expression {
@@ -9,14 +10,7 @@ export class ExpressionTernary extends Expression {
     Expression.RegisterExpression({
       priority: 1,
       match: /^\?$/gm,
-      parse: (w, lookFor, predicate) => {
-        if (!predicate) throw new ParserError("Unexpected ?", w.store);
-        return w
-          .expect("?")
-          .extract("positive", (w) => Expression.Parse(w, [":"]))
-          .extract("negative", (w) => Expression.Parse(w, lookFor))
-          .finish(({ positive, negative }, ctx) => new ExpressionTernary(ctx, predicate, positive, negative));
-      },
+      factory: this,
     });
   }
 
@@ -24,9 +18,15 @@ export class ExpressionTernary extends Expression {
   readonly #positive: Expression;
   readonly #negative: Expression;
 
-  constructor(ctx: EntryContext, predicate: Expression, positive: Expression, negative: Expression) {
-    super(ctx);
-    this.#predicate = predicate;
+  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+    if (!existing) throw new ParserError("Unexpected ?", walker.store);
+    const [{ positive, negative }, done] = walker
+      .expect("?")
+      .extract("positive", (w) => Expression.Parse(w, this, [":"]))
+      .extract("negative", (w) => Expression.Parse(w, this, lookFor))
+      .finish();
+    super(walker.location, done, parent);
+    this.#predicate = existing;
     this.#positive = positive;
     this.#negative = negative;
   }
@@ -44,7 +44,7 @@ export class ExpressionTernary extends Expression {
   }
 
   get resolution() {
-    return new TypeUnion(this.ctx, [this.#positive.resolution, this.#negative.resolution]);
+    return new TypeUnion(this.location, this.done, this, [this.#positive.resolution, this.#negative.resolution]);
   }
 
   async resolve(closure: Closure): Promise<Variable> {

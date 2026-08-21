@@ -8,7 +8,7 @@ describe("logic", () => {
       let test_let = internal_let;
       let internal_let = "hello";
     `);
-    const result = await code.app.run("test_let", {});
+    const result = await code.run("test_let", {});
     assert.equal(result, "hello");
   });
 });

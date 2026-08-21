@@ -1,7 +1,8 @@
 import { VariablePrimitiveBool, type Closure, type Variable } from "#runner";
-import type { EntryContext } from "./EntryContext.ts";
+import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
+import type { TokenWalker } from "./TokenWalker.ts";
 import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 
 export class ExpressionLiteralBool extends ExpressionLiteral {
@@ -9,15 +10,16 @@ export class ExpressionLiteralBool extends ExpressionLiteral {
     Expression.RegisterExpression({
       priority: 150,
       match: /^(true|false)$/gm,
-      parse: (w) => w.text("value").finish(({ value }, ctx) => new ExpressionLiteralBool(ctx, value === "true")),
+      factory: this,
     });
   }
 
   readonly #value: boolean;
 
-  constructor(ctx: EntryContext, value: boolean) {
-    super(ctx);
-    this.#value = value;
+  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+    const [{ value }, done] = walker.text("value").finish();
+    super(walker.location, done, parent);
+    this.#value = value === "true";
   }
 
   get value() {
@@ -25,7 +27,7 @@ export class ExpressionLiteralBool extends ExpressionLiteral {
   }
 
   get resolution() {
-    return new TypePrimitiveBool(this.ctx);
+    return new TypePrimitiveBool(this.location, this.done, this);
   }
 
   async resolve(closure: Closure): Promise<Variable> {

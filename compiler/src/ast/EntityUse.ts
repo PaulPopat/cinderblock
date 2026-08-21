@@ -22,4 +22,8 @@ export class EntityUse extends Entity {
   get namespace() {
     return this.#namespace;
   }
+
+  get fullName() {
+    return "";
+  }
 }

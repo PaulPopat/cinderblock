@@ -1,48 +1,41 @@
 import { TypeArg } from "./TypeArg.ts";
-import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 import { TypeTuple } from "./TypeTuple.ts";
 import { ExpressionTuplePart } from "./ExpressionTuplePart.ts";
 import { VariableTuple, type Closure, type Variable } from "#runner";
+import type { Entry } from "./Entry.ts";
+import type { TokenWalker } from "./TokenWalker.ts";
 
 export class ExpressionTuple extends Expression {
   static {
     Expression.RegisterExpression({
       priority: 100,
       match: /^{$/gm,
-      parse: (w, lookFor) => {
-        return w
-          .if(
-            (w) => w.next.data !== "}",
-            (w) =>
-              w.while(
-                "value",
-                (w) => w.data === "{" || w.data === ",",
-                (s) =>
-                  s.next
-                    .text("name")
-                    .expect("=")
-                    .extract("value", (s) => Expression.Parse(s, [...lookFor, ",", "}"]))
-                    .finish(({ name, value }, ctx) => new ExpressionTuplePart(ctx, name.startsWith('"') ? JSON.parse(name) : name, value)),
-              ),
-          )
-          .if(
-            (w) => w.data === "{",
-            (w) => w.expect("{"),
-          )
-          .expect("}")
-          .finish(({ value }, ctx) => {
-            return new ExpressionTuple(ctx, value ?? []);
-          });
-      },
+      factory: this,
     });
   }
 
   readonly #parts: Array<ExpressionTuplePart>;
 
-  constructor(ctx: EntryContext, parts: Array<ExpressionTuplePart>) {
-    super(ctx);
-    this.#parts = parts;
+  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+    const [{ value }, done] = walker
+      .if(
+        (w) => w.next.data !== "}",
+        (w) =>
+          w.while(
+            "value",
+            (w) => w.data === "{" || w.data === ",",
+            (s) => new ExpressionTuplePart(s, this, [...lookFor, ",", "}"], undefined),
+          ),
+      )
+      .if(
+        (w) => w.data === "{",
+        (w) => w.expect("{"),
+      )
+      .expect("}")
+      .finish();
+    super(walker.location, done, parent);
+    this.#parts = value ?? [];
   }
 
   get parts() {
@@ -55,8 +48,10 @@ export class ExpressionTuple extends Expression {
 
   get resolution() {
     return new TypeTuple(
-      this.ctx,
-      this.#parts.map((part) => new TypeArg(this.ctx, part.value.resolution, part.name)),
+      this.location,
+      this.done,
+      this,
+      this.#parts.map((part) => new TypeArg(this.location, this.done, this, part.value.resolution, part.name)),
     );
   }
 

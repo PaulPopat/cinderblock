@@ -9,8 +9,6 @@ import { EntityExternal } from "./EntityExternal.ts";
 import { TokenWalker } from "./TokenWalker.ts";
 import type { Entry } from "./Entry.ts";
 import { EntityUse } from "./EntityUse.ts";
-import { LinkerError } from "./LinkerError.ts";
-import { EntityStruct } from "./EntityStruct.ts";
 
 export class EntityLet extends Entity {
   static {
@@ -72,7 +70,7 @@ export class EntityLet extends Entity {
     this.#name = name;
     this.#tags = tags ?? [];
     this.#args = args ?? [];
-    this.#entities = entities;
+    this.#entities = entities.filter((e) => e instanceof Entity);
     this.#returns = returns;
     this.#contents = contents;
   }
@@ -117,31 +115,16 @@ export class EntityLet extends Entity {
     ];
   }
 
-  resolveConcrete(name: string): Entry | undefined {
-    const possible = this.possibleNames(name);
+  find(name: string): Entry | undefined {
+    for (const possible of this.possibleNames(name)) {
+      const found = this.#entities.find((s) => s.fullName === possible);
+      if (found) return found;
+    }
 
-    const found = this.#entities
-      .filter((e) => e instanceof EntityLet || e instanceof EntityArg || e instanceof EntityExternal)
-      .filter((s) => possible.includes(s.fullName));
-
-    if (found.length > 1) throw new LinkerError("Ambigious reference", this.location);
-    const [result] = found;
-    if (!result) throw new LinkerError("Reference not found", this.location);
-
-    return result;
-  }
-
-  resolveStruct(name: string): Entry | undefined {
-    const possible = this.possibleNames(name);
-
-    const found = this.#entities.filter((e) => e instanceof EntityStruct).filter((s) => possible.includes(s.fullName));
-
-    if (found.length > 1) throw new LinkerError("Ambigious struct reference", this.location);
-
-    const [result] = found;
-    if (!result) throw new LinkerError("Struct not found", this.location);
-
-    return result;
+    for (const possible of this.possibleNames(name)) {
+      const found = super.find(name);
+      if (found) return found;
+    }
   }
 
   get type() {

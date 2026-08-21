@@ -6,7 +6,7 @@ import type { TokenWalker } from "./TokenWalker.ts";
 type EntityParseable = {
   priority: number;
   match: RegExp;
-  factory: new (walker: TokenWalker, parent: Entry | undefined) => Entry;
+  factory: new (walker: TokenWalker, parent: Entry | undefined) => Entity;
 };
 
 export abstract class Entity extends Entry {
@@ -20,10 +20,12 @@ export abstract class Entity extends Entry {
     return this.#parsers.some((a) => store.data.match(a.match));
   }
 
-  static Parse(walker: TokenWalker, parent: Entry | undefined) {
+  static Parse(walker: TokenWalker, parent: Entry | undefined): Entity {
     const parser = this.#parsers.find((a) => walker.data.match(a.match));
     if (!parser) throw new ParserError("Unexpected token", walker.store);
 
     return new parser.factory(walker, parent);
   }
+
+  abstract get fullName(): string;
 }

@@ -2,20 +2,25 @@ import { Expression } from "./Expression.ts";
 import { ExpressionOperator } from "./ExpressionOperator.ts";
 import { ParserError } from "./ParserError.ts";
 import { type Closure, type Variable, VariablePrimitive } from "#runner";
+import type { Entry } from "./Entry.ts";
+import type { TokenWalker } from "./TokenWalker.ts";
 
 export class ExpressionOperatorMultiply extends ExpressionOperator {
   static {
     Expression.RegisterExpression({
       priority: 100,
       match: /^\*$/gm,
-      parse: (w, lookFor, e) => {
-        if (!e) throw new ParserError("Unexpected *", w.store);
-        return w
-          .expect("*")
-          .extract("right", (w) => Expression.Parse(w, lookFor))
-          .finish(({ right }, ctx) => new ExpressionOperatorMultiply(ctx, e, right));
-      },
+      factory: this,
     });
+  }
+
+  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+    if (!existing) throw new ParserError("Unexpected *", walker.store);
+    const [{ right }, done] = walker
+      .expect("*")
+      .extract("right", (w) => Expression.Parse(w, parent, lookFor))
+      .finish();
+    super(walker.location, done, parent, existing, right);
   }
 
   get resolution() {
