@@ -16,11 +16,11 @@ export class ExpressionArrayAdd extends Expression {
   readonly #subject: Expression;
   readonly #addition: Expression;
 
-  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     if (!existing) throw new ParserError("Unexpected ++", walker.store);
     const [{ addition }, done] = walker
       .expect("++")
-      .extract("addition", (w) => Expression.Parse(w, this, lookFor))
+      .extract("addition", (w) => Expression.Parse(w, () => this, lookFor))
       .finish();
     super(walker.location, done, parent);
     this.#subject = existing;

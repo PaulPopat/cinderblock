@@ -4,7 +4,9 @@ import test, { describe } from "node:test";
 
 describe("input output", () => {
   test("imports a function", async () => {
-    const code = new Inline("let test_let (add: (input: int): int) = { input = 2 } -> add;");
+    const code = new Inline(`
+      let test_let (add: (input: int): int) = { input = 2 } -> add;
+    `);
     const result = await code.run("test_let", {
       add({ input }: { input: number }) {
         return input + 3;

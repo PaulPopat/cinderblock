@@ -17,7 +17,7 @@ export class ExpressionTuple extends Expression {
 
   readonly #parts: Array<ExpressionTuplePart>;
 
-  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     const [{ value }, done] = walker
       .if(
         (w) => w.next.data !== "}",
@@ -25,7 +25,7 @@ export class ExpressionTuple extends Expression {
           w.while(
             "value",
             (w) => w.data === "{" || w.data === ",",
-            (s) => new ExpressionTuplePart(s, this, [...lookFor, ",", "}"], undefined),
+            (s) => new ExpressionTuplePart(s.next, () => this, [...lookFor, ",", "}"], undefined),
           ),
       )
       .if(
@@ -50,8 +50,8 @@ export class ExpressionTuple extends Expression {
     return new TypeTuple(
       this.location,
       this.done,
-      this,
-      this.#parts.map((part) => new TypeArg(this.location, this.done, this, part.value.resolution, part.name)),
+      () => this,
+      this.#parts.map((part) => new TypeArg(this.location, this.done, () => this, part.value.resolution, part.name)),
     );
   }
 

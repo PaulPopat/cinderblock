@@ -11,13 +11,13 @@ export class TypePrimitiveInt extends TypePrimitive {
       priority: 150,
       match: /^int+$/gm,
       chainable: false,
-      factory: (walker: TokenWalker, parent: Entry | undefined, left?: Type) => {
+      factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
         return new TypePrimitiveInt(walker.location, walker.expect("int").store, parent);
       },
     });
   }
 
-  constructor(location: Location, done: TokenStore, parent: Entry | undefined) {
+  constructor(location: Location, done: TokenStore, parent: () => Entry | undefined) {
     super(location, done, parent);
   }
 

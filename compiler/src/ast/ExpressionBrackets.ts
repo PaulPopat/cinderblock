@@ -14,10 +14,10 @@ export class ExpressionBrackets extends Expression {
 
   readonly #subject: Expression;
 
-  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     const [{ subject }, done] = walker
       .expect("(")
-      .extract("subject", (w) => Expression.Parse(w, this, [...lookFor, ")"]))
+      .extract("subject", (w) => Expression.Parse(w, () => this, [...lookFor, ")"]))
       .expect(")")
       .finish();
     super(walker.location, done, parent);

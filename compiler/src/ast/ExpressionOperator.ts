@@ -7,7 +7,7 @@ export abstract class ExpressionOperator extends Expression {
   readonly #left: Expression;
   readonly #right: Expression;
 
-  constructor(location: Location, done: TokenStore, parent: Entry | undefined, left: Expression, right: Expression) {
+  constructor(location: Location, done: TokenStore, parent: () => Entry | undefined, left: Expression, right: Expression) {
     super(location, done, parent);
     this.#left = left;
     this.#right = right;

@@ -17,12 +17,12 @@ export class ExpressionLiteralArray extends ExpressionLiteral {
 
   readonly #value: Array<Expression>;
 
-  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     const [{ value }, done] = walker
       .while(
         "value",
         (w) => w.data === "[" || w.data === ",",
-        (s) => Expression.Parse(s.next, this, [...lookFor, ",", "]"]),
+        (s) => Expression.Parse(s.next, () => this, [...lookFor, ",", "]"]),
       )
       .expect("]")
       .finish();
@@ -35,7 +35,12 @@ export class ExpressionLiteralArray extends ExpressionLiteral {
   }
 
   get resolution() {
-    return new TypeArray(this.location, this.done, this, this.#value[0]?.resolution ?? new TypePrimitiveUnknown(this.location, this.done, this));
+    return new TypeArray(
+      this.location,
+      this.done,
+      () => this,
+      this.#value[0]?.resolution ?? new TypePrimitiveUnknown(this.location, this.done, () => this),
+    );
   }
 
   async resolve(closure: Closure): Promise<Variable> {

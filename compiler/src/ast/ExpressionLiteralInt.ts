@@ -16,7 +16,7 @@ export class ExpressionLiteralInt extends ExpressionLiteral {
 
   readonly #value: string;
 
-  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     const [{ value }, done] = walker.text("value").finish();
     super(walker.location, done, parent);
     this.#value = value.replace("i", "");
@@ -27,7 +27,7 @@ export class ExpressionLiteralInt extends ExpressionLiteral {
   }
 
   get resolution() {
-    return new TypePrimitiveInt(this.location, this.done, this);
+    return new TypePrimitiveInt(this.location, this.done, () => this);
   }
 
   async resolve(closure: Closure): Promise<Variable> {

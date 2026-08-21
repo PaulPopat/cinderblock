@@ -11,7 +11,7 @@ describe("syntax", () => {
 
   test("tags a let", async () => {
     const code = new Inline('let [key="test value"] test_let = "hello";');
-    const found = code.app.withTag("key", "test value");
+    const found = code.withTag("key", "test value");
     assert.equal(found.length, 1);
   });
 
@@ -26,7 +26,7 @@ describe("syntax", () => {
 
   test("returns an array", async () => {
     const code = new Inline(`
-      let test_let = ["hello", "world"]
+      let test_let = ["hello", "world"];
     `);
     const result = await code.run("test_let", {});
     assert.deepStrictEqual(result, ["hello", "world"]);

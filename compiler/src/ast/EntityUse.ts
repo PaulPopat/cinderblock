@@ -13,7 +13,7 @@ export class EntityUse extends Entity {
 
   readonly #namespace: string;
 
-  constructor(walker: TokenWalker, parent: Entry | undefined) {
+  constructor(walker: TokenWalker, parent: () => Entry | undefined) {
     const [{ namespace }, done] = walker.expect("use").text("namespace").expect(";").finish();
     super(walker.location, done, parent);
     this.#namespace = namespace;

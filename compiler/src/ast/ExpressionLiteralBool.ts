@@ -16,7 +16,7 @@ export class ExpressionLiteralBool extends ExpressionLiteral {
 
   readonly #value: boolean;
 
-  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     const [{ value }, done] = walker.text("value").finish();
     super(walker.location, done, parent);
     this.#value = value === "true";
@@ -27,7 +27,7 @@ export class ExpressionLiteralBool extends ExpressionLiteral {
   }
 
   get resolution() {
-    return new TypePrimitiveBool(this.location, this.done, this);
+    return new TypePrimitiveBool(this.location, this.done, () => this);
   }
 
   async resolve(closure: Closure): Promise<Variable> {

@@ -9,8 +9,9 @@ import { EntityExternal } from "./EntityExternal.ts";
 import { TokenWalker } from "./TokenWalker.ts";
 import type { Entry } from "./Entry.ts";
 import { EntityUse } from "./EntityUse.ts";
+import { EntityReferenceable } from "./EntityReferenceable.ts";
 
-export class EntityLet extends Entity {
+export class EntityLet extends EntityReferenceable {
   static {
     Entity.RegisterEntity({
       priority: 100,
@@ -27,7 +28,7 @@ export class EntityLet extends Entity {
   readonly #contents: Expression;
   readonly #internalName = Namer.Next;
 
-  constructor(walker: TokenWalker, parent: Entry | undefined) {
+  constructor(walker: TokenWalker, parent: () => Entry | undefined) {
     const [{ name, args, returns, contents, tags, entities }, done] = walker
       .expect("let")
       .if(
@@ -37,7 +38,7 @@ export class EntityLet extends Entity {
             .while(
               "tags",
               (s) => s.data === "[" || s.data === ",",
-              (s) => new EntryTag(s.next, this),
+              (s) => new EntryTag(s.next, () => this),
             )
             .expect("]"),
       )
@@ -49,21 +50,22 @@ export class EntityLet extends Entity {
             .while(
               "args",
               (s) => s.data === "," || s.data === "(",
-              (s) => new EntityArg(walker, this),
+              (s) => new EntityArg(walker.next, () => this),
             )
             .expect(")"),
       )
       .if(
         (s) => s.data === ":",
-        (walker) => walker.expect(":").extract("returns", (s) => Type.Parse(s, this)),
+        (walker) => walker.expect(":").extract("returns", (s) => Type.Parse(s, () => this)),
       )
       .expect("=")
       .while(
         "entities",
         (s) => Entity.HasParser(s),
-        (w) => Entity.Parse(w, this),
+        (w) => Entity.Parse(w, () => this),
       )
-      .extract("contents", (s) => Expression.Parse(s, this, [";"]))
+      .extract("contents", (s) => Expression.Parse(s, () => this, [";"]))
+      .expect(";")
       .finish();
 
     super(walker.location, done, parent);
@@ -104,7 +106,7 @@ export class EntityLet extends Entity {
   }
 
   get namespace(): string {
-    return [this.parent?.namespace, this.name].filter((r) => r).join("_");
+    return [this.parent()?.namespace, this.name].filter((r) => r).join("_");
   }
 
   possibleNames(name: string) {
@@ -116,6 +118,10 @@ export class EntityLet extends Entity {
   }
 
   find(name: string): Entry | undefined {
+    for (const arg of this.#args) {
+      if (arg.name === name) return arg;
+    }
+
     for (const possible of this.possibleNames(name)) {
       const found = this.#entities.find((s) => s.fullName === possible);
       if (found) return found;
@@ -133,7 +139,7 @@ export class EntityLet extends Entity {
       return new TypePipeable(
         this.location,
         this.done,
-        this,
+        () => this,
         this.#args.map((a) => a.typeArg),
         result,
       );

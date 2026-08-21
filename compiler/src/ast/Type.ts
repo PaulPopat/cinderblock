@@ -6,7 +6,7 @@ type TypeParseable = {
   priority: number;
   match: RegExp;
   chainable: boolean;
-  factory: (walker: TokenWalker, parent: Entry | undefined, left?: Type) => Type;
+  factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => Type;
 };
 
 export abstract class Type extends Entry {
@@ -16,7 +16,7 @@ export abstract class Type extends Entry {
     this.#parsers = [...this.#parsers, entry].sort((a, b) => b.priority - a.priority);
   }
 
-  static Parse(walker: TokenWalker, parent: Entry | undefined): Type {
+  static Parse(walker: TokenWalker, parent: () => Entry | undefined): Type {
     const [{ type }] = walker
       .reduce(
         "type",

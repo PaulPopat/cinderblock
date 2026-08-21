@@ -12,7 +12,7 @@ export class TypeReference extends Type {
       priority: 1,
       match: /^[a-zA-Z][a-zA-Z0-9_@$#:]*$/gm,
       chainable: false,
-      factory: (walker: TokenWalker, parent: Entry | undefined, left?: Type) => {
+      factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
         const [{ value }, done] = walker.text("value").finish();
 
         return new TypeReference(walker.location, done, parent, value);
@@ -22,7 +22,7 @@ export class TypeReference extends Type {
 
   readonly #name: string;
 
-  constructor(location: Location, done: TokenStore, parent: Entry | undefined, name: string) {
+  constructor(location: Location, done: TokenStore, parent: () => Entry | undefined, name: string) {
     super(location, done, parent);
     this.#name = name;
   }

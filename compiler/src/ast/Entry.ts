@@ -5,9 +5,9 @@ import type { TokenWalker } from "./TokenWalker.ts";
 export abstract class Entry {
   readonly #location: Location;
   readonly #done: TokenStore;
-  readonly #parent: Entry | undefined;
+  readonly #parent: () => Entry | undefined;
 
-  constructor(location: Location, done: TokenStore, parent: Entry | undefined) {
+  constructor(location: Location, done: TokenStore, parent: () => Entry | undefined) {
     this.#location = location;
     this.#done = done;
     this.#parent = parent;
@@ -30,10 +30,10 @@ export abstract class Entry {
   }
 
   find(name: string): Entry | undefined {
-    return this.#parent?.find(name);
+    return this.#parent()?.find(name);
   }
 
   get namespace(): string {
-    return this.#parent?.namespace ?? "";
+    return this.#parent()?.namespace ?? "";
   }
 }

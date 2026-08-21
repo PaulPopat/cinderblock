@@ -16,7 +16,7 @@ export class ExpressionLiteralLong extends ExpressionLiteral {
 
   readonly #value: string;
 
-  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     const [{ value }, done] = walker.text("value").finish();
     super(walker.location, done, parent);
     this.#value = value.replace("l", "");
@@ -27,7 +27,7 @@ export class ExpressionLiteralLong extends ExpressionLiteral {
   }
 
   get resolution() {
-    return new TypePrimitiveLong(this.location, this.done, this);
+    return new TypePrimitiveLong(this.location, this.done, () => this);
   }
 
   async resolve(closure: Closure): Promise<Variable> {

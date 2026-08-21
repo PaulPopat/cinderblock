@@ -18,12 +18,12 @@ export class ExpressionTernary extends Expression {
   readonly #positive: Expression;
   readonly #negative: Expression;
 
-  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     if (!existing) throw new ParserError("Unexpected ?", walker.store);
     const [{ positive, negative }, done] = walker
       .expect("?")
-      .extract("positive", (w) => Expression.Parse(w, this, [":"]))
-      .extract("negative", (w) => Expression.Parse(w, this, lookFor))
+      .extract("positive", (w) => Expression.Parse(w, () => this, [":"]))
+      .extract("negative", (w) => Expression.Parse(w, () => this, lookFor))
       .finish();
     super(walker.location, done, parent);
     this.#predicate = existing;
@@ -44,7 +44,7 @@ export class ExpressionTernary extends Expression {
   }
 
   get resolution() {
-    return new TypeUnion(this.location, this.done, this, [this.#positive.resolution, this.#negative.resolution]);
+    return new TypeUnion(this.location, this.done, () => this, [this.#positive.resolution, this.#negative.resolution]);
   }
 
   async resolve(closure: Closure): Promise<Variable> {

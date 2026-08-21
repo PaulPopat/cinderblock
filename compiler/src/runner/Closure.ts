@@ -8,13 +8,13 @@ export class Closure {
     this.#frames = frames;
   }
 
-  search(name: string) {
+  search(name: string, displayName: string) {
     for (const frame of this.#frames) {
       const possible = frame.search(name);
       if (possible) return possible;
     }
 
-    throw new Error(`Variable not resolved`);
+    throw new Error(`Variable ${displayName} not resolved`);
   }
 
   withFrame(frame: Frame) {

@@ -6,7 +6,7 @@ export abstract class CompilerError extends Error {
   constructor(message: string, location: Location) {
     super(
       [
-        ["Error", message].join(": "),
+        ["Error", message.replace("Error: ", "")].join(": "),
         ["Files", location.file].join(": "),
         ["Line", location.line].join(": "),
         ["Character", location.character].join(": "),

@@ -14,7 +14,7 @@ export class ExpressionOperatorIn extends ExpressionOperator {
     });
   }
 
-  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     if (!existing) throw new ParserError("Unexpected in", walker.store);
     const [{ right }, done] = walker
       .expect("in")

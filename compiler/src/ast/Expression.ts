@@ -8,7 +8,7 @@ import type { Type } from "./Type.ts";
 type ExpressionParseable = {
   priority: number;
   match: RegExp;
-  factory: new (walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) => Expression;
+  factory: new (walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) => Expression;
 };
 
 export abstract class Expression extends Entry {
@@ -18,7 +18,7 @@ export abstract class Expression extends Entry {
     this.#parsers = [...this.#parsers, entry].sort((a, b) => b.priority - a.priority);
   }
 
-  static Parse(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string> = [";"]): Expression {
+  static Parse(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string> = [";"]): Expression {
     const [{ expression }] = walker
       .reduce(
         "expression",

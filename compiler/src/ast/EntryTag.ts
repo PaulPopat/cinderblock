@@ -5,7 +5,7 @@ export class EntryTag extends Entry {
   readonly #key: string;
   readonly #value: unknown;
 
-  constructor(walker: TokenWalker, parent: Entry | undefined) {
+  constructor(walker: TokenWalker, parent: () => Entry | undefined) {
     const [{ key, value }, done] = walker.text("key").expect("=").text("value").finish();
     super(walker.location, done, parent);
     this.#key = key;

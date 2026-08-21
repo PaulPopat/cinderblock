@@ -3,9 +3,7 @@ import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import type { TokenWalker } from "./TokenWalker.ts";
 import { LinkerError } from "./LinkerError.ts";
-import { EntityLet } from "./EntityLet.ts";
-import { EntityArg } from "./EntityArg.ts";
-import { EntityExternal } from "./EntityExternal.ts";
+import { EntityReferenceable } from "./EntityReferenceable.ts";
 
 export class ExpressionReference extends Expression {
   static {
@@ -18,7 +16,7 @@ export class ExpressionReference extends Expression {
 
   readonly #name: string;
 
-  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     const [{ value }, done] = walker.text("value").finish();
     super(walker.location, done, parent);
     this.#name = value;
@@ -30,8 +28,7 @@ export class ExpressionReference extends Expression {
 
   get subject() {
     const result = this.find(this.#name);
-    if (!(result instanceof EntityLet) || !(result instanceof EntityArg) || !(result instanceof EntityExternal))
-      throw new LinkerError("Unresolved reference", this.location);
+    if (!(result instanceof EntityReferenceable)) throw new LinkerError("Unresolved reference", this.location);
     return result;
   }
 
@@ -40,7 +37,7 @@ export class ExpressionReference extends Expression {
   }
 
   async resolve(closure: Closure): Promise<Variable> {
-    const value = closure.search(this.subject.internalName);
+    const value = closure.search(this.subject.internalName, this.#name);
 
     if (value instanceof VariablePipeable && value.noArgs) {
       return value.execute(new Frame({}));

@@ -18,7 +18,7 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
     });
   }
 
-  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     if (!existing) throw new ParserError("Unexpected ->", walker.store);
     const [{ right }, done] = walker
       .expect("->")
@@ -35,14 +35,14 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
 
     let input = this.left.resolution;
     if (!(input instanceof TypeTuple)) {
-      input = new TypeTuple(this.location, this.done, this, [new TypeArg(this.location, this.done, this, input, "_s")]);
+      input = new TypeTuple(this.location, this.done, () => this, [new TypeArg(this.location, this.done, () => this, input, "_s")]);
     }
 
     const remaining = right.args.filter((r) => !(input as TypeTuple).args.find((a) => a.name === r.name));
 
     if (!remaining.length) return right.returns;
 
-    return new TypePipeable(this.location, this.done, this, remaining, right.returns);
+    return new TypePipeable(this.location, this.done, () => this, remaining, right.returns);
   }
 
   async resolve(closure: Closure): Promise<Variable> {

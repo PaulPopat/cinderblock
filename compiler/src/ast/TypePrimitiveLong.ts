@@ -11,13 +11,13 @@ export class TypePrimitiveLong extends TypePrimitive {
       priority: 150,
       match: /^long+$/gm,
       chainable: false,
-      factory: (walker: TokenWalker, parent: Entry | undefined, left?: Type) => {
+      factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
         return new TypePrimitiveLong(walker.location, walker.expect("long").store, parent);
       },
     });
   }
 
-  constructor(location: Location, done: TokenStore, parent: Entry | undefined) {
+  constructor(location: Location, done: TokenStore, parent: () => Entry | undefined) {
     super(location, done, parent);
   }
 

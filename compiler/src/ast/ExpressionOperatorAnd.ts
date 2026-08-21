@@ -14,7 +14,7 @@ export class ExpressionOperatorAnd extends ExpressionOperator {
     });
   }
 
-  constructor(walker: TokenWalker, parent: Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
+  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     if (!existing) throw new ParserError("Unexpected &&", walker.store);
     const [{ right }, done] = walker
       .expect("&&")

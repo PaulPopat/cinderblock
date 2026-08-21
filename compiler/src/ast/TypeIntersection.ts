@@ -11,7 +11,7 @@ export class TypeIntersection extends Type {
       priority: 100,
       match: /^\&$/gm,
       chainable: true,
-      factory: (walker: TokenWalker, parent: Entry | undefined, left?: Type) => {
+      factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
         if (!left) throw new ParserError("Unexpected &", walker.store);
         const [{ right }, done] = walker
           .expect("&")
@@ -28,7 +28,7 @@ export class TypeIntersection extends Type {
 
   readonly #parts: Array<Type>;
 
-  constructor(location: Location, done: TokenStore, parent: Entry | undefined, parts: Array<Type>) {
+  constructor(location: Location, done: TokenStore, parent: () => Entry | undefined, parts: Array<Type>) {
     super(location, done, parent);
     this.#parts = parts;
   }

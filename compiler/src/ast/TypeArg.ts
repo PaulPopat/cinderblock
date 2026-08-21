@@ -5,7 +5,7 @@ import { TokenWalker } from "./TokenWalker.ts";
 import { Type } from "./Type.ts";
 
 export class TypeArg extends Type {
-  static Parse(walker: TokenWalker, parent: Entry | undefined) {
+  static Parse(walker: TokenWalker, parent: () => Entry | undefined) {
     const [{ name, type }, done] = walker
       .text("name")
       .expect(":")
@@ -18,7 +18,7 @@ export class TypeArg extends Type {
   readonly #type: Type;
   readonly #name: string;
 
-  constructor(location: Location, done: TokenStore, parent: Entry | undefined, type: Type, name: string) {
+  constructor(location: Location, done: TokenStore, parent: () => Entry | undefined, type: Type, name: string) {
     super(location, done, parent);
     this.#type = type;
     this.#name = name.startsWith('"') ? JSON.parse(name) : name;

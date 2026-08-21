@@ -11,12 +11,12 @@ export class TypePipeable extends Type {
       priority: 100,
       match: /^\($/gm,
       chainable: false,
-      factory: (walker: TokenWalker, parent: Entry | undefined, left?: Type) => {
+      factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
         const [{ args, returns }, done] = walker
           .while(
             "args",
             (s) => s.data === "," || s.data === "(",
-            (s) => TypeArg.Parse(s, parent),
+            (s) => TypeArg.Parse(s.next, parent),
           )
           .expect(")")
           .expect(":")
@@ -31,7 +31,7 @@ export class TypePipeable extends Type {
   readonly #args: Array<TypeArg>;
   readonly #returns: Type;
 
-  constructor(location: Location, done: TokenStore, parent: Entry | undefined, args: Array<TypeArg>, returns: Type) {
+  constructor(location: Location, done: TokenStore, parent: () => Entry | undefined, args: Array<TypeArg>, returns: Type) {
     super(location, done, parent);
     this.#args = args;
     this.#returns = returns;

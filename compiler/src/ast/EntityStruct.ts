@@ -15,14 +15,14 @@ export class EntityStruct extends Entity {
   readonly #name: string;
   readonly #args: Array<TypeArg>;
 
-  constructor(walker: TokenWalker, parent: Entry | undefined) {
+  constructor(walker: TokenWalker, parent: () => Entry | undefined) {
     const [{ name, args }, done] = walker
       .expect("struct")
       .text("name")
       .while(
         "args",
         (s) => s.data !== ";",
-        (s) => TypeArg.Parse(s, this),
+        (s) => TypeArg.Parse(s, () => this),
       )
       .expect(";")
       .finish();

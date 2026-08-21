@@ -11,13 +11,13 @@ export class TypePrimitiveBool extends TypePrimitive {
       priority: 150,
       match: /^bool+$/gm,
       chainable: false,
-      factory: (walker: TokenWalker, parent: Entry | undefined, left?: Type) => {
+      factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
         return new TypePrimitiveBool(walker.location, walker.expect("bool").store, parent);
       },
     });
   }
 
-  constructor(location: Location, done: TokenStore, parent: Entry | undefined) {
+  constructor(location: Location, done: TokenStore, parent: () => Entry | undefined) {
     super(location, done, parent);
   }
 

@@ -11,13 +11,13 @@ export class TypePrimitiveUnknown extends TypePrimitive {
       priority: 150,
       match: /^unknown+$/gm,
       chainable: false,
-      factory: (walker: TokenWalker, parent: Entry | undefined, left?: Type) => {
+      factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
         return new TypePrimitiveUnknown(walker.location, walker.expect("unknown").store, parent);
       },
     });
   }
 
-  constructor(location: Location, done: TokenStore, parent: Entry | undefined) {
+  constructor(location: Location, done: TokenStore, parent: () => Entry | undefined) {
     super(location, done, parent);
   }
 
