@@ -11,4 +11,19 @@ describe("logic", () => {
     const result = await code.run("test_let", {});
     assert.equal(result, "hello");
   });
+
+  test("only calculates a let with no arguments once", async () => {
+    let total = 1;
+    const code = new Inline(
+      `
+        let internal_let = {} -> get_total;
+        let test_let = internal_let + internal_let;
+      `,
+      {
+        get_total: () => total++,
+      },
+    );
+    const result = await code.run("test_let", {});
+    assert.equal(result, 2);
+  });
 });

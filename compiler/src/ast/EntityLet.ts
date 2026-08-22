@@ -3,9 +3,8 @@ import { Expression } from "./Expression.ts";
 import { Entity } from "./Entity.ts";
 import { Type } from "./Type.ts";
 import { TypePipeable } from "./TypePipeable.ts";
-import { Closure, Namer, VariablePipeable, type Frame, type Variable } from "#runner";
+import { Closure, Frame, Namer, VariablePipeable, type Variable } from "#runner";
 import { EntryTag } from "./EntryTag.ts";
-import { EntityExternal } from "./EntityExternal.ts";
 import { TokenWalker } from "./TokenWalker.ts";
 import type { Entry } from "./Entry.ts";
 import { EntityUse } from "./EntityUse.ts";
@@ -50,7 +49,7 @@ export class EntityLet extends EntityReferenceable {
             .while(
               "args",
               (s) => s.data === "," || s.data === "(",
-              (s) => new EntityArg(walker.next, () => this),
+              (s) => new EntityArg(s.next, () => this),
             )
             .expect(")"),
       )
@@ -128,7 +127,7 @@ export class EntityLet extends EntityReferenceable {
     }
 
     for (const possible of this.possibleNames(name)) {
-      const found = super.find(name);
+      const found = super.find(possible);
       if (found) return found;
     }
   }
@@ -147,18 +146,19 @@ export class EntityLet extends EntityReferenceable {
     return result;
   }
 
-  async execute(closure: Closure, args: Frame): Promise<Variable> {
-    closure = closure.withFrame(args);
-    for (const entity of this.#entities) {
-      if (entity instanceof EntityLet) {
-        const c = closure.withVariable(entity.internalName, new VariablePipeable((a) => entity.execute(c, a), !entity.args.length));
-        closure = c;
-      } else if (entity instanceof EntityExternal) {
-        const c = closure.withVariable(entity.internalName, new VariablePipeable((a) => entity.execute(c, a), false));
-        closure = c;
-      }
+  async reference(closure: Closure): Promise<Variable> {
+    if (!this.#args.length) {
+      return this.execute(closure, new Frame({}));
     }
 
-    return this.#contents.resolve(closure);
+    return new VariablePipeable((a) => this.execute(closure, a), !this.args.length);
+  }
+
+  async execute(closure: Closure, args: Frame): Promise<Variable> {
+    return this.#contents.resolve(
+      this.#entities
+        .filter((entity) => entity instanceof EntityReferenceable)
+        .reduce((closure, entity) => closure.withVariable(entity.internalName, entity.reference(closure)), closure.withFrame(args)),
+    );
   }
 }

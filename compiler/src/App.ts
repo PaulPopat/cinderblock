@@ -1,7 +1,8 @@
-import { Entity, EntityExternal, EntityLet, Entry } from "#ast";
-import { Closure, Frame, framise, VariablePipeable } from "#runner";
+import { Entity, EntityLet, Entry } from "#ast";
+import { Closure, Frame, framise } from "#runner";
 import { TokenStore } from "#tokeniser";
 import { Location } from "#utils";
+import { EntityReferenceable } from "./ast/EntityReferenceable.ts";
 
 export abstract class App extends Entry {
   abstract get entities(): Array<Entity>;
@@ -15,18 +16,9 @@ export abstract class App extends Entry {
   }
 
   get #closure() {
-    let closure = new Closure([new Frame({})]);
-    for (const entity of this.entities) {
-      if (entity instanceof EntityLet) {
-        const c = closure.withVariable(entity.internalName, new VariablePipeable((a) => entity.execute(c, a), !entity.args.length));
-        closure = c;
-      } else if (entity instanceof EntityExternal) {
-        const c = closure.withVariable(entity.internalName, new VariablePipeable((a) => entity.execute(c, a), false));
-        closure = c;
-      }
-    }
-
-    return closure;
+    return this.entities
+      .filter((entity) => entity instanceof EntityReferenceable)
+      .reduce((closure, entity) => closure.withVariable(entity.internalName, entity.reference(closure)), new Closure([new Frame({})]));
   }
 
   async run(name: string | EntityLet, args: Record<string, unknown>) {

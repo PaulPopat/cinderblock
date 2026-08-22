@@ -1,3 +1,4 @@
+import type { Closure, Variable } from "#runner";
 import { EntityReferenceable } from "./EntityReferenceable.ts";
 import type { Entry } from "./Entry.ts";
 import { TokenWalker } from "./TokenWalker.ts";
@@ -33,6 +34,10 @@ export class EntityArg extends EntityReferenceable {
 
   get fullName() {
     return this.#name;
+  }
+
+  async reference(closure: Closure): Promise<Variable> {
+    return closure.search(this.internalName, this.name);
   }
 
   get typeArg() {

@@ -1,50 +1,20 @@
 import { Project } from "@cinderblock/compiler";
 import express from "express";
-import { Lazy } from "./Lazy.ts";
-import fs from "node:fs/promises";
-import path from "node:path";
 
 export class Server extends Project {
-  readonly #factories = new Lazy(async () => {
-    const base = path.resolve(this.root, "factories");
-    const entries = await fs.readdir(base);
+  readonly #updaters: Record<string, unknown>;
 
-    let result: Record<string, unknown> = {};
-    for (const entry of entries) {
-      if (!entry.endsWith(".js") && !entry.endsWith(".ts")) continue;
-      result = {
-        ...result,
-        ...(await import(path.resolve(base, entry))),
-      };
-    }
+  constructor(root: string, factories: Record<string, unknown>, updaters: Record<string, unknown>) {
+    super(root, factories);
 
-    return result;
-  });
-
-  readonly #updaters = new Lazy(async () => {
-    const base = path.resolve(this.root, "updaters");
-    const entries = await fs.readdir(base);
-
-    let result: Record<string, unknown> = {};
-    for (const entry of entries) {
-      if (!entry.endsWith(".js") && !entry.endsWith(".ts")) continue;
-      result = {
-        ...result,
-        ...(await import(path.resolve(base, entry))),
-      };
-    }
-
-    return result;
-  });
+    this.#updaters = updaters;
+  }
 
   async start() {
-    const app = this.app(await this.#factories.value);
-    const updaters = await this.#updaters.value;
-
     const server = express();
     server.use(express.json());
 
-    const handlers = app.withTag("type", "handler");
+    const handlers = this.withTag("type", "handler");
 
     for (const handler of handlers) {
       const method = handler.tags.find((t) => t.key === "method")?.value ?? "get";
@@ -58,18 +28,19 @@ export class Server extends Project {
       server.use(path, async (request, response, next) => {
         if (request.method.toUpperCase() !== method) return next();
 
-        const result = await app.run(handler, {
+        const result = await this.run(handler, {
           path: request.path,
           method: request.method,
           body: request.body,
           headers: request.headers,
           params: request.params,
           query: request.query,
+          now: Date.now(),
         });
 
         const updates = "updates" in result ? result.updates : {};
         for (const [key, value] of Object.entries(updates)) {
-          const updater = updaters[key];
+          const updater = this.#updaters[key];
           if (typeof updater !== "function") throw new Error("No updater found");
 
           for (const item of Array.isArray(value) ? value : [value]) {

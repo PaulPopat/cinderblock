@@ -21,7 +21,7 @@ export class Closure {
     return new Closure([...this.#frames, frame]);
   }
 
-  withVariable(name: string, value: Variable) {
+  withVariable(name: string, value: Variable | Promise<Variable>) {
     const frame = this.#frames.findLast(() => true);
     if (!frame) throw new Error("Not within a frame");
     return new Closure([...this.#frames.filter((f) => f !== frame), frame.withVariable(name, value)]);

@@ -3,13 +3,13 @@ import database from "#integration/database";
 type AddUserProps = {
   id: string;
   email: string;
-  hashed_password: string;
+  password: string;
+  created: string;
 };
 
 export async function users_addUser(props: AddUserProps) {
-  const time = new Date().toISOString();
   database.run`
-    INSERT INTO data (
+    INSERT INTO users (
       id,
       email,
       hashed_password,
@@ -18,9 +18,9 @@ export async function users_addUser(props: AddUserProps) {
     ) VALUES (
       ${props.id},
       ${props.email},
-      ${props.hashed_password},
-      ${time},
-      ${time}
+      ${props.password},
+      ${props.created},
+      ${props.created}
     )
   `;
 }

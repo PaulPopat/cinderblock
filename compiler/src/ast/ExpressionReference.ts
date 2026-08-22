@@ -28,7 +28,10 @@ export class ExpressionReference extends Expression {
 
   get subject() {
     const result = this.find(this.#name);
-    if (!(result instanceof EntityReferenceable)) throw new LinkerError("Unresolved reference", this.location);
+    if (!(result instanceof EntityReferenceable)) {
+      throw new LinkerError("Unresolved reference", this.location);
+    }
+
     return result;
   }
 

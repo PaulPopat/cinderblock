@@ -13,7 +13,7 @@ struct controllers_UsersController_PostUsersBody
 
 let
 [type="handler", method="POST", path="/users"]
-controllers_UsersController_PostUsers (body: PostUsersBody) = 
+controllers_UsersController_PostUsers (body: PostUsersBody, now: int) = 
     use services_PasswordService;
     use users;
     use crypto;
@@ -21,13 +21,14 @@ controllers_UsersController_PostUsers (body: PostUsersBody) =
   {
     response = {
       status = 200,
-      body = { message = "success" }
+      body = { message = "success", id = id }
     },
     updates = {
-      addUser = {
+      users_addUser = {
         id = id,
         email = body.email,
-        password = body.password -> HashPassword
+        password = body.password -> HashPassword,
+        created = now -> std_date_iso
       }
     }
   };

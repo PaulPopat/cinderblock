@@ -1,9 +1,9 @@
 import type { Variable } from "./Variable.ts";
 
 export class Frame {
-  readonly #variables: Record<string, Variable | undefined>;
+  readonly #variables: Record<string, Variable | Promise<Variable> | undefined>;
 
-  constructor(variables: Record<string, Variable | undefined>) {
+  constructor(variables: Record<string, Variable | Promise<Variable> | undefined>) {
     this.#variables = variables;
   }
 
@@ -11,11 +11,15 @@ export class Frame {
     return this.#variables[name];
   }
 
-  withVariable(name: string, value: Variable) {
-    return new Frame({ ...this.#variables, [name]: value });
+  /**
+   * @mutates
+   */
+  withVariable(name: string, value: Variable | Promise<Variable>) {
+    this.#variables[name] = value;
+    return this;
   }
 
-  export() {
-    return Object.fromEntries(Object.entries(this.#variables).map(([key, value]) => [key, value?.export()]));
+  async export() {
+    return Object.fromEntries(await Promise.all(Object.entries(this.#variables).map(async ([key, value]) => [key, await (await value)?.export()])));
   }
 }
