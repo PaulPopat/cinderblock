@@ -1,5 +1,5 @@
 import { Project } from "@cinderblock/compiler";
-import express from "express";
+import express, { type NextFunction, type Request, type Response } from "express";
 
 export class Server extends Project {
   readonly #updaters: Record<string, unknown>;
@@ -25,7 +25,7 @@ export class Server extends Project {
 
       console.log(`Found handler for ${method}:${path}`);
 
-      server.use(path, async (request, response, next) => {
+      (server as any)[method.toLowerCase()](path, async (request: Request, response: Response, next: NextFunction) => {
         if (request.method.toUpperCase() !== method) return next();
 
         const result = await this.run(handler, {

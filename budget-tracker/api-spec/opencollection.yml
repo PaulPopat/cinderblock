@@ -1,0 +1,30 @@
+opencollection: 1.0.0
+
+info:
+  name: api-spec
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+request:
+  variables:
+    - name: BASE_URL
+      value: http://localhost:8080
+    - name: EMAIL_ADDRESS
+      value: test.user@test.com
+    - name: PASSWORD
+      value: test-password
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git

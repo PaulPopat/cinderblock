@@ -1,27 +1,28 @@
 let
 [type="handler", method="GET", path="/users/:user_id"]
-controllers_UsersController_GetUsers (params: unknown) =
+controllers_UsersController_GetUser (params: unknown) =
     use users;
   {
     status = 200,
     body = params.user_id -> getUser
   };
 
-struct controllers_UsersController_PostUsersBody
+struct controllers_UsersController_PostUserBody
   email: string
-  password: string;
+  password: string
+  token: string;
 
 let
 [type="handler", method="POST", path="/users"]
-controllers_UsersController_PostUsers (body: PostUsersBody, now: int) = 
+controllers_UsersController_PostUser (body: PostUserBody, now: int) = 
     use services_PasswordService;
-    use users;
-    use crypto;
-    let id = {} -> guid;
-  {
+    let verified = body.token -> jwt_verify;
+    let valid = verified.email == body.email;
+    let id = {} -> crypto_guid;
+  valid ? {
     response = {
       status = 200,
-      body = { message = "success", id = id }
+      body = { message = "success", user_id = id }
     },
     updates = {
       users_addUser = {
@@ -29,6 +30,30 @@ controllers_UsersController_PostUsers (body: PostUsersBody, now: int) =
         email = body.email,
         password = body.password -> HashPassword,
         created = now -> std_date_iso
+      }
+    }
+  } : {
+    status = 401,
+    body = { message = "Could not validate token" }
+  };
+
+struct controllers_UsersController_PostStagedUserBody
+  email: string;
+
+let
+[type="handler", method="POST", path="/staged-users"]
+controllers_UsersController_PostStagedUser (body: PostStagedUserBody, now: int) =
+  {
+    response = {
+      status = 200,
+      body = { message = "Check your inbox" }
+    },
+    updates = {
+      users_sendToken = {
+        token = {
+          email = body.email,
+          exp = (now / 1000) + (60 * 60)
+        } -> jwt_encode
       }
     }
   };

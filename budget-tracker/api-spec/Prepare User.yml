@@ -1,0 +1,22 @@
+info:
+  name: Prepare User
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/staged-users"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "{{EMAIL_ADDRESS}}"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

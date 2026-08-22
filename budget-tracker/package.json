@@ -8,6 +8,7 @@
     "start": "node ./src/index.ts"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.6.0",
     "@types/pug": "^2.0.10",
     "typescript": "^6.0.3"
@@ -23,6 +24,7 @@
   },
   "dependencies": {
     "@cinderblock/server": "*",
+    "jsonwebtoken": "^9.0.3",
     "pug": "^3.0.4"
   }
 }

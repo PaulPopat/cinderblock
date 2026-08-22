@@ -1,0 +1,24 @@
+info:
+  name: Post User
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{BASE_URL}}/users"
+  body:
+    type: json
+    data: |-
+      {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3QudXNlckB0ZXN0LmNvbSIsImV4cCI6MTc4NzQyNzcyNSwiaWF0IjoxNzg3NDI0MTI1fQ.EuwEaVJK5U8V4htoWJ9LsP4STV9S-y0WVEoGpc8A2Fo",
+        "email": "{{EMAIL_ADDRESS}}",
+        "password": "{{PASSWORD}}"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

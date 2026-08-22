@@ -24,3 +24,11 @@ export async function users_addUser(props: AddUserProps) {
     )
   `;
 }
+
+type SendTokenProps = {
+  token: string;
+};
+
+export async function users_sendToken(props: SendTokenProps) {
+  console.log(`Fake email of ${props.token}`);
+}

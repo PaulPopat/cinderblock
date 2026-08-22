@@ -1,4 +1,5 @@
 import { VariablePrimitive } from "./VariablePrimitive.ts";
+import { VariablePrimitiveBool } from "./VariablePrimitiveBool.ts";
 
 export class VariablePrimitiveString extends VariablePrimitive<string> {
   add(value: VariablePrimitive<unknown>): VariablePrimitive<string> {
@@ -29,11 +30,17 @@ export class VariablePrimitiveString extends VariablePrimitive<string> {
   }
 
   equals(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
-    throw new Error("Method not implemented.");
+    const subject = value.value;
+    if (typeof subject !== "string") throw new Error("Incompatible check");
+
+    return new VariablePrimitiveBool(this.value == subject);
   }
 
   notEquals(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
-    throw new Error("Method not implemented.");
+    const subject = value.value;
+    if (typeof subject !== "string") throw new Error("Incompatible check");
+
+    return new VariablePrimitiveBool(this.value != subject);
   }
 
   greaterThan(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
