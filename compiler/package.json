@@ -16,7 +16,8 @@
     "#tokeniser": "./src/tokeniser/index.ts",
     "#utils": "./src/utils/index.ts",
     "#runner": "./src/runner/index.ts",
-    "#std": "./src/std/index.ts"
+    "#std": "./src/std/index.ts",
+    "#struct": "./src/struct/index.ts"
   },
   "exports": {
     ".": "./src/index.ts"
