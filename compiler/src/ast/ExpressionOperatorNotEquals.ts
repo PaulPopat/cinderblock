@@ -4,6 +4,7 @@ import { ParserError } from "./ParserError.ts";
 import { type Closure, type Variable, VariablePrimitive } from "#runner";
 import type { Entry } from "./Entry.ts";
 import type { TokenWalker } from "./TokenWalker.ts";
+import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 
 export class ExpressionOperatorNotEquals extends ExpressionOperator {
   static {
@@ -18,13 +19,13 @@ export class ExpressionOperatorNotEquals extends ExpressionOperator {
     if (!existing) throw new ParserError("Unexpected !=", walker.store);
     const [{ right }, done] = walker
       .expect("!=")
-      .extract("right", (w) => Expression.Parse(w, parent, lookFor))
+      .extract("right", (w) => Expression.ParseOne(w, () => this))
       .finish();
     super(walker.location, done, parent, existing, right);
   }
 
   get resolution() {
-    return this.left.resolution;
+    return new TypePrimitiveBool(this.location, this.done, () => this);
   }
 
   async resolve(closure: Closure): Promise<Variable> {

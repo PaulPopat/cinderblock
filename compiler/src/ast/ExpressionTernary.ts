@@ -4,6 +4,7 @@ import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "./TokenWalker.ts";
 import { TypeUnion } from "./TypeUnion.ts";
+import { WriterError } from "./WriterError.ts";
 
 export class ExpressionTernary extends Expression {
   static {
@@ -51,7 +52,7 @@ export class ExpressionTernary extends Expression {
     const predicate = await this.#predicate.resolve(closure);
 
     if (!(predicate instanceof VariablePrimitiveBool)) {
-      throw new Error("Boolean required");
+      throw new WriterError("Boolean required", this.location);
     }
 
     if (predicate.value) {

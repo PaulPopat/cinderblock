@@ -1,5 +1,7 @@
 import { Project } from "@cinderblock/compiler";
 import express, { type NextFunction, type Request, type Response } from "express";
+import path from "node:path";
+import cookieParser from "cookie-parser";
 
 export class Server extends Project {
   readonly #updaters: Record<string, unknown>;
@@ -13,6 +15,8 @@ export class Server extends Project {
   async start() {
     const server = express();
     server.use(express.json());
+    server.use(express.urlencoded());
+    server.use(cookieParser());
 
     const handlers = this.withTag("type", "handler");
 
@@ -20,42 +24,53 @@ export class Server extends Project {
       const method = handler.tags.find((t) => t.key === "method")?.value ?? "get";
       if (typeof method !== "string") throw new Error("Invalid method type");
 
-      const path = handler.tags.find((t) => t.key === "path")?.value;
-      if (typeof path !== "string") throw new Error("Invalid path");
+      const handlerPath = handler.tags.find((t) => t.key === "path")?.value;
+      if (typeof handlerPath !== "string") throw new Error("Invalid path");
 
-      console.log(`Found handler for ${method}:${path}`);
+      console.log(`Found handler for ${method}:${handlerPath}`);
 
-      (server as any)[method.toLowerCase()](path, async (request: Request, response: Response, next: NextFunction) => {
-        if (request.method.toUpperCase() !== method) return next();
+      server.use("/_", express.static(path.resolve(this.root, "_")));
 
-        const result = await this.run(handler, {
-          path: request.path,
-          method: request.method,
-          body: request.body,
-          headers: request.headers,
-          params: request.params,
-          query: request.query,
-          now: Date.now(),
-        });
+      (server as any)[method.toLowerCase()](handlerPath, async (request: Request, response: Response, next: NextFunction) => {
+        try {
+          if (request.method.toUpperCase() !== method) return next();
 
-        const updates = "updates" in result ? result.updates : {};
-        for (const [key, value] of Object.entries(updates)) {
-          const updater = this.#updaters[key];
-          if (typeof updater !== "function") throw new Error("No updater found");
+          const result = await this.run(handler, {
+            path: request.path,
+            method: request.method,
+            body: request.body,
+            headers: request.headers,
+            params: request.params,
+            query: request.query,
+            now: Date.now(),
+            cookies: request.cookies,
+          });
 
-          for (const item of Array.isArray(value) ? value : [value]) {
-            await updater(item);
+          const updates = "updates" in result ? result.updates : {};
+          for (const [key, value] of Object.entries(updates)) {
+            const updater = this.#updaters[key];
+            if (typeof updater !== "function") throw new Error("No updater found");
+
+            for (const item of Array.isArray(value) ? value : [value]) {
+              await updater(item);
+            }
           }
+
+          const { status, headers, body } = "updates" in result ? result.response : result;
+          response.status(status);
+
+          for (const [key, value] of Object.entries(headers ?? {})) {
+            response.setHeader(key, value as string);
+          }
+
+          response.send(body);
+        } catch (err) {
+          if (process.env.NODE_ENV === "production") {
+            response.status(500).send("Internal server error");
+          }
+
+          response.status(500).send(`<code>${err?.toString()}</code>`);
         }
-
-        const { status, headers, body } = "updates" in result ? result.response : result;
-        response.status(status);
-
-        for (const [key, value] of Object.entries(headers ?? {})) {
-          response.setHeader(key, value as string);
-        }
-
-        response.send(body);
       });
     }
 

@@ -1,5 +1,7 @@
 import database from "#integration/database";
 
+const appBase = process.env.APP_BASE ?? "http://localhost:8080";
+
 type AddUserProps = {
   id: string;
   email: string;
@@ -30,5 +32,7 @@ type SendTokenProps = {
 };
 
 export async function users_sendToken(props: SendTokenProps) {
-  console.log(`Fake email of ${props.token}`);
+  const url = new URL('/register', appBase);
+  url.searchParams.set('token', props.token);
+  console.log(`Fake email of ${url}`);
 }

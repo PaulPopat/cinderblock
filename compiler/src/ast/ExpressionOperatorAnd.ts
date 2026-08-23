@@ -4,6 +4,7 @@ import { Expression } from "./Expression.ts";
 import { ExpressionOperator } from "./ExpressionOperator.ts";
 import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "./TokenWalker.ts";
+import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 
 export class ExpressionOperatorAnd extends ExpressionOperator {
   static {
@@ -18,13 +19,13 @@ export class ExpressionOperatorAnd extends ExpressionOperator {
     if (!existing) throw new ParserError("Unexpected &&", walker.store);
     const [{ right }, done] = walker
       .expect("&&")
-      .extract("right", (w) => Expression.Parse(w, parent, lookFor))
+      .extract("right", (w) => Expression.ParseOne(w, parent))
       .finish();
     super(walker.location, done, parent, existing, right);
   }
 
   get resolution() {
-    return this.left.resolution;
+    return new TypePrimitiveBool(this.location, this.done, () => this);
   }
 
   async resolve(closure: Closure): Promise<Variable> {

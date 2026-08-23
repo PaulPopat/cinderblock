@@ -1,5 +1,4 @@
 import type { Closure, Variable } from "#runner";
-import type { Entity } from "./Entity.ts";
 import { Entry } from "./Entry.ts";
 import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "./TokenWalker.ts";
@@ -16,6 +15,15 @@ export abstract class Expression extends Entry {
 
   static RegisterExpression(entry: ExpressionParseable) {
     this.#parsers = [...this.#parsers, entry].sort((a, b) => b.priority - a.priority);
+  }
+
+  static ParseOne(walker: TokenWalker, parent: () => Entry | undefined): Expression {
+    const match = this.#parsers.find((p) => walker.store.data.match(p.match));
+    if (!match) {
+      throw new ParserError(`Unexpected symbol of ${walker.data}`, walker.store);
+    }
+
+    return new match.factory(walker, parent, [";"], undefined);
   }
 
   static Parse(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string> = [";"]): Expression {

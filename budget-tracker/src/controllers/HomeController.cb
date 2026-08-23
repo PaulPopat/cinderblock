@@ -1,0 +1,36 @@
+struct controllers_HomeController_GetHomeQuery
+  check_inbox: string;
+
+struct controllers_HomeController_GetHomeCookies
+  session: string;
+
+let
+[type="handler", method="GET", path="/"]
+controllers_HomeController_GetHome (query: GetHomeQuery, cookies: GetHomeCookies) =
+    use services_SessionService;
+  {
+    status = 200,
+    body = {
+      name = "home",
+      data = {
+        check_inbox = "check_inbox" in query ? query.check_inbox == "true" : false,
+        user_id = "session" in cookies ? cookies.session -> GetUserId : null
+      }
+    } -> html_template,
+    headers = {
+      "Content-Type" = "text/html"
+    }
+  };
+
+struct controllers_HomeController_GetRegisterProps
+  token: string;
+
+let
+[type="handler", method="GET", path="/register"]
+controllers_HomeController_GetRegister (query: GetRegisterProps) = {
+  status = 200,
+  body = { name = "register", data = { token = query.token } } -> html_template,
+  headers = {
+    "Content-Type" = "text/html"
+  }
+};

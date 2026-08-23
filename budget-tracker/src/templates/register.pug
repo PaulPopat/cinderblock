@@ -1,0 +1,12 @@
+extends extensions/layout.pug
+include components/form.pug
+include components/notification.pug
+
+block content
+  form(action="/users" method="post")
+    +text("email", "email")(placeholder="name@example.com")
+      | Email
+    +text("password", "password")
+      | Password
+    input(type="hidden" name="token" value=token)
+    button(type="submit" class="btn btn-primary") Create Account

@@ -4,6 +4,8 @@ import { Expression } from "./Expression.ts";
 import { ExpressionOperator } from "./ExpressionOperator.ts";
 import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "./TokenWalker.ts";
+import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
+import { WriterError } from "./WriterError.ts";
 
 export class ExpressionOperatorIn extends ExpressionOperator {
   static {
@@ -18,13 +20,13 @@ export class ExpressionOperatorIn extends ExpressionOperator {
     if (!existing) throw new ParserError("Unexpected in", walker.store);
     const [{ right }, done] = walker
       .expect("in")
-      .extract("right", (w) => Expression.Parse(w, parent, lookFor))
+      .extract("right", (w) => Expression.ParseOne(w, () => this))
       .finish();
     super(walker.location, done, parent, existing, right);
   }
 
   get resolution() {
-    return this.right.resolution;
+    return new TypePrimitiveBool(this.location, this.done, () => this);
   }
 
   async resolve(closure: Closure): Promise<Variable> {
@@ -32,11 +34,11 @@ export class ExpressionOperatorIn extends ExpressionOperator {
     const right = await this.right.resolve(closure);
 
     if (!(left instanceof VariablePrimitiveString)) {
-      throw new Error("String required");
+      throw new WriterError("String required", this.location);
     }
 
     if (!(right instanceof VariableTuple)) {
-      throw new Error("Tuple required");
+      throw new WriterError("Tuple required", this.location);
     }
 
     return new VariablePrimitiveBool(right.has(left.value));
