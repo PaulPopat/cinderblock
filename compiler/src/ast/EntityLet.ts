@@ -112,6 +112,10 @@ export class EntityLet extends EntityReferenceable {
     return [
       name,
       [this.namespace, name].join("_"),
+      ...this.namespace
+        .split("_")
+        .reduce((current, next) => [...current, [current.findLast(() => true), next].filter((f) => f).join("_")], [] as Array<string>)
+        .map((n) => [n, name].join("_")),
       ...this.#entities.filter((e) => e instanceof EntityUse).map((e) => [e.namespace, name].join("_")),
     ];
   }

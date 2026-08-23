@@ -6,7 +6,8 @@ let services_SessionService_CreateUserIdCookie (_s: string, now: int) =
 
 let services_SessionService_GetUserId (_s: string) =
     struct SessionToken user_id: string;
-  ((_s -> jwt_verify) as SessionToken).user_id;
+    let parsed = (_s -> jwt_verify) as SessionToken;
+  "user_id" in parsed ? parsed.user_id : null;
 
 let services_SessionService_CreateRegisterCookie (_s: string, now: int) =
    {
@@ -16,4 +17,4 @@ let services_SessionService_CreateRegisterCookie (_s: string, now: int) =
 
 let services_SessionService_GetRegisterEmail (_s: string) =
     struct RegisterToken email: string;
-  ((_s -> jwt_verify) as RegisterToken).email;
+  (_s -> jwt_verify as RegisterToken).email;

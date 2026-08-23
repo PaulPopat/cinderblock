@@ -1,12 +1,13 @@
 import type { Closure, Variable } from "#runner";
 import { Entry } from "./Entry.ts";
 import { ParserError } from "./ParserError.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
+import { TokenWalker } from "./TokenWalker.ts";
 import type { Type } from "./Type.ts";
 
 type ExpressionParseable = {
   priority: number;
   match: RegExp;
+  inOne?: boolean;
   factory: new (walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) => Expression;
 };
 
@@ -23,7 +24,25 @@ export abstract class Expression extends Entry {
       throw new ParserError(`Unexpected symbol of ${walker.data}`, walker.store);
     }
 
-    return new match.factory(walker, parent, [";"], undefined);
+    const left = new match.factory(walker, parent, [";"], undefined);
+
+    const [{ right }] = TokenWalker.start(left.done)
+      .reduce(
+        "right",
+        (s) => s.data !== ";" && !!this.#parsers.find((p) => s.data.match(p.match))?.inOne,
+        (w, _, p): Expression => {
+          const match = this.#parsers.find((p) => w.store.data.match(p.match));
+          if (!match) {
+            throw new ParserError(`Unexpected symbol of ${w.data}`, w.store);
+          }
+
+          return new match.factory(w, parent, [";"], p);
+        },
+        left,
+      )
+      .finish();
+
+    return right;
   }
 
   static Parse(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string> = [";"]): Expression {

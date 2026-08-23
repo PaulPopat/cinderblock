@@ -38,7 +38,7 @@ export class ExpressionOperatorIn extends ExpressionOperator {
     }
 
     if (!(right instanceof VariableTuple)) {
-      throw new WriterError("Tuple required", this.location);
+      return new VariablePrimitiveBool(false);
     }
 
     return new VariablePrimitiveBool(right.has(left.value));

@@ -26,4 +26,12 @@ describe("logic", () => {
     const result = await code.run("test_let", {});
     assert.equal(result, 2);
   });
+
+  test("adds strings in the correct order", async () => {
+    const code = new Inline(`
+      let test_let = "hello" + "." + "world";
+    `);
+    const result = await code.run("test_let", {});
+    assert.equal(result, "hello.world");
+  });
 });

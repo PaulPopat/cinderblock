@@ -96,9 +96,10 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
     name: TKey,
     predicate: (store: TokenStore, previous?: TResult) => TWhile,
     extractor: (store: TokenWalker, whileResult: TWhile, previous?: TResult) => TResult,
+    previous?: TResult,
   ) {
     type NewContext = TContext & { [key in TKey]: TResult };
-    let result: TResult | undefined = undefined;
+    let result: TResult | undefined = previous;
     let whileResult: TWhile;
     let newStore: TokenStore = this.#store;
 

@@ -1,3 +1,27 @@
+struct controllers_UsersController_PostSessionBody
+  email: string
+  password: string;
+
+let
+[type="handler", method="POST", path="/sessions"]
+controllers_UsersController_PostSession (body: PostUserBody, now: int) = 
+    use services;
+    let user = body.email -> users_getUserByEmail;
+  {
+    _s = body.password,
+    original = user.password
+  } -> PasswordService_Matches ? {
+    status = 303,
+    body = { message = "Success" },
+    headers = {
+      "set-cookie" = { _s = user.id, now = now } -> SessionService_CreateUserIdCookie,
+      location = "/" 
+    }
+  } : {
+    status = 401,
+    body = { message = "Could not validate token" }
+  };
+  
 struct controllers_UsersController_PostUserBody
   email: string
   password: string
@@ -9,7 +33,7 @@ controllers_UsersController_PostUser (body: PostUserBody, now: int) =
     use services_PasswordService;
     use services_SessionService;
     let id = {} -> crypto_guid;
-  ((body.token -> GetRegisterEmail) == body.email) ? {
+  body.token -> GetRegisterEmail == body.email ? {
     response = {
       status = 303,
       body = { message = "User created" },

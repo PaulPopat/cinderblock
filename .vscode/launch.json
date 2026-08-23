@@ -8,13 +8,12 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "program": "budget-tracker/src/index.ts",
-      "outFiles": [
-        "${workspaceFolder}/**/*.js"
-      ]
+      "outFiles": ["${workspaceFolder}/**/*.js"],
+      "env": {
+        "DATABASE_LOCATION": "${workspaceFolder}/budget-tracker/app.db"
+      }
     }
   ]
 }

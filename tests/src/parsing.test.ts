@@ -19,4 +19,15 @@ describe("parsing", () => {
 
     assert.equal(result, "present");
   });
+
+  test("resolves access in maths", async () => {
+    const app = new Inline(`
+      struct test email: string;
+      let main_export (data: test) = "hello" == data.email ? "present" : "not present";
+    `);
+
+    const result = await app.run("main_export", { data: { email: "hello" } });
+
+    assert.equal(result, "present");
+  });
 });

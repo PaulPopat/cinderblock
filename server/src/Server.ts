@@ -35,6 +35,8 @@ export class Server extends Project {
         try {
           if (request.method.toUpperCase() !== method) return next();
 
+          console.log(`${request.method}:${handlerPath} Starting`);
+
           const result = await this.run(handler, {
             path: request.path,
             method: request.method,
@@ -65,12 +67,14 @@ export class Server extends Project {
 
           response.send(body);
         } catch (err) {
-          if (process.env.NODE_ENV === "production") {
+          if (process.env.NODE_ENV === "production" || !(err instanceof Error)) {
             response.status(500).send("Internal server error");
+          } else {
+            response.status(500).send(`<style>code {white-space: pre-wrap}</style><code>${err.stack}</code>`);
           }
-
-          response.status(500).send(`<code>${err?.toString()}</code>`);
         }
+
+        console.log(`${request.method}:${handlerPath} Finished`);
       });
     }
 

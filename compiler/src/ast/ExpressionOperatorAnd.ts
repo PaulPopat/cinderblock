@@ -5,6 +5,7 @@ import { ExpressionOperator } from "./ExpressionOperator.ts";
 import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "./TokenWalker.ts";
 import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
+import { WriterError } from "./WriterError.ts";
 
 export class ExpressionOperatorAnd extends ExpressionOperator {
   static {
@@ -33,11 +34,11 @@ export class ExpressionOperatorAnd extends ExpressionOperator {
     const right = await this.right.resolve(closure);
 
     if (!(left instanceof VariablePrimitive)) {
-      throw new Error("Primitive required");
+      throw new WriterError("Primitive required", this.location);
     }
 
     if (!(right instanceof VariablePrimitive)) {
-      throw new Error("Primitive required");
+      throw new WriterError("Primitive required", this.location);
     }
 
     return left.and(right);

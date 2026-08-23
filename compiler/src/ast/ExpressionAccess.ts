@@ -6,12 +6,14 @@ import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "./TokenWalker.ts";
 import { TypeReference } from "./TypeReference.ts";
 import { TypeTuple } from "./TypeTuple.ts";
+import { WriterError } from "./WriterError.ts";
 
 export class ExpressionAccess extends Expression {
   static {
     Expression.RegisterExpression({
       priority: 100,
       match: /^\.$/gm,
+      inOne: true,
       factory: this,
     });
   }
@@ -50,7 +52,7 @@ export class ExpressionAccess extends Expression {
 
   async resolve(closure: Closure): Promise<Variable> {
     const subject = await this.#subject.resolve(closure);
-    if (!(subject instanceof VariableTuple)) throw new Error("Subject not tuple");
+    if (!(subject instanceof VariableTuple)) throw new WriterError("Subject not tuple", this.location);
 
     return subject.get(this.#name);
   }
