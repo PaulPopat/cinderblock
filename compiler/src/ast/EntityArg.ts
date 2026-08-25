@@ -37,7 +37,7 @@ export class EntityArg extends EntityReferenceable {
   }
 
   async reference(closure: Closure): Promise<Variable> {
-    return closure.search(this.internalName, this.name);
+    return closure.search(this.internalName, this.name, this.location);
   }
 
   get typeArg() {

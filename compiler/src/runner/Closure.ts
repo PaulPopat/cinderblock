@@ -1,3 +1,5 @@
+import type { Location } from "#utils";
+import { WriterError } from "../ast/WriterError.ts";
 import type { Frame } from "./Frame.ts";
 import type { Variable } from "./Variable.ts";
 
@@ -8,13 +10,13 @@ export class Closure {
     this.#frames = frames;
   }
 
-  search(name: string, displayName: string) {
+  search(name: string, displayName: string, location: Location) {
     for (const frame of this.#frames) {
       const possible = frame.search(name);
       if (possible) return possible;
     }
 
-    throw new Error(`Variable ${displayName} not resolved`);
+    throw new WriterError(`Variable ${displayName} not resolved`, location);
   }
 
   withFrame(frame: Frame) {

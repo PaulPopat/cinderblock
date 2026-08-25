@@ -1,6 +1,6 @@
 import { DatabaseSync, type SQLInputValue } from "node:sqlite";
 
-const database = new DatabaseSync(process.env.DATABASE_LOCATION ?? ":memory:");
+export const database = new DatabaseSync(process.env.DATABASE_LOCATION ?? ":memory:");
 
 database.exec(`
   CREATE TABLE IF NOT EXISTS users (
@@ -12,11 +12,23 @@ database.exec(`
   )
 `);
 
-export default {
-  query(query: TemplateStringsArray, ...args: Array<SQLInputValue>) {
-    return database.prepare(query.join("?")).all(...args);
-  },
-  run(query: TemplateStringsArray, ...args: Array<SQLInputValue>) {
-    database.prepare(query.join("?")).run(...args);
-  },
-};
+database.exec(`
+  CREATE TABLE IF NOT EXISTS categories (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )
+`);
+
+database.exec(`
+  CREATE TABLE IF NOT EXISTS transactions (
+    id INTEGER PRIMARY KEY,
+    user TEXT NOT NULL REFERENCES users(id) ON UPDATE CASCADE,
+    title TEXT NOT NULL,
+    category TEXT NOT NULL REFERENCES categories(id) ON UPDATE CASCADE,
+    amount INTEGER NOT NULL,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  )
+`);

@@ -17,10 +17,44 @@ export class Server extends Project {
     server.use(express.json());
     server.use(express.urlencoded());
     server.use(cookieParser());
+    server.use("/_", express.static(path.resolve(this.root, "_")));
 
-    const handlers = this.withTag("type", "handler");
+    for (const middleware of this.withTag("type", "middleware")) {
+      const location = middleware.tags.find((t) => t.key === "path")?.value;
+      if (typeof location !== "string") throw new Error("Invalid path");
 
-    for (const handler of handlers) {
+      console.log(`Found handler for MIDDLEWARE:${location}`);
+
+      server.use(location, async (request: Request, response: Response, next: NextFunction) => {
+        try {
+          console.log(`MIDDLEWARE:${location} Starting`);
+
+          const result = await this.run(middleware, {
+            path: request.path,
+            method: request.method,
+            body: request.body,
+            headers: request.headers,
+            params: request.params,
+            query: request.query,
+            now: Date.now(),
+            cookies: request.cookies,
+          });
+
+          (request as any).ctx = result;
+          next();
+        } catch (err) {
+          if (process.env.NODE_ENV === "production" || !(err instanceof Error)) {
+            response.status(500).send("Internal server error");
+          } else {
+            response.status(500).send(`<style>code {white-space: pre-wrap}</style><code>${err.stack}</code>`);
+          }
+        }
+
+        console.log(`MIDDLEWARE:${location} Finished`);
+      });
+    }
+
+    for (const handler of this.withTag("type", "handler")) {
       const method = handler.tags.find((t) => t.key === "method")?.value ?? "get";
       if (typeof method !== "string") throw new Error("Invalid method type");
 
@@ -28,8 +62,6 @@ export class Server extends Project {
       if (typeof handlerPath !== "string") throw new Error("Invalid path");
 
       console.log(`Found handler for ${method}:${handlerPath}`);
-
-      server.use("/_", express.static(path.resolve(this.root, "_")));
 
       (server as any)[method.toLowerCase()](handlerPath, async (request: Request, response: Response, next: NextFunction) => {
         try {
@@ -46,6 +78,7 @@ export class Server extends Project {
             query: request.query,
             now: Date.now(),
             cookies: request.cookies,
+            context: (request as any).ctx,
           });
 
           const updates = "updates" in result ? result.updates : {};

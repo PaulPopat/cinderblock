@@ -40,7 +40,7 @@ export class ExpressionReference extends Expression {
   }
 
   async resolve(closure: Closure): Promise<Variable> {
-    const value = closure.search(this.subject.internalName, this.#name);
+    const value = closure.search(this.subject.internalName, this.#name, this.location);
 
     if (value instanceof VariablePipeable && value.noArgs) {
       return value.execute(new Frame({}));

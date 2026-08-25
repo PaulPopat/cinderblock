@@ -6,10 +6,10 @@ let
 [type="handler", method="POST", path="/sessions"]
 controllers_UsersController_PostSession (body: PostUserBody, now: int) = 
     use services;
-    let user = body.email -> users_getUserByEmail;
+    let user = body.email -> UsersService_GetUserByEmail;
   {
     _s = body.password,
-    original = user.password
+    original = user.hashed_password
   } -> PasswordService_Matches ? {
     status = 303,
     body = { message = "Success" },
@@ -30,25 +30,26 @@ struct controllers_UsersController_PostUserBody
 let
 [type="handler", method="POST", path="/users"]
 controllers_UsersController_PostUser (body: PostUserBody, now: int) = 
-    use services_PasswordService;
-    use services_SessionService;
+    use services;
     let id = {} -> crypto_guid;
-  body.token -> GetRegisterEmail == body.email ? {
+  body.token -> SessionService_GetRegisterEmail == body.email ? {
     response = {
       status = 303,
       body = { message = "User created" },
       headers = {
-        "set-cookie" = { _s = id, now = now } -> CreateUserIdCookie,
+        "set-cookie" = { _s = id, now = now } -> SessionService_CreateUserIdCookie,
         location = "/" 
       }
     },
     updates = {
-      users_addUser = {
-        id = id,
-        email = body.email,
-        password = body.password -> HashPassword,
-        created = now -> std_date_iso
-      }
+      database_execute = [
+        {
+          id = id,
+          email = body.email,
+          password = body.password -> PasswordService_HashPassword,
+          created = now -> std_date_iso
+        } -> UsersService_AddUserQuery
+      ]
     }
   } : {
     status = 401,
@@ -61,7 +62,7 @@ struct controllers_UsersController_PostStagedUserBody
 let
 [type="handler", method="POST", path="/staged-users"]
 controllers_UsersController_PostStagedUser (body: PostStagedUserBody, now: int) =
-    use services_SessionService;
+    use services;
   {
     response = {
       status = 303,
@@ -70,7 +71,7 @@ controllers_UsersController_PostStagedUser (body: PostStagedUserBody, now: int) 
     },
     updates = {
       users_sendToken = {
-        token = { _s = body.email, now = now } -> CreateRegisterCookie
+        token = { _s = body.email, now = now } -> SessionService_CreateRegisterCookie
       }
     }
   };
