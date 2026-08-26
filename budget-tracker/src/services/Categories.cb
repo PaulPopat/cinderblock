@@ -1,0 +1,25 @@
+let services_Categories_Categories: Category[] =
+  {
+    sql = "select * from categories",
+    parameters = []
+  } -> database_query;
+
+let services_Categories_AddQuery  (
+  id: string,
+  title: string,
+  now: int
+) =
+  {
+    sql = "INSERT INTO categories (id, title, created_at, updated_at) VALUES (?, ?, ?, ?)",
+    parameters = [id, title, now, now]
+  };
+
+let services_Categories_RenameQuery  (
+  id: string,
+  title: string,
+  now: int
+) =
+  {
+    sql = "update categories set title = ?, updated_at = ? where id = ?",
+    parameters = [title, now, id]
+  };

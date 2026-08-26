@@ -19,6 +19,7 @@ export * from "./ExpressionLiteralInt.ts";
 export * from "./ExpressionLiteralLong.ts";
 export * from "./ExpressionLiteralNull.ts";
 export * from "./ExpressionLiteralString.ts";
+export * from "./ExpressionNot.ts";
 export * from "./ExpressionOperator.ts";
 export * from "./ExpressionOperatorAdd.ts";
 export * from "./ExpressionOperatorAnd.ts";

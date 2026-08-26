@@ -6,5 +6,5 @@ block content
   if check_inbox
     +alert()
       | You will receive an email with a link to create your account
-  if user_id
-    p Your user ID #{user_id}.
+  if user
+    p Hello #{user.email}

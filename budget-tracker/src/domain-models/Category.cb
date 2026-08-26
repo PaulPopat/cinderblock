@@ -1,0 +1,5 @@
+struct Category
+  id: string
+  title: string
+  created_at: int
+  updated_at: int;

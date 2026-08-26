@@ -34,4 +34,24 @@ describe("logic", () => {
     const result = await code.run("test_let", {});
     assert.equal(result, "hello.world");
   });
+
+  test("only parses the right of an && when needed", async () => {
+    // The second part of this will error as we are not passing in value
+    const code = new Inline(`
+      struct Input value: string;
+      let test_let (input: Input) = false && input.value;
+    `);
+    const result = await code.run("test_let", { input: null });
+    assert.equal(result, false);
+  });
+
+  test("can see the args of a parent let", async () => {
+    const code = new Inline(`
+      let test_let (value: string) =
+          let internal = value;
+        internal;
+    `);
+    const result = await code.run("test_let", { value: "hello.world" });
+    assert.equal(result, "hello.world");
+  });
 });

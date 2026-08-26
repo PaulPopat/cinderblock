@@ -1,0 +1,18 @@
+let services_Transactions_List (from: int, to: int): Transaction[] =
+  {
+    sql = "select * from transactions where created_at > ? and created_at < ?",
+    parameters = [from, to],
+  } -> database_query;
+
+let services_Transactions_AddQuery (
+  id: string,
+  user_id: string,
+  title: string,
+  category_id: string,
+  amount: int,
+  now: int
+) =
+  {
+    sql = "INSERT INTO transactions (id, user, title, category, amount, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+    parameters = [id, user_id, title, category, amount, now]
+  };

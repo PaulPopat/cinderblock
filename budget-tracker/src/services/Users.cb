@@ -1,17 +1,26 @@
-let services_UsersService_GetUserByEmail (_s: string) =
+let services_Users_User (_s: string): User =
   {
     _s =  {
+      sql = "SELECT * FROM users WHERE id = ?",
+      parameters = [_s]
+    } -> database_query,
+    i = 0
+  } -> std_array_get;
+
+let services_Users_UserByEmail (_s: string): User =
+  {
+    _s = {
       sql = "SELECT * FROM users WHERE email = ?",
       parameters = [_s]
     } -> database_query,
     i = 0
   } -> std_array_get;
 
-let services_UsersService_AddUserQuery (
+let services_Users_AddUserQuery (
   id: string,
   email: string,
   password: string,
-  created: string
+  created: int
 ) =
   {
     sql = "INSERT INTO users (id, email, hashed_password, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",

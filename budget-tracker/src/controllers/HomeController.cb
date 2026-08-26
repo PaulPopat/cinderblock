@@ -11,7 +11,7 @@ controllers_HomeController_GetHome (query: GetHomeQuery, cookies: AppCookies) =
       name = "home",
       data = {
         check_inbox = "check_inbox" in query ? query.check_inbox == "true" : false,
-        user_id = { _s = cookies } -> CookiesService_GetUserId
+        user = { _s = cookies } -> Cookies_User
       }
     } -> html_template,
     headers = {
@@ -24,7 +24,7 @@ let
 controllers_HomeController_Authorise (cookies: AppCookies) =
   use services;
   {
-    user_id = { _s = cookies } -> CookiesService_GetUserId
+    user_id = { _s = cookies } -> Cookies_UserId
   };
 
 struct controllers_HomeController_GetRegisterProps

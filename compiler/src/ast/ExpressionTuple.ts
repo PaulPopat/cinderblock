@@ -24,13 +24,17 @@ export class ExpressionTuple extends Expression {
         (w) =>
           w.while(
             "value",
-            (w) => w.data === "{" || w.data === ",",
+            (w) => (w.data === "{" || w.data === ",") && w.next.data !== "}",
             (s) => new ExpressionTuplePart(s.next, () => this, [...lookFor, ",", "}"], undefined),
           ),
       )
       .if(
         (w) => w.data === "{",
         (w) => w.expect("{"),
+      )
+      .if(
+        (w) => w.data === ",",
+        (w) => w.expect(","),
       )
       .expect("}")
       .finish();

@@ -6,21 +6,24 @@ let
 [type="handler", method="POST", path="/sessions"]
 controllers_UsersController_PostSession (body: PostUserBody, now: int) = 
     use services;
-    let user = body.email -> UsersService_GetUserByEmail;
-  {
+    let user = body.email -> Users_UserByEmail;
+  "hashed_password" in user &&
+  ({
     _s = body.password,
     original = user.hashed_password
-  } -> PasswordService_Matches ? {
-    status = 303,
-    body = { message = "Success" },
-    headers = {
-      "set-cookie" = { _s = user.id, now = now } -> SessionService_CreateUserIdCookie,
-      location = "/" 
+  } -> Password_Matches)
+    ? {
+      status = 303,
+      body = { message = "Success" },
+      headers = {
+        "set-cookie" = { _s = user.id, now = now } -> Session_UserIdCookie,
+        location = "/" 
+      }
     }
-  } : {
-    status = 401,
-    body = { message = "Could not validate token" }
-  };
+    : {
+      status = 401,
+      body = { message = "Could not validate token" }
+    };
   
 struct controllers_UsersController_PostUserBody
   email: string
@@ -32,12 +35,12 @@ let
 controllers_UsersController_PostUser (body: PostUserBody, now: int) = 
     use services;
     let id = {} -> crypto_guid;
-  body.token -> SessionService_GetRegisterEmail == body.email ? {
+  body.token -> Session_RegisterEmail == body.email ? {
     response = {
       status = 303,
       body = { message = "User created" },
       headers = {
-        "set-cookie" = { _s = id, now = now } -> SessionService_CreateUserIdCookie,
+        "set-cookie" = { _s = id, now = now } -> Session_UserIdCookie,
         location = "/" 
       }
     },
@@ -46,9 +49,9 @@ controllers_UsersController_PostUser (body: PostUserBody, now: int) =
         {
           id = id,
           email = body.email,
-          password = body.password -> PasswordService_HashPassword,
-          created = now -> std_date_iso
-        } -> UsersService_AddUserQuery
+          password = body.password -> Password_Hash,
+          created = now
+        } -> Users_AddUserQuery
       ]
     }
   } : {
@@ -71,7 +74,7 @@ controllers_UsersController_PostStagedUser (body: PostStagedUserBody, now: int) 
     },
     updates = {
       users_sendToken = {
-        token = { _s = body.email, now = now } -> SessionService_CreateRegisterCookie
+        token = { _s = body.email, now = now } -> Session_RegisterCookie
       }
     }
   };

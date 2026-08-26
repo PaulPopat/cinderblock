@@ -1,0 +1,7 @@
+struct Transaction
+  id: int
+  user: string
+  title: string
+  category: string
+  amount: int
+  created_at: int;

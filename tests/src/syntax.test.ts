@@ -32,9 +32,41 @@ describe("syntax", () => {
     assert.deepStrictEqual(result, ["hello", "world"]);
   });
 
+  test("returns an array with a trailing comma", async () => {
+    const code = new Inline(`
+      let test_let = ["hello", "world",];
+    `);
+    const result = await code.run("test_let", {});
+    assert.deepStrictEqual(result, ["hello", "world"]);
+  });
+
+  test("returns an empty array", async () => {
+    const code = new Inline(`
+      let test_let = [];
+    `);
+    const result = await code.run("test_let", {});
+    assert.deepStrictEqual(result, []);
+  });
+
+  test("returns an empty array with a gap", async () => {
+    const code = new Inline(`
+      let test_let = [ ];
+    `);
+    const result = await code.run("test_let", {});
+    assert.deepStrictEqual(result, []);
+  });
+
   test("returns a tuple", async () => {
     const code = new Inline(`
       let test_let = {test="hello", world=123};
+    `);
+    const result = await code.run("test_let", {});
+    assert.deepStrictEqual(result, { test: "hello", world: 123 });
+  });
+
+  test("returns a tuple with a trailing comma", async () => {
+    const code = new Inline(`
+      let test_let = {test="hello", world=123,};
     `);
     const result = await code.run("test_let", {});
     assert.deepStrictEqual(result, { test: "hello", world: 123 });

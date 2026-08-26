@@ -1,0 +1,10 @@
+struct AppCookies
+  session: string;
+
+struct AppContext
+  user_id: string;
+
+let services_Cookies_User (_s: AppCookies) =
+  "session" in _s
+    ? _s.session -> Session_UserId -> Users_User
+    : null;

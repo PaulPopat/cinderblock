@@ -10,7 +10,7 @@ export class ExpressionLiteralArray extends ExpressionLiteral {
   static {
     Expression.RegisterExpression({
       priority: 150,
-      match: /^\[$/gm,
+      match: /^(\[)|(\[\])$/gm,
       factory: this,
     });
   }
@@ -19,15 +19,34 @@ export class ExpressionLiteralArray extends ExpressionLiteral {
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     const [{ value }, done] = walker
-      .while(
-        "value",
-        (w) => w.data === "[" || w.data === ",",
-        (s) => Expression.Parse(s.next, () => this, [...lookFor, ",", "]"]),
+      .if(
+        (s) => s.data !== "[]",
+        (w) =>
+          w.while(
+            "value",
+            (w) => (w.data === "[" || w.data === ",") && w.next.data !== "]",
+            (s) => Expression.Parse(s.next, () => this, [...lookFor, ",", "]"]),
+          ),
       )
-      .expect("]")
+      .if(
+        (w) => w.data === "[",
+        (w) => w.expect("["),
+      )
+      .if(
+        (w) => w.data === ",",
+        (w) => w.expect(","),
+      )
+      .if(
+        (w) => w.data === "[]",
+        (w) => w.expect("[]"),
+      )
+      .if(
+        (w) => w.data === "]",
+        (w) => w.expect("]"),
+      )
       .finish();
     super(walker.location, done, parent);
-    this.#value = value;
+    this.#value = value ?? [];
   }
 
   get value() {

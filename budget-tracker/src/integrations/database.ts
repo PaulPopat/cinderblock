@@ -1,4 +1,4 @@
-import { DatabaseSync, type SQLInputValue } from "node:sqlite";
+import { DatabaseSync } from "node:sqlite";
 
 export const database = new DatabaseSync(process.env.DATABASE_LOCATION ?? ":memory:");
 
@@ -7,8 +7,8 @@ database.exec(`
     id TEXT PRIMARY KEY,
     email TEXT NOT NULL,
     hashed_password TEXT NOT NULL,
-    created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
   )
 `);
 
@@ -16,8 +16,8 @@ database.exec(`
   CREATE TABLE IF NOT EXISTS categories (
     id TEXT PRIMARY KEY,
     title TEXT NOT NULL,
-    created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
   )
 `);
 
@@ -28,7 +28,6 @@ database.exec(`
     title TEXT NOT NULL,
     category TEXT NOT NULL REFERENCES categories(id) ON UPDATE CASCADE,
     amount INTEGER NOT NULL,
-    created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL
+    created_at INTEGER NOT NULL
   )
 `);

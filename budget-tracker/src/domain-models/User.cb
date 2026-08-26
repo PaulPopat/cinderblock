@@ -1,0 +1,6 @@
+struct User
+  id: string
+  email: string
+  hashed_password: string
+  created_at: int
+  updated_at: int;
