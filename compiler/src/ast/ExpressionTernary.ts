@@ -5,6 +5,7 @@ import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypeUnion } from "./TypeUnion.ts";
 import { WriterError } from "./WriterError.ts";
+import { TokenTypeName } from "#tokeniser";
 
 export class ExpressionTernary extends Expression {
   static {
@@ -22,7 +23,7 @@ export class ExpressionTernary extends Expression {
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     if (!existing) throw new ParserError("Unexpected ?", walker);
     const [{ positive, negative }, done] = walker
-      .expect("?")
+      .expect("?", TokenTypeName.Operator)
       .extract("positive", (w) => Expression.Parse(w, () => this, [":"]))
       .extract("negative", (w) => Expression.Parse(w, () => this, lookFor))
       .finish();

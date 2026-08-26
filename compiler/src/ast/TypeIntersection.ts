@@ -1,4 +1,4 @@
-import type { TokenWalker } from "#tokeniser";
+import { TokenTypeName, type TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
 import type { Entry } from "./Entry.ts";
 import { ParserError } from "./ParserError.ts";
@@ -13,7 +13,7 @@ export class TypeIntersection extends Type {
       factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
         if (!left) throw new ParserError("Unexpected &", walker);
         const [{ right }, done] = walker
-          .expect("&")
+          .expect("&", TokenTypeName.Operator)
           .extract("right", (w) => Type.Parse(w, parent))
           .finish();
 

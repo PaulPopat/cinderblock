@@ -1,4 +1,4 @@
-import type { TokenWalker } from "#tokeniser";
+import { TokenTypeName, type TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
 import type { Entry } from "./Entry.ts";
 import { ParserError } from "./ParserError.ts";
@@ -12,7 +12,7 @@ export class TypeArray extends Type {
       chainable: true,
       factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
         if (!left) throw new ParserError("Unexpected []", walker);
-        return new TypeArray(walker.location, walker.expect("[]"), parent, left);
+        return new TypeArray(walker.location, walker.expect("[]", TokenTypeName.Operator), parent, left);
       },
     });
   }

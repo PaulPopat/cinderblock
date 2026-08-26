@@ -2,7 +2,7 @@ import { TypeArg } from "./TypeArg.ts";
 import { Type } from "./Type.ts";
 import type { Entry } from "./Entry.ts";
 import type { Location } from "#utils";
-import type { TokenWalker } from "#tokeniser";
+import { TokenTypeName, type TokenWalker } from "#tokeniser";
 
 export class TypeTuple extends Type {
   static {
@@ -15,9 +15,9 @@ export class TypeTuple extends Type {
           .while(
             "parts",
             (s) => s.data === "{" || s.data === ",",
-            (w) => TypeArg.Parse(w.next, parent),
+            (w) => TypeArg.Parse(w.expect(["{", ","], TokenTypeName.Punctuation), parent),
           )
-          .expect("}")
+          .expect("}", TokenTypeName.Punctuation)
           .finish();
 
         return new TypeTuple(walker.location, done, parent, parts);

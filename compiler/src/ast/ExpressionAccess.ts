@@ -7,6 +7,7 @@ import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypeReference } from "./TypeReference.ts";
 import { TypeTuple } from "./TypeTuple.ts";
 import { WriterError } from "./WriterError.ts";
+import { TokenTypeName } from "#tokeniser";
 
 export class ExpressionAccess extends Expression {
   static {
@@ -24,7 +25,7 @@ export class ExpressionAccess extends Expression {
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     if (!existing) throw new ParserError("Unexpected .", walker);
 
-    const [{ name }, done] = walker.expect(".").text("name").finish();
+    const [{ name }, done] = walker.expect(".", TokenTypeName.Operator).text("name", TokenTypeName.PropertyReference).finish();
     super(walker.location, done, parent);
     this.#subject = existing;
     this.#name = name;

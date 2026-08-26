@@ -2,6 +2,7 @@ import { type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
+import { TokenTypeName } from "#tokeniser";
 
 export class ExpressionBrackets extends Expression {
   static {
@@ -16,9 +17,9 @@ export class ExpressionBrackets extends Expression {
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     const [{ subject }, done] = walker
-      .expect("(")
+      .expect("(", TokenTypeName.Operator)
       .extract("subject", (w) => Expression.Parse(w, () => this, [...lookFor, ")"]))
-      .expect(")")
+      .expect(")", TokenTypeName.Operator)
       .finish();
     super(walker.location, done, parent);
     this.#subject = subject;

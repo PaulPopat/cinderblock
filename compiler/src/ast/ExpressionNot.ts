@@ -5,6 +5,7 @@ import { LinkerError } from "./LinkerError.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 import { WriterError } from "./WriterError.ts";
+import { TokenTypeName } from "#tokeniser";
 
 export class ExpressionNot extends Expression {
   static {
@@ -20,7 +21,7 @@ export class ExpressionNot extends Expression {
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     const [{ subject }, done] = walker
-      .expect("!")
+      .expect("!", TokenTypeName.Operator)
       .extract("subject", (w) => Expression.ParseOne(w, () => this))
       .finish();
     super(walker.location, done, parent);

@@ -3,6 +3,7 @@ import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
+import { TokenTypeName } from "#tokeniser";
 
 export class ExpressionArrayAdd extends Expression {
   static {
@@ -19,7 +20,7 @@ export class ExpressionArrayAdd extends Expression {
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     if (!existing) throw new ParserError("Unexpected ++", walker);
     const [{ addition }, done] = walker
-      .expect("++")
+      .expect("++", TokenTypeName.Operator)
       .extract("addition", (w) => Expression.Parse(w, () => this, lookFor))
       .finish();
     super(walker.location, done, parent);

@@ -1,4 +1,4 @@
-import type { TokenWalker } from "#tokeniser";
+import { TokenTypeName, type TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
 import type { Entry } from "./Entry.ts";
 import { Type } from "./Type.ts";
@@ -11,7 +11,7 @@ export class TypePrimitiveFloat extends TypePrimitive {
       match: /^float+$/gm,
       chainable: false,
       factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
-        return new TypePrimitiveFloat(walker.location, walker.expect("float"), parent);
+        return new TypePrimitiveFloat(walker.location, walker.expect("float", TokenTypeName.Primitive), parent);
       },
     });
   }

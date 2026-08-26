@@ -4,6 +4,7 @@ import { Expression } from "./Expression.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { LinkerError } from "./LinkerError.ts";
 import { EntityReferenceable } from "./EntityReferenceable.ts";
+import { TokenTypeName } from "#tokeniser";
 
 export class ExpressionReference extends Expression {
   static {
@@ -17,7 +18,7 @@ export class ExpressionReference extends Expression {
   readonly #name: string;
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
-    const [{ value }, done] = walker.text("value").finish();
+    const [{ value }, done] = walker.text("value", TokenTypeName.VariableName).finish();
     super(walker.location, done, parent);
     this.#name = value;
   }

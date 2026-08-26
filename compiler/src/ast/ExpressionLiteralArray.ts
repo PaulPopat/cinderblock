@@ -5,6 +5,7 @@ import { ExpressionLiteral } from "./ExpressionLiteral.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypeArray } from "./TypeArray.ts";
 import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
+import { TokenTypeName } from "#tokeniser";
 
 export class ExpressionLiteralArray extends ExpressionLiteral {
   static {
@@ -24,25 +25,25 @@ export class ExpressionLiteralArray extends ExpressionLiteral {
         (w) =>
           w.while(
             "value",
-            (w) => (w.data === "[" || w.data === ",") && w.next.data !== "]",
-            (s) => Expression.Parse(s.next, () => this, [...lookFor, ",", "]"]),
+            (w) => (w.data === "[" || w.data === ",") && w.expect(["[", ","], TokenTypeName.Punctuation).data !== "]",
+            (s) => Expression.Parse(s.expect(["[", ","], TokenTypeName.Punctuation), () => this, [...lookFor, ",", "]"]),
           ),
       )
       .if(
         (w) => w.data === "[",
-        (w) => w.expect("["),
+        (w) => w.expect("[", TokenTypeName.Punctuation),
       )
       .if(
         (w) => w.data === ",",
-        (w) => w.expect(","),
+        (w) => w.expect(",", TokenTypeName.Punctuation),
       )
       .if(
         (w) => w.data === "[]",
-        (w) => w.expect("[]"),
+        (w) => w.expect("[]", TokenTypeName.Punctuation),
       )
       .if(
         (w) => w.data === "]",
-        (w) => w.expect("]"),
+        (w) => w.expect("]", TokenTypeName.Punctuation),
       )
       .finish();
     super(walker.location, done, parent);

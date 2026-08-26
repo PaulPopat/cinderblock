@@ -5,6 +5,7 @@ import { ExpressionTuplePart } from "./ExpressionTuplePart.ts";
 import { VariableTuple, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
+import { TokenTypeName } from "#tokeniser";
 
 export class ExpressionTuple extends Expression {
   static {
@@ -19,24 +20,20 @@ export class ExpressionTuple extends Expression {
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     const [{ value }, done] = walker
-      .if(
-        (w) => w.next.data !== "}",
-        (w) =>
-          w.while(
-            "value",
-            (w) => (w.data === "{" || w.data === ",") && w.next.data !== "}",
-            (s) => new ExpressionTuplePart(s.next, () => this, [...lookFor, ",", "}"], undefined),
-          ),
+      .while(
+        "value",
+        (w) => (w.data === "{" || w.data === ",") && w.expect(["{", ","], TokenTypeName.Punctuation).data !== "}",
+        (s) => new ExpressionTuplePart(s.expect(["{", ","], TokenTypeName.Punctuation), () => this, [...lookFor, ",", "}"], undefined),
       )
       .if(
         (w) => w.data === "{",
-        (w) => w.expect("{"),
+        (w) => w.expect("{", TokenTypeName.Punctuation),
       )
       .if(
         (w) => w.data === ",",
-        (w) => w.expect(","),
+        (w) => w.expect(",", TokenTypeName.Punctuation),
       )
-      .expect("}")
+      .expect("}", TokenTypeName.Punctuation)
       .finish();
     super(walker.location, done, parent);
     this.#parts = value ?? [];

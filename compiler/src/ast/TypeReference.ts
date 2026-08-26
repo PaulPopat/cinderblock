@@ -1,4 +1,4 @@
-import type { TokenWalker } from "#tokeniser";
+import { TokenTypeName, type TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
 import { EntityStruct } from "./EntityStruct.ts";
 import type { Entry } from "./Entry.ts";
@@ -12,7 +12,7 @@ export class TypeReference extends Type {
       match: /^[a-zA-Z][a-zA-Z0-9_@$#:]*$/gm,
       chainable: false,
       factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
-        const [{ value }, done] = walker.text("value").finish();
+        const [{ value }, done] = walker.text("value", TokenTypeName.StructReference).finish();
 
         return new TypeReference(walker.location, done, parent, value);
       },

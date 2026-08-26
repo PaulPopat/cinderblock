@@ -4,6 +4,7 @@ import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveFloat } from "./TypePrimitiveFloat.ts";
+import { TokenTypeName } from "#tokeniser";
 
 export class ExpressionLiteralFloat extends ExpressionLiteral {
   static {
@@ -17,7 +18,7 @@ export class ExpressionLiteralFloat extends ExpressionLiteral {
   readonly #value: string;
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
-    const [{ value }, done] = walker.text("value").finish();
+    const [{ value }, done] = walker.text("value", TokenTypeName.Number).finish();
     super(walker.location, done, parent);
     this.#value = value.replace("f", "");
   }

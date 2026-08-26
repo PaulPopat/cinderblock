@@ -1,1 +1,1 @@
-export * from "./SemanticHighlighter";
+export * from "./SemanticHighlighter.ts";

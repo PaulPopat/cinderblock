@@ -1,4 +1,4 @@
-import type { TokenWalker } from "#tokeniser";
+import { TokenTypeName, type TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
 import type { Entry } from "./Entry.ts";
 import { Type } from "./Type.ts";
@@ -11,7 +11,7 @@ export class TypePrimitiveLong extends TypePrimitive {
       match: /^long+$/gm,
       chainable: false,
       factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
-        return new TypePrimitiveLong(walker.location, walker.expect("long"), parent);
+        return new TypePrimitiveLong(walker.location, walker.expect("long", TokenTypeName.Primitive), parent);
       },
     });
   }

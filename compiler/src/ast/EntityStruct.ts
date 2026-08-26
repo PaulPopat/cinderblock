@@ -2,6 +2,7 @@ import { TypeArg } from "./TypeArg.ts";
 import { Entity } from "./Entity.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import type { Entry } from "./Entry.ts";
+import { TokenTypeName } from "#tokeniser";
 
 export class EntityStruct extends Entity {
   static {
@@ -17,14 +18,14 @@ export class EntityStruct extends Entity {
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined) {
     const [{ name, args }, done] = walker
-      .expect("struct")
-      .text("name")
+      .expect("struct", TokenTypeName.KeyWord)
+      .text("name", TokenTypeName.StructName)
       .while(
         "args",
         (s) => s.data !== ";",
         (s) => TypeArg.Parse(s, () => this),
       )
-      .expect(";")
+      .expect(";", TokenTypeName.Punctuation)
       .finish();
     super(walker.location, done, parent);
     this.#name = name;

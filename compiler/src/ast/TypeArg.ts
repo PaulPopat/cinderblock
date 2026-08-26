@@ -1,4 +1,4 @@
-import type { TokenWalker } from "#tokeniser";
+import { TokenTypeName, type TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
 import type { Entry } from "./Entry.ts";
 import { Type } from "./Type.ts";
@@ -6,8 +6,8 @@ import { Type } from "./Type.ts";
 export class TypeArg extends Type {
   static Parse(walker: TokenWalker, parent: () => Entry | undefined) {
     const [{ name, type }, done] = walker
-      .text("name")
-      .expect(":")
+      .text("name", TokenTypeName.PropertyName)
+      .expect(":", TokenTypeName.Punctuation)
       .extract("type", (w) => Type.Parse(w, parent))
       .finish();
 

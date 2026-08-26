@@ -1,7 +1,7 @@
 import { TypeArg } from "./TypeArg.ts";
 import { Type } from "./Type.ts";
 import type { Entry } from "./Entry.ts";
-import type { TokenWalker } from "#tokeniser";
+import { TokenTypeName, type TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
 
 export class TypePipeable extends Type {
@@ -15,10 +15,10 @@ export class TypePipeable extends Type {
           .while(
             "args",
             (s) => s.data === "," || s.data === "(",
-            (s) => TypeArg.Parse(s.next, parent),
+            (s) => TypeArg.Parse(s.expect([",", "("], TokenTypeName.Punctuation), parent),
           )
-          .expect(")")
-          .expect(":")
+          .expect(")", TokenTypeName.Punctuation)
+          .expect(":", TokenTypeName.Punctuation)
           .extract("returns", (w) => Type.Parse(w, parent))
           .finish();
 

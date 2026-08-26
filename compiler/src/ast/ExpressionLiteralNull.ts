@@ -4,6 +4,7 @@ import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
+import { TokenTypeName } from "#tokeniser";
 
 export class ExpressionLiteralNull extends ExpressionLiteral {
   static {
@@ -15,7 +16,7 @@ export class ExpressionLiteralNull extends ExpressionLiteral {
   }
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
-    const [, done] = walker.expect("null").finish();
+    const [, done] = walker.expect("null", TokenTypeName.KeyWord).finish();
     super(walker.location, done, parent);
   }
 

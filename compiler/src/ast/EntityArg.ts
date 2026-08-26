@@ -4,6 +4,7 @@ import type { Entry } from "./Entry.ts";
 import { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { Type } from "./Type.ts";
 import { TypeArg } from "./TypeArg.ts";
+import { TokenTypeName } from "#tokeniser";
 
 export class EntityArg extends EntityReferenceable {
   readonly #type: Type;
@@ -11,8 +12,8 @@ export class EntityArg extends EntityReferenceable {
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined) {
     const [{ type, name }, done] = walker
-      .text("name")
-      .expect(":")
+      .text("name", TokenTypeName.ParameterName)
+      .expect(":", TokenTypeName.Punctuation)
       .extract("type", (w) => Type.Parse(w, () => this))
       .finish();
     super(walker.location, done, parent);

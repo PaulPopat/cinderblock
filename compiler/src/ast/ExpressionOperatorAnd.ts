@@ -6,6 +6,7 @@ import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 import { WriterError } from "./WriterError.ts";
+import { TokenTypeName } from "#tokeniser";
 
 export class ExpressionOperatorAnd extends ExpressionOperator {
   static {
@@ -19,7 +20,7 @@ export class ExpressionOperatorAnd extends ExpressionOperator {
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     if (!existing) throw new ParserError("Unexpected &&", walker);
     const [{ right }, done] = walker
-      .expect("&&")
+      .expect("&&", TokenTypeName.Operator)
       .extract("right", (w) => Expression.ParseOne(w, parent))
       .finish();
     super(walker.location, done, parent, existing, right);

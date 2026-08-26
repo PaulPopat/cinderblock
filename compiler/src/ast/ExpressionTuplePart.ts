@@ -4,6 +4,7 @@ import { TypeTuple } from "./TypeTuple.ts";
 import { VariableTuple, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
+import { TokenTypeName } from "#tokeniser";
 
 export class ExpressionTuplePart extends Expression {
   readonly #name: string;
@@ -11,8 +12,8 @@ export class ExpressionTuplePart extends Expression {
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     const [{ name, value }, done] = walker
-      .text("name")
-      .expect("=")
+      .text("name", TokenTypeName.PropertyName)
+      .expect("=", TokenTypeName.Operator)
       .extract("value", (s) => Expression.Parse(s, () => this, lookFor))
       .finish();
     super(walker.location, done, parent);

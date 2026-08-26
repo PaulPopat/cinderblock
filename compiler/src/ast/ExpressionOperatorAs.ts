@@ -4,6 +4,7 @@ import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { Type } from "./Type.ts";
+import { TokenTypeName } from "#tokeniser";
 
 export class ExpressionOperatorAs extends Expression {
   static {
@@ -20,7 +21,7 @@ export class ExpressionOperatorAs extends Expression {
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     if (!existing) throw new ParserError("Unexpected as", walker);
     const [{ right }, done] = walker
-      .expect("as")
+      .expect("as", TokenTypeName.Operator)
       .extract("right", (w) => Type.Parse(w, () => this))
       .finish();
     super(walker.location, done, parent);

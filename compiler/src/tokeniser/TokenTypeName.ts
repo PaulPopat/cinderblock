@@ -1,0 +1,25 @@
+export const TokenTypeName = Object.freeze({
+  Namespace: "namespace",
+  FunctionName: "function.declaration",
+  TypeName: "type",
+  StructName: "struct.declaration",
+  StructReference: "struct",
+  ClassName: "class",
+  InterfaceName: "interface",
+  EnumName: "enum",
+  MethodName: "method",
+  MacroName: "macro",
+  VariableName: "function",
+  ParameterName: "parameter.declaration",
+  PropertyName: "property.declaration",
+  PropertyReference: "property",
+  KeyWord: "keyword",
+  String: "string",
+  Number: "number",
+  Operator: "operator",
+  Punctuation: "operator",
+  Comment: "comment",
+  Primitive: "type.defaultLibrary",
+});
+
+export type TokenTypeName = (typeof TokenTypeName)[keyof typeof TokenTypeName];

@@ -1,6 +1,7 @@
 import { Entity } from "./Entity.ts";
 import type { Entry } from "./Entry.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
+import { TokenTypeName } from "#tokeniser";
 
 export class EntityUse extends Entity {
   static {
@@ -14,7 +15,11 @@ export class EntityUse extends Entity {
   readonly #namespace: string;
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined) {
-    const [{ namespace }, done] = walker.expect("use").text("namespace").expect(";").finish();
+    const [{ namespace }, done] = walker
+      .expect("use", TokenTypeName.KeyWord)
+      .text("namespace", TokenTypeName.Namespace)
+      .expect(";", TokenTypeName.Punctuation)
+      .finish();
     super(walker.location, done, parent);
     this.#namespace = namespace;
   }

@@ -9,6 +9,7 @@ import { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import type { Entry } from "./Entry.ts";
 import { EntityUse } from "./EntityUse.ts";
 import { EntityReferenceable } from "./EntityReferenceable.ts";
+import { TokenTypeName } from "#tokeniser";
 
 export class EntityLet extends EntityReferenceable {
   static {
@@ -29,7 +30,7 @@ export class EntityLet extends EntityReferenceable {
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined) {
     const [{ name, args, returns, contents, tags, entities }, done] = walker
-      .expect("let")
+      .expect("let", TokenTypeName.KeyWord)
       .if(
         (s) => s.data === "[",
         (s) =>
@@ -37,11 +38,11 @@ export class EntityLet extends EntityReferenceable {
             .while(
               "tags",
               (s) => s.data === "[" || s.data === ",",
-              (s) => new EntryTag(s.next, () => this),
+              (s) => new EntryTag(s.expect(["[", ","], TokenTypeName.Punctuation), () => this),
             )
-            .expect("]"),
+            .expect("]", TokenTypeName.Punctuation),
       )
-      .text("name")
+      .text("name", TokenTypeName.FunctionName)
       .if(
         (s) => s.data === "(",
         (walker) =>
@@ -49,22 +50,22 @@ export class EntityLet extends EntityReferenceable {
             .while(
               "args",
               (s) => s.data === "," || s.data === "(",
-              (s) => new EntityArg(s.next, () => this),
+              (s) => new EntityArg(s.expect(["(", ","], TokenTypeName.Punctuation), () => this),
             )
-            .expect(")"),
+            .expect(")", TokenTypeName.Punctuation),
       )
       .if(
         (s) => s.data === ":",
-        (walker) => walker.expect(":").extract("returns", (s) => Type.Parse(s, () => this)),
+        (walker) => walker.expect(":", TokenTypeName.Punctuation).extract("returns", (s) => Type.Parse(s, () => this)),
       )
-      .expect("=")
+      .expect("=", TokenTypeName.Operator)
       .while(
         "entities",
         (s) => Entity.HasParser(s),
         (w) => Entity.Parse(w, () => this),
       )
       .extract("contents", (s) => Expression.Parse(s, () => this, [";"]))
-      .expect(";")
+      .expect(";", TokenTypeName.Punctuation)
       .finish();
 
     super(walker.location, done, parent);
@@ -114,7 +115,7 @@ export class EntityLet extends EntityReferenceable {
       [this.namespace, name].join("_"),
       ...this.namespace
         .split("_")
-        .reduce((current, next) => [...current, [current.findLast(() => true), next].filter((f) => f).join("_")], [] as Array<string>)
+        .reduce((current, next) => [...current, [current[current.length - 1], next].filter((f) => f).join("_")], [] as Array<string>)
         .map((n) => [n, name].join("_")),
       ...this.#entities.filter((e) => e instanceof EntityUse).map((e) => [e.namespace, name].join("_")),
     ];
