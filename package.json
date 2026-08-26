@@ -15,7 +15,8 @@
     "compiler",
     "tests",
     "server",
-    "budget-tracker"
+    "budget-tracker",
+    "vscode-extension"
   ],
   "prettier": {
     "printWidth": 150
