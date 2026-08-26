@@ -3,7 +3,7 @@ import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { LinkerError } from "./LinkerError.ts";
 import { ParserError } from "./ParserError.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
+import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypeReference } from "./TypeReference.ts";
 import { TypeTuple } from "./TypeTuple.ts";
 import { WriterError } from "./WriterError.ts";
@@ -22,7 +22,7 @@ export class ExpressionAccess extends Expression {
   readonly #name: string;
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
-    if (!existing) throw new ParserError("Unexpected .", walker.store);
+    if (!existing) throw new ParserError("Unexpected .", walker);
 
     const [{ name }, done] = walker.expect(".").text("name").finish();
     super(walker.location, done, parent);

@@ -1,8 +1,7 @@
 import { TypeArg } from "./TypeArg.ts";
 import { Type } from "./Type.ts";
 import type { Entry } from "./Entry.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
-import type { TokenStore } from "#tokeniser";
+import type { TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
 
 export class TypePipeable extends Type {
@@ -31,7 +30,7 @@ export class TypePipeable extends Type {
   readonly #args: Array<TypeArg>;
   readonly #returns: Type;
 
-  constructor(location: Location, done: TokenStore, parent: () => Entry | undefined, args: Array<TypeArg>, returns: Type) {
+  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined, args: Array<TypeArg>, returns: Type) {
     super(location, done, parent);
     this.#args = args;
     this.#returns = returns;

@@ -1,7 +1,6 @@
-import type { TokenStore } from "#tokeniser";
+import type { TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
 import type { Entry } from "./Entry.ts";
-import { TokenWalker } from "./TokenWalker.ts";
 import { Type } from "./Type.ts";
 
 export class TypeArg extends Type {
@@ -18,7 +17,7 @@ export class TypeArg extends Type {
   readonly #type: Type;
   readonly #name: string;
 
-  constructor(location: Location, done: TokenStore, parent: () => Entry | undefined, type: Type, name: string) {
+  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined, type: Type, name: string) {
     super(location, done, parent);
     this.#type = type;
     this.#name = name.startsWith('"') ? JSON.parse(name) : name;

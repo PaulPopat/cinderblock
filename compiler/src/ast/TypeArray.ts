@@ -1,8 +1,7 @@
-import type { TokenStore } from "#tokeniser";
+import type { TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
 import type { Entry } from "./Entry.ts";
 import { ParserError } from "./ParserError.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
 import { Type } from "./Type.ts";
 
 export class TypeArray extends Type {
@@ -12,15 +11,15 @@ export class TypeArray extends Type {
       match: /^\[\]$/gm,
       chainable: true,
       factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
-        if (!left) throw new ParserError("Unexpected []", walker.store);
-        return new TypeArray(walker.location, walker.expect("[]").store, parent, left);
+        if (!left) throw new ParserError("Unexpected []", walker);
+        return new TypeArray(walker.location, walker.expect("[]"), parent, left);
       },
     });
   }
 
   readonly #contains: Type;
 
-  constructor(location: Location, done: TokenStore, parent: () => Entry | undefined, left: Type) {
+  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined, left: Type) {
     super(location, done, parent);
     this.#contains = left;
   }

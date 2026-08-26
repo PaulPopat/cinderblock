@@ -1,13 +1,12 @@
-import type { TokenStore } from "#tokeniser";
 import type { Location } from "#utils";
-import type { TokenWalker } from "./TokenWalker.ts";
+import type { TokenWalker } from "#tokeniser";
 
 export abstract class Entry {
   readonly #location: Location;
-  readonly #done: TokenStore;
+  readonly #done: TokenWalker;
   readonly #parent: () => Entry | undefined;
 
-  constructor(location: Location, done: TokenStore, parent: () => Entry | undefined) {
+  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined) {
     this.#location = location;
     this.#done = done;
     this.#parent = parent;

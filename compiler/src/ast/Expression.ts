@@ -1,7 +1,7 @@
 import type { Closure, Variable } from "#runner";
 import { Entry } from "./Entry.ts";
 import { ParserError } from "./ParserError.ts";
-import { TokenWalker } from "./TokenWalker.ts";
+import { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import type { Type } from "./Type.ts";
 
 type ExpressionParseable = {
@@ -19,21 +19,21 @@ export abstract class Expression extends Entry {
   }
 
   static ParseOne(walker: TokenWalker, parent: () => Entry | undefined): Expression {
-    const match = this.#parsers.find((p) => walker.store.data.match(p.match));
+    const match = this.#parsers.find((p) => walker.data.match(p.match));
     if (!match) {
-      throw new ParserError(`Unexpected symbol of ${walker.data}`, walker.store);
+      throw new ParserError(`Unexpected symbol of ${walker.data}`, walker);
     }
 
     const left = new match.factory(walker, parent, [";"], undefined);
 
-    const [{ right }] = TokenWalker.start(left.done)
+    const [{ right }] = left.done
       .reduce(
         "right",
         (s) => s.data !== ";" && !!this.#parsers.find((p) => s.data.match(p.match))?.inOne,
         (w, _, p): Expression => {
-          const match = this.#parsers.find((p) => w.store.data.match(p.match));
+          const match = this.#parsers.find((p) => w.data.match(p.match));
           if (!match) {
-            throw new ParserError(`Unexpected symbol of ${w.data}`, w.store);
+            throw new ParserError(`Unexpected symbol of ${w.data}`, w);
           }
 
           return new match.factory(w, parent, [";"], p);
@@ -51,9 +51,9 @@ export abstract class Expression extends Entry {
         "expression",
         (s) => !lookFor.includes(s.data),
         (w, _, p): Expression => {
-          const match = this.#parsers.find((p) => w.store.data.match(p.match));
+          const match = this.#parsers.find((p) => w.data.match(p.match));
           if (!match) {
-            throw new ParserError(`Unexpected symbol of ${w.data}`, w.store);
+            throw new ParserError(`Unexpected symbol of ${w.data}`, w);
           }
 
           return new match.factory(w, parent, lookFor, p);

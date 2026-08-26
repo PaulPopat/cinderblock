@@ -4,7 +4,7 @@ import { Expression } from "./Expression.ts";
 import { ExpressionOperator } from "./ExpressionOperator.ts";
 import { LinkerError } from "./LinkerError.ts";
 import { ParserError } from "./ParserError.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
+import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypeArg } from "./TypeArg.ts";
 import { TypePipeable } from "./TypePipeable.ts";
 import { TypeTuple } from "./TypeTuple.ts";
@@ -19,7 +19,7 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
   }
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
-    if (!existing) throw new ParserError("Unexpected ->", walker.store);
+    if (!existing) throw new ParserError("Unexpected ->", walker);
     const [{ right }, done] = walker
       .expect("->")
       .extract("right", (w) => Expression.ParseOne(w, () => this))

@@ -1,5 +1,5 @@
-import { Entity, EntityExternal, EntityLet, Expression, TokenWalker } from "#ast";
-import { Tokeniser, TokenStore } from "#tokeniser";
+import { Entity, EntityExternal } from "#ast";
+import { Tokeniser, TokenWalker } from "#tokeniser";
 import path from "node:path";
 import { App } from "./App.ts";
 import fs from "node:fs";
@@ -20,7 +20,7 @@ export class Project extends App {
         .readdirSync(this.#root, { recursive: true, encoding: "utf-8" })
         .filter((f) => f.endsWith(".cb"))
         .map((f) => [f, fs.readFileSync(path.resolve(this.#root, f), "utf8")] as const)
-        .reduce((store, [key, value]) => store.with(new Tokeniser(key, value).tokens), TokenStore.start([])),
+        .flatMap(([key, value]) => new Tokeniser(key, value).tokens),
     )
       .while(
         "entities",

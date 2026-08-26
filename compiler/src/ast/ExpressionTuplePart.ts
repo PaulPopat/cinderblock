@@ -3,7 +3,7 @@ import { Expression } from "./Expression.ts";
 import { TypeTuple } from "./TypeTuple.ts";
 import { VariableTuple, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
+import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 
 export class ExpressionTuplePart extends Expression {
   readonly #name: string;

@@ -2,7 +2,7 @@ import { VariablePrimitiveBool, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { LinkerError } from "./LinkerError.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
+import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 import { WriterError } from "./WriterError.ts";
 

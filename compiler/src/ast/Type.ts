@@ -1,6 +1,6 @@
 import { Entry } from "./Entry.ts";
 import { ParserError } from "./ParserError.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
+import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 
 type TypeParseable = {
   priority: number;
@@ -22,9 +22,9 @@ export abstract class Type extends Entry {
         "type",
         (s, p) => !p || this.#parsers.find((p) => s.data.match(p.match))?.chainable,
         (w, _, p): Type => {
-          const match = this.#parsers.find((p) => w.store.data.match(p.match));
+          const match = this.#parsers.find((p) => w.data.match(p.match));
           if (!match) {
-            throw new ParserError(`Unexpected symbol of ${w.data}`, w.store);
+            throw new ParserError(`Unexpected symbol of ${w.data}`, w);
           }
 
           return match.factory(w, parent, p);

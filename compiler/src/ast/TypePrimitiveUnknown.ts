@@ -1,7 +1,6 @@
-import type { TokenStore } from "#tokeniser";
+import type { TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
 import type { Entry } from "./Entry.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
 import { Type } from "./Type.ts";
 import { TypePrimitive } from "./TypePrimitive.ts";
 
@@ -12,12 +11,12 @@ export class TypePrimitiveUnknown extends TypePrimitive {
       match: /^unknown+$/gm,
       chainable: false,
       factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
-        return new TypePrimitiveUnknown(walker.location, walker.expect("unknown").store, parent);
+        return new TypePrimitiveUnknown(walker.location, walker.expect("unknown"), parent);
       },
     });
   }
 
-  constructor(location: Location, done: TokenStore, parent: () => Entry | undefined) {
+  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined) {
     super(location, done, parent);
   }
 

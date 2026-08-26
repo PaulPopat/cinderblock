@@ -1,6 +1,6 @@
 import { Entity } from "./Entity.ts";
 import type { Entry } from "./Entry.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
+import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 
 export class EntityUse extends Entity {
   static {

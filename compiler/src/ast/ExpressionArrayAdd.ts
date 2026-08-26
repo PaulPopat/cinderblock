@@ -2,7 +2,7 @@ import { VariableArray, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
+import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 
 export class ExpressionArrayAdd extends Expression {
   static {
@@ -17,7 +17,7 @@ export class ExpressionArrayAdd extends Expression {
   readonly #addition: Expression;
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
-    if (!existing) throw new ParserError("Unexpected ++", walker.store);
+    if (!existing) throw new ParserError("Unexpected ++", walker);
     const [{ addition }, done] = walker
       .expect("++")
       .extract("addition", (w) => Expression.Parse(w, () => this, lookFor))

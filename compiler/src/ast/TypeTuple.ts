@@ -1,9 +1,8 @@
 import { TypeArg } from "./TypeArg.ts";
 import { Type } from "./Type.ts";
 import type { Entry } from "./Entry.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
 import type { Location } from "#utils";
-import type { TokenStore } from "#tokeniser";
+import type { TokenWalker } from "#tokeniser";
 
 export class TypeTuple extends Type {
   static {
@@ -28,7 +27,7 @@ export class TypeTuple extends Type {
 
   readonly #args: Array<TypeArg>;
 
-  constructor(location: Location, done: TokenStore, parent: () => Entry | undefined, args: Array<TypeArg>) {
+  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined, args: Array<TypeArg>) {
     super(location, done, parent);
     this.#args = args;
   }

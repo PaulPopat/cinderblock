@@ -41,7 +41,6 @@ export * from "./ExpressionTernary.ts";
 export * from "./ExpressionTuple.ts";
 export * from "./ExpressionTuplePart.ts";
 export * from "./ParserError.ts";
-export * from "./TokenWalker.ts";
 export * from "./Type.ts";
 export * from "./TypeArg.ts";
 export * from "./TypeArray.ts";

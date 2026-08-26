@@ -5,7 +5,7 @@ import { Type } from "./Type.ts";
 import { TypePipeable } from "./TypePipeable.ts";
 import { Closure, Frame, Namer, VariablePipeable, type Variable } from "#runner";
 import { EntryTag } from "./EntryTag.ts";
-import { TokenWalker } from "./TokenWalker.ts";
+import { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import type { Entry } from "./Entry.ts";
 import { EntityUse } from "./EntityUse.ts";
 import { EntityReferenceable } from "./EntityReferenceable.ts";

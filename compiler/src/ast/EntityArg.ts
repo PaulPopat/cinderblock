@@ -1,7 +1,7 @@
 import type { Closure, Variable } from "#runner";
 import { EntityReferenceable } from "./EntityReferenceable.ts";
 import type { Entry } from "./Entry.ts";
-import { TokenWalker } from "./TokenWalker.ts";
+import { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { Type } from "./Type.ts";
 import { TypeArg } from "./TypeArg.ts";
 

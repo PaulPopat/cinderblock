@@ -1,9 +1,8 @@
-import type { TokenStore } from "#tokeniser";
+import type { TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
 import { EntityStruct } from "./EntityStruct.ts";
 import type { Entry } from "./Entry.ts";
 import { LinkerError } from "./LinkerError.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
 import { Type } from "./Type.ts";
 
 export class TypeReference extends Type {
@@ -22,7 +21,7 @@ export class TypeReference extends Type {
 
   readonly #name: string;
 
-  constructor(location: Location, done: TokenStore, parent: () => Entry | undefined, name: string) {
+  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined, name: string) {
     super(location, done, parent);
     this.#name = name;
   }

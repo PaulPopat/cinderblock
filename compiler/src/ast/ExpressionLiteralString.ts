@@ -2,7 +2,7 @@ import { Closure, Variable, VariablePrimitiveString } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
+import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveString } from "./TypePrimitiveString.ts";
 
 export class ExpressionLiteralString extends ExpressionLiteral {

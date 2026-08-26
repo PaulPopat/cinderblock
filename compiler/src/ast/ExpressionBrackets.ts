@@ -1,7 +1,7 @@
 import { type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
+import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 
 export class ExpressionBrackets extends Expression {
   static {

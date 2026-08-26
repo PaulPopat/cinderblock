@@ -2,7 +2,7 @@ import { type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
+import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { Type } from "./Type.ts";
 
 export class ExpressionOperatorAs extends Expression {
@@ -18,7 +18,7 @@ export class ExpressionOperatorAs extends Expression {
   readonly #right: Type;
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
-    if (!existing) throw new ParserError("Unexpected as", walker.store);
+    if (!existing) throw new ParserError("Unexpected as", walker);
     const [{ right }, done] = walker
       .expect("as")
       .extract("right", (w) => Type.Parse(w, () => this))

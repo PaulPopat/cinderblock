@@ -1,6 +1,6 @@
 import { Entity, EntityLet, Entry } from "#ast";
 import { Closure, Frame, framise } from "#runner";
-import { TokenStore } from "#tokeniser";
+import { TokenWalker } from "#tokeniser";
 import { Location } from "#utils";
 import { EntityReferenceable } from "./ast/EntityReferenceable.ts";
 
@@ -8,7 +8,7 @@ export abstract class App extends Entry {
   abstract get entities(): Array<Entity>;
 
   constructor() {
-    super(Location.empty, TokenStore.start([]), () => undefined);
+    super(Location.empty, TokenWalker.start([]), () => undefined);
   }
 
   find(name: string): Entry | undefined {

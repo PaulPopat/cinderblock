@@ -2,7 +2,7 @@ import { Closure, Namer, VariablePipeable, variablise, type Frame, type Variable
 import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
 import { Location } from "#utils";
 import { TypePipeable } from "./TypePipeable.ts";
-import { TokenStore } from "#tokeniser";
+import { TokenWalker } from "#tokeniser";
 import { EntityReferenceable } from "./EntityReferenceable.ts";
 
 export class EntityExternal extends EntityReferenceable {
@@ -11,7 +11,7 @@ export class EntityExternal extends EntityReferenceable {
   readonly #internalName = Namer.Next;
 
   constructor(name: string, implementation: Function) {
-    super(Location.empty, TokenStore.start([]), () => undefined);
+    super(Location.empty, TokenWalker.start([]), () => undefined);
     this.#name = name;
     this.#implementation = implementation;
   }

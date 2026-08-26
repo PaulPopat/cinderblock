@@ -1,5 +1,5 @@
 import { Entry } from "./Entry.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
+import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 
 export class EntryTag extends Entry {
   readonly #key: string;

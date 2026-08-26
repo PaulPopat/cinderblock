@@ -1,5 +1,5 @@
-import { Entity, EntityExternal, TokenWalker } from "#ast";
-import { Tokeniser, TokenStore } from "#tokeniser";
+import { Entity, EntityExternal } from "#ast";
+import { Tokeniser, TokenWalker } from "#tokeniser";
 import { App } from "./App.ts";
 import * as std from "#std";
 
@@ -10,7 +10,8 @@ export class Inline extends App {
   constructor(code: string, globals: Record<string, unknown> = {}) {
     super();
     this.#code = code;
-    const [{ entities }] = TokenWalker.start(TokenStore.start([]).with(new Tokeniser("inline", this.#code).tokens))
+    const [{ entities }] = TokenWalker.start([])
+      .with(new Tokeniser("inline", this.#code).tokens)
       .while(
         "entities",
         (s) => Entity.HasParser(s),

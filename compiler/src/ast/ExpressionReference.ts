@@ -1,7 +1,7 @@
 import { Frame, VariablePipeable, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
+import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { LinkerError } from "./LinkerError.ts";
 import { EntityReferenceable } from "./EntityReferenceable.ts";
 

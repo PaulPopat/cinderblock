@@ -1,7 +1,6 @@
-import type { TokenStore } from "#tokeniser";
+import type { TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
 import type { Entry } from "./Entry.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
 import { Type } from "./Type.ts";
 import { TypePrimitive } from "./TypePrimitive.ts";
 
@@ -12,12 +11,12 @@ export class TypePrimitiveDouble extends TypePrimitive {
       match: /^double+$/gm,
       chainable: false,
       factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
-        return new TypePrimitiveDouble(walker.location, walker.expect("double").store, parent);
+        return new TypePrimitiveDouble(walker.location, walker.expect("double"), parent);
       },
     });
   }
 
-  constructor(location: Location, done: TokenStore, parent: () => Entry | undefined) {
+  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined) {
     super(location, done, parent);
   }
 

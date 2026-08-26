@@ -2,7 +2,7 @@ import { VariablePrimitiveBool, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
+import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypeUnion } from "./TypeUnion.ts";
 import { WriterError } from "./WriterError.ts";
 
@@ -20,7 +20,7 @@ export class ExpressionTernary extends Expression {
   readonly #negative: Expression;
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
-    if (!existing) throw new ParserError("Unexpected ?", walker.store);
+    if (!existing) throw new ParserError("Unexpected ?", walker);
     const [{ positive, negative }, done] = walker
       .expect("?")
       .extract("positive", (w) => Expression.Parse(w, () => this, [":"]))

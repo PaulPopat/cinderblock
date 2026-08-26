@@ -1,6 +1,6 @@
 import { TypeArg } from "./TypeArg.ts";
 import { Entity } from "./Entity.ts";
-import type { TokenWalker } from "./TokenWalker.ts";
+import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import type { Entry } from "./Entry.ts";
 
 export class EntityStruct extends Entity {
