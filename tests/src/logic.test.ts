@@ -54,4 +54,19 @@ describe("logic", () => {
     const result = await code.run("test_let", { value: "hello.world" });
     assert.equal(result, "hello.world");
   });
+
+  test("resolves use statements in a namespace", async () => {
+    const code = new Inline(
+      `
+        let internal_item = "hello";
+        namespace test {
+          use internal;
+
+          let test = item + item;
+        }
+      `,
+    );
+    const result = await code.run("test_test", {});
+    assert.equal(result, "hellohello");
+  });
 });

@@ -61,4 +61,16 @@ export class EntityNamespace extends Entity {
       ...this.#entities.filter((e) => e instanceof EntityUse).map((e) => [e.namespace, name].join("_")),
     ];
   }
+
+  find(name: string): Entry | undefined {
+    for (const possible of this.possibleNames(name)) {
+      const found = this.#entities.find((s) => s.fullName === possible);
+      if (found) return found;
+    }
+
+    for (const possible of this.possibleNames(name)) {
+      const found = super.find(possible);
+      if (found) return found;
+    }
+  }
 }
