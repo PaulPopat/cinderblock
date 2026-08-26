@@ -2,6 +2,7 @@ export * from "./Entity.ts";
 export * from "./EntityArg.ts";
 export * from "./EntityExternal.ts";
 export * from "./EntityLet.ts";
+export * from "./EntityNamespace.ts";
 export * from "./EntityStruct.ts";
 export * from "./EntityUse.ts";
 export * from "./Entry.ts";

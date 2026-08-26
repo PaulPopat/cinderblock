@@ -22,7 +22,7 @@ export class Tokeniser {
   }
 
   #isValid(subject: string) {
-    return !!this.#patterns.find((p) => subject.match(p));
+    return !!this.#patterns.find((p) => subject.match(p)) && !subject.includes("\n");
   }
 
   get tokens() {
@@ -55,6 +55,8 @@ export class Tokeniser {
           current = character;
         }
       }
+
+      current += "\n";
     }
 
     finish(lines.length, 0);

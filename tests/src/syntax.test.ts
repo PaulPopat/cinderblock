@@ -9,6 +9,12 @@ describe("syntax", () => {
     assert.equal(result, "hello");
   });
 
+  test("uses a namespace", async () => {
+    const code = new Inline('namespace test { let name = "hello"; }');
+    const result = await code.run("test_name", {});
+    assert.equal(result, "hello");
+  });
+
   test("tags a let", async () => {
     const code = new Inline('let [key="test value"] test_let = "hello";');
     const found = code.withTag("key", "test value");
