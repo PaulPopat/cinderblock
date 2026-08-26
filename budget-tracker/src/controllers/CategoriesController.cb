@@ -1,6 +1,7 @@
 namespace controllers_CategoriesController {
+  use services;
+
   let [type="handler", method="GET", path="/app/categories"] GetCategories =
-      use services;
     {
     };
 }

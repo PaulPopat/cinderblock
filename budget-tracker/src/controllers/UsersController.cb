@@ -1,80 +1,75 @@
-struct controllers_UsersController_PostSessionBody
-  email: string
-  password: string;
+namespace controllers_UsersController {
+  use services;
 
-let
-[type="handler", method="POST", path="/sessions"]
-controllers_UsersController_PostSession (body: PostUserBody, now: int) = 
-    use services;
-    let user = body.email -> Users_UserByEmail;
-  "hashed_password" in user &&
-  ({
-    _s = body.password,
-    original = user.hashed_password
-  } -> Password_Matches)
-    ? {
-      status = 303,
-      body = { message = "Success" },
-      headers = {
-        "set-cookie" = { _s = user.id, now = now } -> Session_UserIdCookie,
-        location = "/" 
+  struct PostSessionBody
+    email: string
+    password: string;
+
+  let [type="handler", method="POST", path="/sessions"] PostSession (body: PostUserBody, now: int) = 
+      let user = body.email -> Users_UserByEmail;
+    "hashed_password" in user &&
+    ({
+      _s = body.password,
+      original = user.hashed_password
+    } -> Password_Matches)
+      ? {
+        status = 303,
+        body = { message = "Success" },
+        headers = {
+          "set-cookie" = { _s = user.id, now = now } -> Session_UserIdCookie,
+          location = "/" 
+        }
       }
-    }
-    : {
+      : {
+        status = 401,
+        body = { message = "Could not validate token" }
+      };
+    
+  struct PostUserBody
+    email: string
+    password: string
+    token: string;
+
+  let [type="handler", method="POST", path="/users"] PostUser (body: PostUserBody, now: int) = 
+      let id = {} -> crypto_guid;
+    body.token -> Session_RegisterEmail == body.email ? {
+      response = {
+        status = 303,
+        body = { message = "User created" },
+        headers = {
+          "set-cookie" = { _s = id, now = now } -> Session_UserIdCookie,
+          location = "/" 
+        }
+      },
+      updates = {
+        database_execute = [
+          {
+            id = id,
+            email = body.email,
+            password = body.password -> Password_Hash,
+            created = now
+          } -> Users_AddUserQuery
+        ]
+      }
+    } : {
       status = 401,
       body = { message = "Could not validate token" }
     };
-  
-struct controllers_UsersController_PostUserBody
-  email: string
-  password: string
-  token: string;
 
-let
-[type="handler", method="POST", path="/users"]
-controllers_UsersController_PostUser (body: PostUserBody, now: int) = 
-    use services;
-    let id = {} -> crypto_guid;
-  body.token -> Session_RegisterEmail == body.email ? {
-    response = {
-      status = 303,
-      body = { message = "User created" },
-      headers = {
-        "set-cookie" = { _s = id, now = now } -> Session_UserIdCookie,
-        location = "/" 
+  struct PostStagedUserBody
+    email: string;
+
+  let [type="handler", method="POST", path="/staged-users"] PostStagedUser (body: PostStagedUserBody, now: int) =
+    {
+      response = {
+        status = 303,
+        body = { message = "Check your inbox" },
+        headers = { location = "/?check_inbox=true" }
+      },
+      updates = {
+        users_sendToken = {
+          token = { _s = body.email, now = now } -> Session_RegisterCookie
+        }
       }
-    },
-    updates = {
-      database_execute = [
-        {
-          id = id,
-          email = body.email,
-          password = body.password -> Password_Hash,
-          created = now
-        } -> Users_AddUserQuery
-      ]
-    }
-  } : {
-    status = 401,
-    body = { message = "Could not validate token" }
-  };
-
-struct controllers_UsersController_PostStagedUserBody
-  email: string;
-
-let
-[type="handler", method="POST", path="/staged-users"]
-controllers_UsersController_PostStagedUser (body: PostStagedUserBody, now: int) =
-    use services;
-  {
-    response = {
-      status = 303,
-      body = { message = "Check your inbox" },
-      headers = { location = "/?check_inbox=true" }
-    },
-    updates = {
-      users_sendToken = {
-        token = { _s = body.email, now = now } -> Session_RegisterCookie
-      }
-    }
-  };
+    };
+}

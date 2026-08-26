@@ -1,41 +1,37 @@
-struct controllers_HomeController_GetHomeQuery
-  check_inbox: string;
+namespace controllers_HomeController {
+  use services;
 
-let
-[type="handler", method="GET", path="/"]
-controllers_HomeController_GetHome (query: GetHomeQuery, cookies: AppCookies) =
-    use services;
-  {
-    status = 200,
-    body = {
-      name = "home",
-      data = {
-        check_inbox = "check_inbox" in query ? query.check_inbox == "true" : false,
-        user = { _s = cookies } -> Cookies_User
+  struct GetHomeQuery
+    check_inbox: string;
+
+  let [type="handler", method="GET", path="/"] GetHome (query: GetHomeQuery, cookies: AppCookies) =
+    {
+      status = 200,
+      body = {
+        name = "home",
+        data = {
+          check_inbox = "check_inbox" in query ? query.check_inbox == "true" : false,
+          user = { _s = cookies } -> Cookies_User
+        }
+      } -> html_template,
+      headers = {
+        "Content-Type" = "text/html"
       }
-    } -> html_template,
+    };
+
+  let [type="middleware", path="/app"] Authorise (cookies: AppCookies) =
+    {
+      user_id = { _s = cookies } -> Cookies_UserId
+    };
+
+  struct GetRegisterProps
+    token: string;
+
+  let [type="handler", method="GET", path="/register"] GetRegister (query: GetRegisterProps) = {
+    status = 200,
+    body = { name = "register", data = { token = query.token } } -> html_template,
     headers = {
       "Content-Type" = "text/html"
     }
   };
-
-let
-[type="middleware", path="/app"]
-controllers_HomeController_Authorise (cookies: AppCookies) =
-  use services;
-  {
-    user_id = { _s = cookies } -> Cookies_UserId
-  };
-
-struct controllers_HomeController_GetRegisterProps
-  token: string;
-
-let
-[type="handler", method="GET", path="/register"]
-controllers_HomeController_GetRegister (query: GetRegisterProps) = {
-  status = 200,
-  body = { name = "register", data = { token = query.token } } -> html_template,
-  headers = {
-    "Content-Type" = "text/html"
-  }
-};
+}
