@@ -1,10 +1,13 @@
 extends extensions/layout.pug
 include components/form.pug
-include components/notification.pug
 
 block content
-  if check_inbox
-    +alert()
-      | You will receive an email with a link to create your account
-  if user
-    p Hello #{user.email}
+  ul
+    each category in categories
+      li= category.title
+  
+  form(action="/app/categories" method="post")
+    +text("title", "text")
+      | Category Title
+    +button("submit")
+      | Create

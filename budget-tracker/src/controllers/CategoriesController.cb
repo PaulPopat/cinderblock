@@ -14,4 +14,25 @@ namespace controllers_CategoriesController {
         "Content-Type" = "text/html",
       },
     };
+
+  struct PostCategoriesBody
+    title: string;
+
+  let [type="handler", method="POST", path="/app/categories"] PostCategory (body: PostCategoriesBody, now: int) =
+    {
+      response = {
+        status = 303,
+        body = { message = "Category Created" },
+        headers = { location = "/app/categories" },
+      },
+      updates = {
+        database_execute = [
+          {
+            id = {} -> crypto_guid,
+            title = body.title,
+            now = now,
+          } -> Categories_AddQuery
+        ],
+      },
+    };
 }

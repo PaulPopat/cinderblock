@@ -3,3 +3,7 @@ mixin text(name, inputType="text")
     label(for=name class="form-label")
       block
     input(type=inputType class="form-control" name=name)&attributes(attributes)
+
+mixin button(buttonType = "button", colour = "primary", size = "md")
+  button(type=buttonType class=`btn btn-${colour} btn-${size}`)
+    block
