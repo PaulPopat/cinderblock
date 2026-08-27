@@ -21,7 +21,7 @@ namespace controllers_HomeController {
 
   let [type="middleware", path="/app"] Authorise (cookies: AppCookies) =
     {
-      user_id = { _s = cookies } -> Cookies_UserId
+      user_id = { _s = cookies } -> Cookies_User
     };
 
   struct GetRegisterProps

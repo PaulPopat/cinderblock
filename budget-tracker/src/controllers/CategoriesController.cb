@@ -1,7 +1,17 @@
 namespace controllers_CategoriesController {
   use services;
 
-  let [type="handler", method="GET", path="/app/categories"] GetCategories =
+  let [type="handler", method="GET", path="/app/categories"] GetCategories (cookies: AppCookies) =
     {
+      status = 200,
+      body = {
+        name = "categories",
+        data = {
+          categories = Categories_List,
+        },
+      } -> html_template,
+      headers = {
+        "Content-Type" = "text/html",
+      },
     };
 }

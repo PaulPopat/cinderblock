@@ -1,5 +1,5 @@
 namespace services_Categories {
-  let Categories: Category[] =
+  let List: Category[] =
     {
       sql = "select * from categories",
       parameters = []
