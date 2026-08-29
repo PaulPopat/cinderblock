@@ -1,4 +1,3 @@
-import { VariablePrimitiveBool, VariablePrimitiveString, VariableTuple, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionOperator } from "./ExpressionOperator.ts";
@@ -32,21 +31,6 @@ export class ExpressionOperatorIn extends ExpressionOperator {
 
   get resolution() {
     return new TypePrimitiveBool(this.location, this.done, () => this);
-  }
-
-  async resolve(closure: Closure): Promise<Variable> {
-    const left = await this.left.resolve(closure);
-    const right = await this.right.resolve(closure);
-
-    if (!(left instanceof VariablePrimitiveString)) {
-      throw new WriterError("String required", this.location);
-    }
-
-    if (!(right instanceof VariableTuple)) {
-      return new VariablePrimitiveBool(false);
-    }
-
-    return new VariablePrimitiveBool(right.has(left.value));
   }
 
   get instruction(): Instruction {

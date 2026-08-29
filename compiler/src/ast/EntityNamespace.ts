@@ -2,8 +2,7 @@ import { Entity } from "./Entity.ts";
 import { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import type { Entry } from "./Entry.ts";
 import { TokenTypeName } from "#tokeniser";
-import { Lazy, type Location } from "#utils";
-import type { Closure } from "#runner";
+import { type Location } from "#utils";
 import type { CreateFunc } from "#writer";
 
 export class EntityNamespace extends Entity {
@@ -68,10 +67,6 @@ export class EntityNamespace extends Entity {
 
   get topLevelEntities(): Array<Entity> {
     return this.#entities;
-  }
-
-  build(closure: Closure) {
-    return this.#entities.reduce((closure, entity) => entity.build(closure), closure);
   }
 
   dig(name: string): Entry | undefined {

@@ -1,14 +1,12 @@
-import type { Closure, Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { Type } from "./Type.ts";
 import { TypeArg } from "./TypeArg.ts";
 import { TokenTypeName } from "#tokeniser";
 import { Entity } from "./Entity.ts";
-import type { IEntityReferenceable } from "./IEntityReferenceable.ts";
 import type { CreateFunc } from "#writer";
 
-export class EntityArg extends Entity implements IEntityReferenceable {
+export class EntityArg extends Entity {
   readonly #type: Type;
   readonly #name: string;
 
@@ -31,14 +29,6 @@ export class EntityArg extends Entity implements IEntityReferenceable {
     return this.#name;
   }
 
-  get internalName() {
-    return this.#name;
-  }
-
-  async reference(closure: Closure): Promise<Variable> {
-    return closure.search(this.internalName);
-  }
-
   get typeArg() {
     return new TypeArg(this.location, this.done, () => this, this.#type, this.#name);
   }
@@ -51,10 +41,6 @@ export class EntityArg extends Entity implements IEntityReferenceable {
 
   float(name: string): Entry | undefined {
     return this.parent?.float(name);
-  }
-
-  build(closure: Closure): Closure {
-    return closure;
   }
 
   get model(): CreateFunc[] {

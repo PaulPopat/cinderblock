@@ -1,4 +1,3 @@
-import { VariableTuple, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { LinkerError } from "./LinkerError.ts";
@@ -50,13 +49,6 @@ export class ExpressionAccess extends Expression {
     if (!property) throw new LinkerError("Could not find property", this.location);
 
     return property.type;
-  }
-
-  async resolve(closure: Closure): Promise<Variable> {
-    const subject = await this.#subject.resolve(closure);
-    if (!(subject instanceof VariableTuple)) throw new WriterError("Subject not tuple", this.location);
-
-    return subject.get(this.#name);
   }
 
   get instruction(): Instruction {

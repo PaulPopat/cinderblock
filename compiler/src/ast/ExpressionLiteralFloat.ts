@@ -1,4 +1,3 @@
-import { Variable, VariablePrimitiveFloat, type Closure } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
@@ -30,10 +29,6 @@ export class ExpressionLiteralFloat extends ExpressionLiteral {
 
   get resolution() {
     return new TypePrimitiveFloat(this.location, this.done, () => this);
-  }
-
-  async resolve(closure: Closure): Promise<Variable> {
-    return new VariablePrimitiveFloat(Number.parseFloat(this.#value));
   }
 
   get instruction(): Instruction {

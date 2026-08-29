@@ -1,4 +1,3 @@
-import { VariablePrimitive, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionOperator } from "./ExpressionOperator.ts";
@@ -29,21 +28,6 @@ export class ExpressionOperatorAdd extends ExpressionOperator {
 
   get resolution() {
     return this.left.resolution;
-  }
-
-  async resolve(closure: Closure): Promise<Variable> {
-    const left = await this.left.resolve(closure);
-    const right = await this.right.resolve(closure);
-
-    if (!(left instanceof VariablePrimitive)) {
-      throw new WriterError("Primitive required", this.location);
-    }
-
-    if (!(right instanceof VariablePrimitive)) {
-      throw new WriterError("Primitive required", this.location);
-    }
-
-    return left.add(right);
   }
 
   get instruction(): Instruction {

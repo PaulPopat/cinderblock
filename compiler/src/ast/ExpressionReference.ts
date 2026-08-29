@@ -1,10 +1,8 @@
-import { Frame, VariablePipeable, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { LinkerError } from "./LinkerError.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { IEntityReferenceable } from "./IEntityReferenceable.ts";
 import type { Instruction } from "#writer";
 import { EntityLet } from "./EntityLet.ts";
 import { EntityArg } from "./EntityArg.ts";
@@ -34,25 +32,15 @@ export class ExpressionReference extends Expression {
 
   get subject() {
     const result = this.float(this.#name);
-    if (!result || !("reference" in result)) {
+    if (!(result instanceof EntityLet) && !(result instanceof EntityArg) && !(result instanceof EntityExternal)) {
       throw new LinkerError("Unresolved reference", this.location);
     }
 
-    return result as IEntityReferenceable;
+    return result;
   }
 
   get resolution() {
     return this.subject.type;
-  }
-
-  async resolve(closure: Closure): Promise<Variable> {
-    const value = closure.search(this.subject.internalName);
-
-    if (value instanceof VariablePipeable && value.noArgs) {
-      return value.execute(new Frame({}));
-    }
-
-    return value;
   }
 
   get instruction(): Instruction {

@@ -1,4 +1,3 @@
-import { VariablePrimitiveNull, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
@@ -23,10 +22,6 @@ export class ExpressionLiteralNull extends ExpressionLiteral {
 
   get resolution() {
     return new TypePrimitiveBool(this.location, this.done, () => this);
-  }
-
-  async resolve(closure: Closure): Promise<Variable> {
-    return new VariablePrimitiveNull(null);
   }
 
   get instruction(): Instruction {

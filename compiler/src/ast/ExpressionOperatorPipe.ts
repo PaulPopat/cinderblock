@@ -1,4 +1,3 @@
-import { Frame, VariablePipeable, VariableTuple, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionOperator } from "./ExpressionOperator.ts";
@@ -45,40 +44,6 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
     if (!remaining.length) return right.returns;
 
     return new TypePipeable(this.location, this.done, () => this, remaining, right.returns);
-  }
-
-  async resolve(closure: Closure): Promise<Variable> {
-    let left = await this.left.resolve(closure);
-    const right = await this.right.resolve(closure);
-
-    if (!(left instanceof VariableTuple)) {
-      left = new VariableTuple({ _s: left });
-    }
-
-    if (!(right instanceof VariablePipeable)) {
-      throw new Error("Pipeable required");
-    }
-
-    const rightType = this.right.resolution;
-    if (!(rightType instanceof TypePipeable)) {
-      throw new LinkerError("Target not pipeable", this.location);
-    }
-
-    const frame = new Frame({
-      ...(left as VariableTuple).entries.reduce(
-        (frame, [key, value]) => ({
-          ...frame,
-          [key]: value,
-        }),
-        {} as Record<string, Variable>,
-      ),
-    });
-
-    if (rightType.args.some((r) => !(left as VariableTuple).has(r.name))) {
-      return new VariablePipeable((args) => right.execute(frame.merge(args)));
-    }
-
-    return right.execute(frame);
   }
 
   get instruction(): Instruction {

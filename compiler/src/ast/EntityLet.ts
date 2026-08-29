@@ -3,16 +3,15 @@ import { Expression } from "./Expression.ts";
 import { Entity } from "./Entity.ts";
 import { Type } from "./Type.ts";
 import { TypePipeable } from "./TypePipeable.ts";
-import { Closure, Frame, Namer, VariablePipeable, type Variable } from "#runner";
+import { Namer } from "#runner";
 import { EntryTag } from "./EntryTag.ts";
 import { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import type { Entry } from "./Entry.ts";
 import { TokenTypeName } from "#tokeniser";
 import { EntityNamespace } from "./EntityNamespace.ts";
-import type { IEntityReferenceable } from "./IEntityReferenceable.ts";
 import type { CreateFunc } from "#writer";
 
-export class EntityLet extends EntityNamespace implements IEntityReferenceable {
+export class EntityLet extends EntityNamespace {
   static {
     Entity.RegisterEntity({
       priority: 100,
@@ -114,22 +113,6 @@ export class EntityLet extends EntityNamespace implements IEntityReferenceable {
       );
 
     return result;
-  }
-
-  async reference(closure: Closure): Promise<Variable> {
-    if (!this.#args.length) {
-      return this.execute(closure, new Frame({}));
-    }
-
-    return new VariablePipeable((a) => this.execute(closure, a), !this.args.length);
-  }
-
-  async execute(closure: Closure, args: Frame): Promise<Variable> {
-    return this.#contents.resolve(super.build(closure.withFrame(args)));
-  }
-
-  build(closure: Closure): Closure {
-    return closure.withVariable(this.#internalName, this.reference(closure));
   }
 
   dig(name: string): Entry | undefined {

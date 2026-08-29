@@ -1,4 +1,3 @@
-import { VariablePrimitiveBool, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
@@ -49,20 +48,6 @@ export class ExpressionTernary extends Expression {
 
   get resolution() {
     return new TypeUnion(this.location, this.done, () => this, [this.#positive.resolution, this.#negative.resolution]);
-  }
-
-  async resolve(closure: Closure): Promise<Variable> {
-    const predicate = await this.#predicate.resolve(closure);
-
-    if (!(predicate instanceof VariablePrimitiveBool)) {
-      throw new WriterError("Boolean required", this.location);
-    }
-
-    if (predicate.value) {
-      return this.#positive.resolve(closure);
-    }
-
-    return this.#negative.resolve(closure);
   }
 
   get instruction(): Instruction {

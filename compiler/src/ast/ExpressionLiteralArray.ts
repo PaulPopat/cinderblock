@@ -1,4 +1,3 @@
-import { VariableArray, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
@@ -62,10 +61,6 @@ export class ExpressionLiteralArray extends ExpressionLiteral {
       () => this,
       this.#value[0]?.resolution ?? new TypePrimitiveUnknown(this.location, this.done, () => this),
     );
-  }
-
-  async resolve(closure: Closure): Promise<Variable> {
-    return new VariableArray(await Promise.all(this.#value.map((v) => v.resolve(closure))));
   }
 
   get instruction(): Instruction {

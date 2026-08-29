@@ -1,4 +1,3 @@
-import { type Closure, type Variable, VariablePrimitive, VariablePrimitiveBool } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionOperator } from "./ExpressionOperator.ts";
@@ -8,7 +7,6 @@ import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 import { WriterError } from "./WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { Instruction } from "#writer";
-import { TypePrimitive } from "./TypePrimitive.ts";
 
 export class ExpressionOperatorAnd extends ExpressionOperator {
   static {
@@ -30,25 +28,6 @@ export class ExpressionOperatorAnd extends ExpressionOperator {
 
   get resolution() {
     return new TypePrimitiveBool(this.location, this.done, () => this);
-  }
-
-  async resolve(closure: Closure): Promise<Variable> {
-    const left = await this.left.resolve(closure);
-
-    if (!(left instanceof VariablePrimitiveBool)) {
-      throw new WriterError("Boolean required", this.location);
-    }
-
-    if (!left.value) {
-      return new VariablePrimitiveBool(false);
-    }
-
-    const right = await this.right.resolve(closure);
-    if (!(right instanceof VariablePrimitiveBool)) {
-      throw new WriterError("Boolean required", this.location);
-    }
-
-    return new VariablePrimitiveBool(right.value);
   }
 
   get instruction(): Instruction {

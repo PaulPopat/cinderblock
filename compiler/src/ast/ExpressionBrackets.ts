@@ -1,4 +1,3 @@
-import { type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
@@ -31,10 +30,6 @@ export class ExpressionBrackets extends Expression {
 
   get resolution() {
     return this.#subject.resolution;
-  }
-
-  resolve(closure: Closure): Promise<Variable> {
-    return this.#subject.resolve(closure);
   }
 
   get instruction() {

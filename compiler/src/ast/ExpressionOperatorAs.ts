@@ -1,4 +1,3 @@
-import { type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
@@ -33,10 +32,6 @@ export class ExpressionOperatorAs extends Expression {
 
   get resolution() {
     return this.#right;
-  }
-
-  async resolve(closure: Closure): Promise<Variable> {
-    return this.#left.resolve(closure);
   }
 
   get instruction(): Instruction {

@@ -2,7 +2,6 @@ import { TypeArg } from "./TypeArg.ts";
 import { Expression } from "./Expression.ts";
 import { TypeTuple } from "./TypeTuple.ts";
 import { ExpressionTuplePart } from "./ExpressionTuplePart.ts";
-import { VariableTuple, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TokenTypeName } from "#tokeniser";
@@ -55,12 +54,6 @@ export class ExpressionTuple extends Expression {
       () => this,
       this.#parts.map((part) => new TypeArg(this.location, this.done, () => this, part.value.resolution, part.name)),
     );
-  }
-
-  async resolve(closure: Closure): Promise<Variable> {
-    const inputs = Object.fromEntries(await Promise.all(this.#parts.map(async (next) => [next.name, await next.value.resolve(closure)] as const)));
-
-    return new VariableTuple(inputs);
   }
 
   get instruction(): Instruction {

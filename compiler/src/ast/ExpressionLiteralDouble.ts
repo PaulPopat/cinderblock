@@ -1,4 +1,3 @@
-import type { Closure, Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
@@ -30,10 +29,6 @@ export class ExpressionLiteralDouble extends ExpressionLiteral {
 
   get resolution() {
     return new TypePrimitiveDouble(this.location, this.done, () => this);
-  }
-
-  async resolve(closure: Closure): Promise<Variable> {
-    throw new Error("Method not implemented.");
   }
 
   get instruction(): Instruction {

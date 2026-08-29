@@ -1,4 +1,3 @@
-import { VariableArray, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
@@ -41,18 +40,6 @@ export class ExpressionArrayAdd extends Expression {
 
   get resolution() {
     return this.#subject.resolution;
-  }
-
-  async resolve(closure: Closure): Promise<Variable> {
-    const left = await this.#subject.resolve(closure);
-    const right = await this.#addition.resolve(closure);
-
-    if (!(left instanceof VariableArray)) throw new Error("Invalid left");
-    if (right instanceof VariableArray) {
-      return new VariableArray([...left.data, ...right.data]);
-    }
-
-    return new VariableArray([...left.data, right]);
   }
 
   get instruction(): Instruction {

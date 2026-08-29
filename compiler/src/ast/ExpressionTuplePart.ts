@@ -1,7 +1,6 @@
 import { TypeArg } from "./TypeArg.ts";
 import { Expression } from "./Expression.ts";
 import { TypeTuple } from "./TypeTuple.ts";
-import { VariableTuple, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TokenTypeName } from "#tokeniser";
@@ -34,12 +33,6 @@ export class ExpressionTuplePart extends Expression {
     return new TypeTuple(this.location, this.done, () => this, [
       new TypeArg(this.location, this.done, () => this, this.#value.resolution, this.#name),
     ]);
-  }
-
-  async resolve(closure: Closure): Promise<Variable> {
-    return new VariableTuple({
-      [this.#name]: await this.#value.resolve(closure),
-    });
   }
 
   get instruction(): Instruction {

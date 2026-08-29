@@ -29,7 +29,6 @@ export abstract class Entity extends Entry {
   }
 
   abstract get name(): string;
-  abstract build(closure: Closure): Closure;
   abstract get model(): Array<CreateFunc>;
 
   get fullName() {

@@ -1,4 +1,3 @@
-import type { Closure, Variable } from "#runner";
 import { Entry } from "./Entry.ts";
 import { ParserError } from "./ParserError.ts";
 import { TokenWalker } from "../tokeniser/TokenWalker.ts";
@@ -66,8 +65,6 @@ export abstract class Expression extends Entry {
   }
 
   abstract get resolution(): Type;
-
-  abstract resolve(closure: Closure): Promise<Variable>;
 
   float(name: string): Entry | undefined {
     return this.parent?.float(name);

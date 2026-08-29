@@ -1,10 +1,8 @@
-import { VariablePrimitiveBool, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { LinkerError } from "./LinkerError.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
-import { WriterError } from "./WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { Instruction } from "#writer";
 
@@ -40,15 +38,6 @@ export class ExpressionNot extends Expression {
     }
 
     return new TypePrimitiveBool(this.location, this.done, () => this);
-  }
-
-  async resolve(closure: Closure): Promise<Variable> {
-    const subject = await this.#subject.resolve(closure);
-    if (!(subject instanceof VariablePrimitiveBool)) {
-      throw new WriterError("Subject not boolean", this.location);
-    }
-
-    return new VariablePrimitiveBool(!subject.value);
   }
 
   get instruction(): Instruction {
