@@ -6,6 +6,7 @@ import { VariableTuple, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Instruction } from "#writer";
 
 export class ExpressionTuple extends Expression {
   static {
@@ -60,5 +61,12 @@ export class ExpressionTuple extends Expression {
     const inputs = Object.fromEntries(await Promise.all(this.#parts.map(async (next) => [next.name, await next.value.resolve(closure)] as const)));
 
     return new VariableTuple(inputs);
+  }
+
+  get instruction(): Instruction {
+    return {
+      type: "tuple",
+      parts: this.#parts.map((p) => [p.name, p.instruction]),
+    };
   }
 }

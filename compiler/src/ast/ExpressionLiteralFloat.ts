@@ -5,6 +5,7 @@ import { ExpressionLiteral } from "./ExpressionLiteral.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveFloat } from "./TypePrimitiveFloat.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Instruction } from "#writer";
 
 export class ExpressionLiteralFloat extends ExpressionLiteral {
   static {
@@ -33,5 +34,9 @@ export class ExpressionLiteralFloat extends ExpressionLiteral {
 
   async resolve(closure: Closure): Promise<Variable> {
     return new VariablePrimitiveFloat(Number.parseFloat(this.#value));
+  }
+
+  get instruction(): Instruction {
+    return { type: "literal_float", value: Number.parseFloat(this.#value) };
   }
 }

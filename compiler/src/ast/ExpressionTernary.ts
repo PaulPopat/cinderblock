@@ -6,6 +6,8 @@ import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypeUnion } from "./TypeUnion.ts";
 import { WriterError } from "./WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Instruction } from "#writer";
+import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 
 export class ExpressionTernary extends Expression {
   static {
@@ -61,5 +63,18 @@ export class ExpressionTernary extends Expression {
     }
 
     return this.#negative.resolve(closure);
+  }
+
+  get instruction(): Instruction {
+    if (!(this.#predicate.resolution instanceof TypePrimitiveBool)) {
+      throw new WriterError("Boolean required", this.location);
+    }
+
+    return {
+      type: "ternary",
+      predicate: this.#predicate.instruction,
+      positive: this.#positive.instruction,
+      negative: this.#negative.instruction,
+    };
   }
 }

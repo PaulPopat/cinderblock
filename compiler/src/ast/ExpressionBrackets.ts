@@ -36,4 +36,8 @@ export class ExpressionBrackets extends Expression {
   resolve(closure: Closure): Promise<Variable> {
     return this.#subject.resolve(closure);
   }
+
+  get instruction() {
+    return this.#subject.instruction;
+  }
 }

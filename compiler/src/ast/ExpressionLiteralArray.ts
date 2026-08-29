@@ -6,6 +6,7 @@ import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypeArray } from "./TypeArray.ts";
 import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Instruction } from "#writer";
 
 export class ExpressionLiteralArray extends ExpressionLiteral {
   static {
@@ -65,5 +66,12 @@ export class ExpressionLiteralArray extends ExpressionLiteral {
 
   async resolve(closure: Closure): Promise<Variable> {
     return new VariableArray(await Promise.all(this.#value.map((v) => v.resolve(closure))));
+  }
+
+  get instruction(): Instruction {
+    return {
+      type: "literal_array",
+      subject: this.#value.map((v) => v.instruction),
+    };
   }
 }

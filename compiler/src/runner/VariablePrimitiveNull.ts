@@ -30,23 +30,23 @@ export class VariablePrimitiveNull extends VariablePrimitive<null> {
     return new VariablePrimitiveBool(value instanceof VariablePrimitiveNull);
   }
 
-  notEquals(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
+  not_equals(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
     return new VariablePrimitiveBool(!(value instanceof VariablePrimitiveNull));
   }
 
-  greaterThan(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
+  greater_than(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
     throw new Error("Method not implemented.");
   }
 
-  lessThan(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
+  less_than(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
     throw new Error("Method not implemented.");
   }
 
-  equalsOrGreaterThan(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
+  greater_than_or_equal_to(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
     throw new Error("Method not implemented.");
   }
 
-  equalsOrLessThan(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
+  less_than_or_equal_to(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
     throw new Error("Method not implemented.");
   }
 }

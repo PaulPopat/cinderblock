@@ -4,6 +4,9 @@ import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Instruction } from "#writer";
+import { TypeArray } from "./TypeArray.ts";
+import { WriterError } from "./WriterError.ts";
 
 export class ExpressionArrayAdd extends Expression {
   static {
@@ -50,5 +53,17 @@ export class ExpressionArrayAdd extends Expression {
     }
 
     return new VariableArray([...left.data, right]);
+  }
+
+  get instruction(): Instruction {
+    if (!(this.#subject.resolution instanceof TypeArray)) {
+      throw new WriterError("Left must be array", this.location);
+    }
+
+    return {
+      type: "array_add",
+      left: this.#subject.instruction,
+      right: this.#addition.instruction,
+    };
   }
 }

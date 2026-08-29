@@ -10,6 +10,7 @@ import type { Entry } from "./Entry.ts";
 import { TokenTypeName } from "#tokeniser";
 import { EntityNamespace } from "./EntityNamespace.ts";
 import type { IEntityReferenceable } from "./IEntityReferenceable.ts";
+import type { CreateFunc } from "#writer";
 
 export class EntityLet extends EntityNamespace implements IEntityReferenceable {
   static {
@@ -139,5 +140,14 @@ export class EntityLet extends EntityNamespace implements IEntityReferenceable {
 
   float(name: string): Entry | undefined {
     return this.#args.reduce((result, arg) => result ?? arg.dig(name), undefined as Entry | undefined) ?? super.float(name);
+  }
+
+  get model(): CreateFunc {
+    return {
+      name: this.#internalName,
+      vars: this.topLevelEntities.filter((e) => e instanceof EntityLet).map((e) => e.model),
+      returns: this.#contents.instruction,
+      no_args: this.#args.length === 0,
+    };
   }
 }

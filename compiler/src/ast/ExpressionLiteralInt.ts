@@ -5,6 +5,7 @@ import { ExpressionLiteral } from "./ExpressionLiteral.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveInt } from "./TypePrimitiveInt.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Instruction } from "#writer";
 
 export class ExpressionLiteralInt extends ExpressionLiteral {
   static {
@@ -33,5 +34,9 @@ export class ExpressionLiteralInt extends ExpressionLiteral {
 
   async resolve(closure: Closure): Promise<Variable> {
     return new VariablePrimitiveInt(Number.parseInt(this.#value));
+  }
+
+  get instruction(): Instruction {
+    return { type: "literal_int", value: Number.parseInt(this.#value) };
   }
 }

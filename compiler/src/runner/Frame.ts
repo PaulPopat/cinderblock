@@ -19,6 +19,13 @@ export class Frame {
     return this;
   }
 
+  merge(input: Frame) {
+    return new Frame({
+      ...this.#variables,
+      ...input.#variables,
+    });
+  }
+
   async export() {
     return Object.fromEntries(await Promise.all(Object.entries(this.#variables).map(async ([key, value]) => [key, await (await value)?.export()])));
   }

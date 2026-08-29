@@ -7,6 +7,8 @@ import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 import { WriterError } from "./WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Instruction } from "#writer";
+import { TypePrimitive } from "./TypePrimitive.ts";
 
 export class ExpressionOperatorEquals extends ExpressionOperator {
   static {
@@ -43,5 +45,22 @@ export class ExpressionOperatorEquals extends ExpressionOperator {
     }
 
     return left.equals(right);
+  }
+
+  get instruction(): Instruction {
+    if (!(this.left.resolution instanceof TypePrimitive)) {
+      throw new WriterError("Boolean required", this.location);
+    }
+
+    if (!(this.right.resolution instanceof TypePrimitive)) {
+      throw new WriterError("Boolean required", this.location);
+    }
+
+    return {
+      type: "operator",
+      operator: "equals",
+      left: this.left.instruction,
+      right: this.right.instruction,
+    };
   }
 }

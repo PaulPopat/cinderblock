@@ -1,5 +1,3 @@
-import type { Location } from "#utils";
-import { WriterError } from "../ast/WriterError.ts";
 import type { Frame } from "./Frame.ts";
 import type { Variable } from "./Variable.ts";
 
@@ -12,13 +10,13 @@ export class Closure {
     this.#frames = frames;
   }
 
-  search(name: string, displayName: string, location: Location) {
+  search(name: string) {
     for (const frame of this.#frames) {
       const possible = frame.search(name);
       if (possible) return possible;
     }
 
-    throw new WriterError(`Variable ${displayName} not resolved`, location);
+    throw new Error(`Variable  not resolved`);
   }
 
   withFrame(frame: Frame) {
@@ -31,9 +29,9 @@ export class Closure {
     return new Closure(this.#globals, [...this.#frames.filter((f) => f !== frame), frame.withVariable(name, value)]);
   }
 
-  searchGlobal(name: string, location: Location) {
+  searchGlobal(name: string) {
     const possible = this.#globals.search(name);
-    if (!possible) throw new WriterError(`Could not find external ${name}`, location);
+    if (!possible) throw new Error(`Could not find external ${name}`);
 
     return possible;
   }

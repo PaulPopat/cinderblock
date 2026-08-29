@@ -104,4 +104,18 @@ describe("logic", () => {
     const result = await code.run("thing_test_test", {});
     assert.equal(result, "hellohello");
   });
+
+  test("partial pipe", async () => {
+    const code = new Inline(
+      `
+        let multiple (left: string, right: string) = left + " " + right;
+
+        let result_entry =
+            let partial = { left = "hello" } -> multiple;
+          { right = "world" } -> partial;
+      `,
+    );
+    const result = await code.run("result_entry", {});
+    assert.equal(result, "hello world");
+  });
 });

@@ -9,6 +9,7 @@ import { TypeArg } from "./TypeArg.ts";
 import { TypePipeable } from "./TypePipeable.ts";
 import { TypeTuple } from "./TypeTuple.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Instruction } from "#writer";
 
 export class ExpressionOperatorPipe extends ExpressionOperator {
   static {
@@ -63,16 +64,50 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
       throw new LinkerError("Target not pipeable", this.location);
     }
 
-    return right.execute(
-      new Frame(
-        (left as VariableTuple).entries.reduce(
-          (frame, [key, value]) => ({
-            ...frame,
-            [key]: value,
-          }),
-          {} as Record<string, Variable>,
-        ),
+    const frame = new Frame({
+      ...(left as VariableTuple).entries.reduce(
+        (frame, [key, value]) => ({
+          ...frame,
+          [key]: value,
+        }),
+        {} as Record<string, Variable>,
       ),
-    );
+    });
+
+    if (rightType.args.some((r) => !(left as VariableTuple).has(r.name))) {
+      return new VariablePipeable((args) => right.execute(frame.merge(args)));
+    }
+
+    return right.execute(frame);
+  }
+
+  get instruction(): Instruction {
+    const right = this.right.resolution;
+    if (!(right instanceof TypePipeable)) {
+      throw new LinkerError("Target not pipeable", this.location);
+    }
+
+    let input = this.left.resolution;
+    if (!(input instanceof TypeTuple)) {
+      input = new TypeTuple(this.location, this.done, () => this, [new TypeArg(this.location, this.done, () => this, input, "_s")]);
+    }
+
+    const remaining = right.args.filter((r) => !(input as TypeTuple).args.find((a) => a.name === r.name));
+
+    if (!remaining.length) {
+      return {
+        type: "operator",
+        operator: "pipe",
+        left: this.left.instruction,
+        right: this.right.instruction,
+      };
+    }
+
+    return {
+      type: "operator",
+      operator: "partial_pipe",
+      left: this.left.instruction,
+      right: this.right.instruction,
+    };
   }
 }

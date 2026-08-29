@@ -4,7 +4,6 @@ import type { Entry } from "./Entry.ts";
 import { TokenTypeName } from "#tokeniser";
 import { Lazy, type Location } from "#utils";
 import type { Closure } from "#runner";
-import type { IEntityReferenceable } from "./IEntityReferenceable.ts";
 
 export class EntityNamespace extends Entity {
   static {
@@ -17,9 +16,6 @@ export class EntityNamespace extends Entity {
 
   readonly #name: string;
   readonly #entities: Array<Entity>;
-  readonly #flatEntities: Lazy<Array<Entity>> = new Lazy(() =>
-    this.#entities.flatMap((e) => (e instanceof EntityNamespace ? [e, ...e.entities] : [e])),
-  );
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined);
   constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined, name: string, entities: Array<Entity>);
@@ -65,8 +61,12 @@ export class EntityNamespace extends Entity {
     return [this.parent?.namespace, this.name].filter((r) => r).join("_");
   }
 
-  get entities() {
-    return this.#flatEntities.value;
+  get entities(): Array<Entity> {
+    return this.#entities.flatMap((e) => (e instanceof EntityNamespace ? [e, ...e.entities] : [e]));
+  }
+
+  get topLevelEntities(): Array<Entity> {
+    return this.#entities;
   }
 
   build(closure: Closure) {

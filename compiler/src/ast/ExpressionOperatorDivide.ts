@@ -6,6 +6,8 @@ import type { Entry } from "./Entry.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { WriterError } from "./WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Instruction } from "#writer";
+import { TypePrimitive } from "./TypePrimitive.ts";
 
 export class ExpressionOperatorDivide extends ExpressionOperator {
   static {
@@ -42,5 +44,22 @@ export class ExpressionOperatorDivide extends ExpressionOperator {
     }
 
     return left.divide(right);
+  }
+
+  get instruction(): Instruction {
+    if (!(this.left.resolution instanceof TypePrimitive)) {
+      throw new WriterError("Primitive required", this.location);
+    }
+
+    if (!(this.right.resolution instanceof TypePrimitive)) {
+      throw new WriterError("Primitive required", this.location);
+    }
+
+    return {
+      type: "operator",
+      operator: "divide",
+      left: this.left.instruction,
+      right: this.right.instruction,
+    };
   }
 }

@@ -7,6 +7,8 @@ import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 import { WriterError } from "./WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Instruction } from "#writer";
+import { TypePrimitive } from "./TypePrimitive.ts";
 
 export class ExpressionOperatorLessThanOrEqualTo extends ExpressionOperator {
   static {
@@ -42,6 +44,23 @@ export class ExpressionOperatorLessThanOrEqualTo extends ExpressionOperator {
       throw new WriterError("Primitive required", this.location);
     }
 
-    return left.equalsOrLessThan(right);
+    return left.less_than_or_equal_to(right);
+  }
+
+  get instruction(): Instruction {
+    if (!(this.left.resolution instanceof TypePrimitive)) {
+      throw new WriterError("Primitive required", this.location);
+    }
+
+    if (!(this.right.resolution instanceof TypePrimitive)) {
+      throw new WriterError("Primitive required", this.location);
+    }
+
+    return {
+      type: "operator",
+      operator: "less_than_or_equal_to",
+      left: this.left.instruction,
+      right: this.right.instruction,
+    };
   }
 }

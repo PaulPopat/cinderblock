@@ -5,6 +5,7 @@ import { ExpressionLiteral } from "./ExpressionLiteral.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveString } from "./TypePrimitiveString.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Instruction } from "#writer";
 
 export class ExpressionLiteralString extends ExpressionLiteral {
   static {
@@ -20,7 +21,7 @@ export class ExpressionLiteralString extends ExpressionLiteral {
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     const [{ value }, done] = walker.text("value", TokenTypeName.String).finish();
     super(walker.location, done, parent);
-    this.#value = value.slice(1, value.length - 1);
+    this.#value = JSON.parse(value);
   }
 
   get value() {
@@ -33,5 +34,9 @@ export class ExpressionLiteralString extends ExpressionLiteral {
 
   async resolve(closure: Closure): Promise<Variable> {
     return new VariablePrimitiveString(this.#value);
+  }
+
+  get instruction(): Instruction {
+    return { type: "literal_string", value: this.#value };
   }
 }

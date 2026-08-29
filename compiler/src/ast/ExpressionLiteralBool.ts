@@ -5,6 +5,7 @@ import { ExpressionLiteral } from "./ExpressionLiteral.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Instruction } from "#writer";
 
 export class ExpressionLiteralBool extends ExpressionLiteral {
   static {
@@ -33,5 +34,9 @@ export class ExpressionLiteralBool extends ExpressionLiteral {
 
   async resolve(closure: Closure): Promise<Variable> {
     return new VariablePrimitiveBool(this.#value);
+  }
+
+  get instruction(): Instruction {
+    return { type: "literal_bool", value: this.#value };
   }
 }

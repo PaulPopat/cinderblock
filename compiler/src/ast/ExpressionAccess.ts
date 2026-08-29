@@ -8,6 +8,7 @@ import { TypeReference } from "./TypeReference.ts";
 import { TypeTuple } from "./TypeTuple.ts";
 import { WriterError } from "./WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Instruction } from "#writer";
 
 export class ExpressionAccess extends Expression {
   static {
@@ -56,5 +57,22 @@ export class ExpressionAccess extends Expression {
     if (!(subject instanceof VariableTuple)) throw new WriterError("Subject not tuple", this.location);
 
     return subject.get(this.#name, this.location);
+  }
+
+  get instruction(): Instruction {
+    let subjectType = this.#subject.resolution;
+    if (!(subjectType instanceof TypeTuple) && !(subjectType instanceof TypeReference)) {
+      throw new WriterError("Left must be array", this.location);
+    }
+
+    if (!subjectType.args.some((a) => a.name === this.#name)) {
+      throw new WriterError("Could not find property", this.location);
+    }
+
+    return {
+      type: "access",
+      subject: this.#subject.instruction,
+      key: this.#name,
+    };
   }
 }

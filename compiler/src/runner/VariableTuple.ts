@@ -1,5 +1,3 @@
-import type { Location } from "#utils";
-import { WriterError } from "../ast/WriterError.ts";
 import { Variable } from "./Variable.ts";
 
 export class VariableTuple extends Variable {
@@ -10,10 +8,10 @@ export class VariableTuple extends Variable {
     this.#values = values;
   }
 
-  get(name: string, location: Location) {
+  get(name: string) {
     const result = this.#values[name];
 
-    if (!result) throw new WriterError(`${name} not indexable`, location);
+    if (!result) throw new Error(`${name} not indexable`);
 
     return result;
   }

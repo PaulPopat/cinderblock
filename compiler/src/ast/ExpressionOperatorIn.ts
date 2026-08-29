@@ -7,6 +7,9 @@ import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 import { WriterError } from "./WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Instruction } from "#writer";
+import { TypePrimitiveString } from "./TypePrimitiveString.ts";
+import { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionOperatorIn extends ExpressionOperator {
   static {
@@ -43,5 +46,22 @@ export class ExpressionOperatorIn extends ExpressionOperator {
     }
 
     return new VariablePrimitiveBool(right.has(left.value));
+  }
+
+  get instruction(): Instruction {
+    if (!(this.left.resolution instanceof TypePrimitiveString)) {
+      throw new WriterError("String required", this.location);
+    }
+
+    if (!(this.right.resolution instanceof TypeTuple)) {
+      throw new WriterError("Tuple required", this.location);
+    }
+
+    return {
+      type: "operator",
+      operator: "in",
+      left: this.left.instruction,
+      right: this.right.instruction,
+    };
   }
 }

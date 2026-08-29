@@ -1,10 +1,11 @@
-import { VariablePrimitiveBool, VariablePrimitiveNull, type Closure, type Variable } from "#runner";
+import { VariablePrimitiveNull, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Instruction } from "#writer";
 
 export class ExpressionLiteralNull extends ExpressionLiteral {
   static {
@@ -26,5 +27,9 @@ export class ExpressionLiteralNull extends ExpressionLiteral {
 
   async resolve(closure: Closure): Promise<Variable> {
     return new VariablePrimitiveNull(null);
+  }
+
+  get instruction(): Instruction {
+    return { type: "literal_null" };
   }
 }

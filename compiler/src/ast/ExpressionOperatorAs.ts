@@ -5,6 +5,7 @@ import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { Type } from "./Type.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Instruction } from "#writer";
 
 export class ExpressionOperatorAs extends Expression {
   static {
@@ -36,5 +37,9 @@ export class ExpressionOperatorAs extends Expression {
 
   async resolve(closure: Closure): Promise<Variable> {
     return this.#left.resolve(closure);
+  }
+
+  get instruction(): Instruction {
+    return this.#left.instruction;
   }
 }

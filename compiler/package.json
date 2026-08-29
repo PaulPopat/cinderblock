@@ -17,7 +17,8 @@
     "#utils": "./src/utils/index.ts",
     "#runner": "./src/runner/index.ts",
     "#std": "./src/std/index.ts",
-    "#struct": "./src/struct/index.ts"
+    "#struct": "./src/struct/index.ts",
+    "#writer": "./src/writer/index.ts"
   },
   "exports": {
     ".": "./src/index.ts"

@@ -5,6 +5,11 @@ import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { LinkerError } from "./LinkerError.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { IEntityReferenceable } from "./IEntityReferenceable.ts";
+import type { Instruction } from "#writer";
+import { EntityLet } from "./EntityLet.ts";
+import { EntityArg } from "./EntityArg.ts";
+import { EntityExternal } from "./EntityExternal.ts";
+import { WriterError } from "./WriterError.ts";
 
 export class ExpressionReference extends Expression {
   static {
@@ -48,5 +53,18 @@ export class ExpressionReference extends Expression {
     }
 
     return value;
+  }
+
+  get instruction(): Instruction {
+    const subject = this.float(this.#name);
+    if (subject instanceof EntityLet) {
+      return { type: "reference", name: subject.internalName };
+    } else if (subject instanceof EntityArg) {
+      return { type: "arg", name: subject.name };
+    } else if (subject instanceof EntityExternal) {
+      return { type: "external", name: subject.name };
+    }
+
+    throw new WriterError("Unknown subject type", this.location);
   }
 }

@@ -45,35 +45,35 @@ export class VariablePrimitiveFloat extends VariablePrimitive<number> {
     return new VariablePrimitiveBool(this.value === subject);
   }
 
-  notEquals(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
+  not_equals(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
     const subject = value.value;
     if (typeof subject !== "number") throw new Error("Incompatible addition");
 
     return new VariablePrimitiveBool(this.value !== subject);
   }
 
-  greaterThan(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
+  greater_than(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
     const subject = value.value;
     if (typeof subject !== "number") throw new Error("Incompatible addition");
 
     return new VariablePrimitiveBool(this.value > subject);
   }
 
-  lessThan(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
+  less_than(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
     const subject = value.value;
     if (typeof subject !== "number") throw new Error("Incompatible addition");
 
     return new VariablePrimitiveBool(this.value < subject);
   }
 
-  equalsOrGreaterThan(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
+  greater_than_or_equal_to(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
     const subject = value.value;
     if (typeof subject !== "number") throw new Error("Incompatible addition");
 
     return new VariablePrimitiveBool(this.value >= subject);
   }
 
-  equalsOrLessThan(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
+  less_than_or_equal_to(value: VariablePrimitive<unknown>): VariablePrimitive<boolean> {
     const subject = value.value;
     if (typeof subject !== "number") throw new Error("Incompatible addition");
 

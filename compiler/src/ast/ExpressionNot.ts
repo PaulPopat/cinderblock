@@ -6,6 +6,7 @@ import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 import { WriterError } from "./WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Instruction } from "#writer";
 
 export class ExpressionNot extends Expression {
   static {
@@ -48,5 +49,13 @@ export class ExpressionNot extends Expression {
     }
 
     return new VariablePrimitiveBool(!subject.value);
+  }
+
+  get instruction(): Instruction {
+    if (!(this.#subject.resolution instanceof TypePrimitiveBool)) {
+      throw new LinkerError("Boolean required", this.location);
+    }
+
+    return { type: "not", subject: this.#subject.instruction };
   }
 }

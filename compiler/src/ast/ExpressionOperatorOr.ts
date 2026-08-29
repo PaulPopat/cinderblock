@@ -7,6 +7,7 @@ import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 import { WriterError } from "./WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Instruction } from "#writer";
 
 export class ExpressionOperatorOr extends ExpressionOperator {
   static {
@@ -43,5 +44,22 @@ export class ExpressionOperatorOr extends ExpressionOperator {
     }
 
     return left.or(right);
+  }
+
+  get instruction(): Instruction {
+    if (!(this.left.resolution instanceof TypePrimitiveBool)) {
+      throw new WriterError("Boolean required", this.location);
+    }
+
+    if (!(this.right.resolution instanceof TypePrimitiveBool)) {
+      throw new WriterError("Boolean required", this.location);
+    }
+
+    return {
+      type: "operator",
+      operator: "or",
+      left: this.left.instruction,
+      right: this.right.instruction,
+    };
   }
 }

@@ -3,6 +3,7 @@ import { Entry } from "./Entry.ts";
 import { ParserError } from "./ParserError.ts";
 import { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import type { Type } from "./Type.ts";
+import type { Instruction } from "#writer";
 
 type ExpressionParseable = {
   priority: number;
@@ -75,4 +76,6 @@ export abstract class Expression extends Entry {
   dig(name: string): Entry | undefined {
     return undefined;
   }
+
+  abstract get instruction(): Instruction;
 }

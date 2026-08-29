@@ -5,6 +5,7 @@ import { VariableTuple, type Closure, type Variable } from "#runner";
 import type { Entry } from "./Entry.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Instruction } from "#writer";
 
 export class ExpressionTuplePart extends Expression {
   readonly #name: string;
@@ -39,5 +40,9 @@ export class ExpressionTuplePart extends Expression {
     return new VariableTuple({
       [this.#name]: await this.#value.resolve(closure),
     });
+  }
+
+  get instruction(): Instruction {
+    return this.#value.instruction;
   }
 }

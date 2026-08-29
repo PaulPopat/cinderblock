@@ -20,11 +20,11 @@ export abstract class VariablePrimitive<T> extends Variable {
   abstract and(value: VariablePrimitive<unknown>): VariablePrimitive<boolean>;
   abstract or(value: VariablePrimitive<unknown>): VariablePrimitive<boolean>;
   abstract equals(value: VariablePrimitive<unknown>): VariablePrimitive<boolean>;
-  abstract notEquals(value: VariablePrimitive<unknown>): VariablePrimitive<boolean>;
-  abstract greaterThan(value: VariablePrimitive<unknown>): VariablePrimitive<boolean>;
-  abstract lessThan(value: VariablePrimitive<unknown>): VariablePrimitive<boolean>;
-  abstract equalsOrGreaterThan(value: VariablePrimitive<unknown>): VariablePrimitive<boolean>;
-  abstract equalsOrLessThan(value: VariablePrimitive<unknown>): VariablePrimitive<boolean>;
+  abstract not_equals(value: VariablePrimitive<unknown>): VariablePrimitive<boolean>;
+  abstract greater_than(value: VariablePrimitive<unknown>): VariablePrimitive<boolean>;
+  abstract less_than(value: VariablePrimitive<unknown>): VariablePrimitive<boolean>;
+  abstract greater_than_or_equal_to(value: VariablePrimitive<unknown>): VariablePrimitive<boolean>;
+  abstract less_than_or_equal_to(value: VariablePrimitive<unknown>): VariablePrimitive<boolean>;
 
   export() {
     return this.#value;
