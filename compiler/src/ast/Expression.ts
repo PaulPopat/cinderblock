@@ -67,4 +67,12 @@ export abstract class Expression extends Entry {
   abstract get resolution(): Type;
 
   abstract resolve(closure: Closure): Promise<Variable>;
+
+  float(name: string): Entry | undefined {
+    return this.parent?.float(name);
+  }
+
+  dig(name: string): Entry | undefined {
+    return undefined;
+  }
 }

@@ -24,11 +24,25 @@ export class EntityUse extends Entity {
     this.#namespace = namespace;
   }
 
+  get name(): string {
+    throw this.#namespace;
+  }
+
   get namespace() {
     return this.#namespace;
   }
 
   get fullName() {
     return "";
+  }
+
+  dig(name: string): Entry | undefined {
+    if (name.startsWith(this.#namespace + "_")) return undefined;
+
+    return this.float([this.#namespace, name].join("_"));
+  }
+
+  float(name: string): Entry | undefined {
+    return this.parent?.float(name);
   }
 }

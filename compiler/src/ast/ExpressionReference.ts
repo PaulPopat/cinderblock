@@ -3,8 +3,8 @@ import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { LinkerError } from "./LinkerError.ts";
-import { EntityReferenceable } from "./EntityReferenceable.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { IEntityReferenceable } from "./IEntityReferenceable.ts";
 
 export class ExpressionReference extends Expression {
   static {
@@ -28,12 +28,12 @@ export class ExpressionReference extends Expression {
   }
 
   get subject() {
-    const result = this.find(this.#name);
-    if (!(result instanceof EntityReferenceable)) {
+    const result = this.float(this.#name);
+    if (!result || !("reference" in result)) {
       throw new LinkerError("Unresolved reference", this.location);
     }
 
-    return result;
+    return result as IEntityReferenceable;
   }
 
   get resolution() {

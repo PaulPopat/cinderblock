@@ -13,7 +13,7 @@ export abstract class Entry {
   }
 
   get parent() {
-    return this.#parent;
+    return this.#parent();
   }
 
   get location() {
@@ -28,9 +28,8 @@ export abstract class Entry {
     return this.#done;
   }
 
-  find(name: string): Entry | undefined {
-    return this.#parent()?.find(name);
-  }
+  abstract float(name: string): Entry | undefined;
+  abstract dig(name: string): Entry | undefined;
 
   get namespace(): string {
     return this.#parent()?.namespace ?? "";

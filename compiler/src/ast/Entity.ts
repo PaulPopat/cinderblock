@@ -26,5 +26,9 @@ export abstract class Entity extends Entry {
     return new parser.factory(walker, parent);
   }
 
-  abstract get fullName(): string;
+  abstract get name(): string;
+
+  get fullName() {
+    return [super.namespace, this.name].join("_");
+  }
 }

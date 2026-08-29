@@ -31,7 +31,7 @@ export class TypeReference extends Type {
   }
 
   get struct() {
-    const result = this.find(this.#name);
+    const result = this.float(this.#name);
     if (!(result instanceof EntityStruct)) throw new LinkerError("Reference not found", this.location);
 
     return result;

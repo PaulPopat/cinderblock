@@ -14,8 +14,12 @@ export class TypePipeable extends Type {
         const [{ args, returns }, done] = walker
           .while(
             "args",
-            (s) => s.data === "," || s.data === "(",
+            (s) => (s.data === "," || s.data === "(") && s.expect([",", "("], TokenTypeName.Punctuation).data !== ")",
             (s) => TypeArg.Parse(s.expect([",", "("], TokenTypeName.Punctuation), parent),
+          )
+          .if(
+            (s) => s.data === "(",
+            (s) => s.expect("(", TokenTypeName.Punctuation),
           )
           .expect(")", TokenTypeName.Punctuation)
           .expect(":", TokenTypeName.Punctuation)

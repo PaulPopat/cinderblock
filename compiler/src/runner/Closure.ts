@@ -4,9 +4,11 @@ import type { Frame } from "./Frame.ts";
 import type { Variable } from "./Variable.ts";
 
 export class Closure {
+  readonly #globals: Frame;
   readonly #frames: Array<Frame>;
 
-  constructor(frames: Array<Frame>) {
+  constructor(globals: Frame, frames: Array<Frame>) {
+    this.#globals = globals;
     this.#frames = frames;
   }
 
@@ -20,12 +22,19 @@ export class Closure {
   }
 
   withFrame(frame: Frame) {
-    return new Closure([...this.#frames, frame]);
+    return new Closure(this.#globals, [...this.#frames, frame]);
   }
 
   withVariable(name: string, value: Variable | Promise<Variable>) {
     const frame = this.#frames[this.#frames.length - 1];
     if (!frame) throw new Error("Not within a frame");
-    return new Closure([...this.#frames.filter((f) => f !== frame), frame.withVariable(name, value)]);
+    return new Closure(this.#globals, [...this.#frames.filter((f) => f !== frame), frame.withVariable(name, value)]);
+  }
+
+  searchGlobal(name: string, location: Location) {
+    const possible = this.#globals.search(name);
+    if (!possible) throw new WriterError(`Could not find external ${name}`, location);
+
+    return possible;
   }
 }

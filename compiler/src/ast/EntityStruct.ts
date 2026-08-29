@@ -43,4 +43,14 @@ export class EntityStruct extends Entity {
   get fullName() {
     return this.#name;
   }
+
+  dig(name: string): Entry | undefined {
+    if (name === this.name) return this;
+
+    return undefined;
+  }
+
+  float(name: string): Entry | undefined {
+    return undefined;
+  }
 }

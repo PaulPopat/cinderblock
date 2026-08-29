@@ -34,4 +34,12 @@ export abstract class Type extends Entry {
 
     return type;
   }
+
+  float(name: string): Entry | undefined {
+    return this.parent?.float(name);
+  }
+
+  dig(name: string): Entry | undefined {
+    return undefined;
+  }
 }

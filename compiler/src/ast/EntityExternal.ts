@@ -1,46 +1,58 @@
-import { Closure, Namer, VariablePipeable, variablise, type Frame, type Variable } from "#runner";
-import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
-import { Location } from "#utils";
-import { TypePipeable } from "./TypePipeable.ts";
-import { TokenWalker } from "#tokeniser";
-import { EntityReferenceable } from "./EntityReferenceable.ts";
+import { Closure, Namer, type Variable } from "#runner";
+import { TokenTypeName, TokenWalker } from "#tokeniser";
+import { Entity } from "./Entity.ts";
+import type { IEntityReferenceable } from "./IEntityReferenceable.ts";
+import { Type } from "./Type.ts";
+import type { Entry } from "./Entry.ts";
 
-export class EntityExternal extends EntityReferenceable {
+export class EntityExternal extends Entity implements IEntityReferenceable {
+  static {
+    Entity.RegisterEntity({
+      priority: 100,
+      match: /^extern$/gm,
+      factory: this,
+    });
+  }
+
   readonly #name: string;
-  readonly #implementation: Function;
-  readonly #internalName = Namer.Next;
+  readonly #type: Type;
 
-  constructor(name: string, implementation: Function) {
-    super(Location.empty, TokenWalker.start([]), () => undefined);
+  constructor(walker: TokenWalker, parent: () => Entry | undefined) {
+    const [{ name, type }, done] = walker
+      .expect("extern", TokenTypeName.KeyWord)
+      .text("name", TokenTypeName.FunctionName)
+      .extract("type", (w) => Type.Parse(w, () => this))
+      .expect(";", TokenTypeName.Punctuation)
+      .finish();
+
+    super(walker.location, done, parent);
     this.#name = name;
-    this.#implementation = implementation;
+    this.#type = type;
   }
 
   get name() {
     return this.#name;
   }
 
-  get internalName() {
-    return this.#internalName;
-  }
-
-  get fullName() {
-    return this.#name;
-  }
-
-  get namespace() {
-    return this.#name;
-  }
-
   get type() {
-    return new TypePipeable(this.location, this.done, () => this, [], new TypePrimitiveUnknown(this.location, this.done, () => this));
+    return this.#type;
+  }
+
+  get internalName() {
+    return this.#name;
   }
 
   async reference(closure: Closure): Promise<Variable> {
-    return new VariablePipeable((a) => this.execute(closure, a), false);
+    return closure.searchGlobal(this.#name, this.location);
   }
 
-  async execute(_: Closure, args: Frame): Promise<Variable> {
-    return variablise(await this.#implementation(await args.export()));
+  dig(name: string): Entry | undefined {
+    if (name === this.#name) return this;
+
+    return undefined;
+  }
+
+  float(name: string): Entry | undefined {
+    return this.parent?.float(name);
   }
 }

@@ -24,4 +24,12 @@ export class EntryTag extends Entry {
   get value() {
     return this.#value;
   }
+
+  float(name: string): Entry | undefined {
+    return undefined;
+  }
+
+  dig(name: string): Entry | undefined {
+    return undefined;
+  }
 }

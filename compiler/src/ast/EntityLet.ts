@@ -7,11 +7,11 @@ import { Closure, Frame, Namer, VariablePipeable, type Variable } from "#runner"
 import { EntryTag } from "./EntryTag.ts";
 import { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import type { Entry } from "./Entry.ts";
-import { EntityUse } from "./EntityUse.ts";
-import { EntityReferenceable } from "./EntityReferenceable.ts";
 import { TokenTypeName } from "#tokeniser";
+import { EntityNamespace } from "./EntityNamespace.ts";
+import type { IEntityReferenceable } from "./IEntityReferenceable.ts";
 
-export class EntityLet extends EntityReferenceable {
+export class EntityLet extends EntityNamespace implements IEntityReferenceable {
   static {
     Entity.RegisterEntity({
       priority: 100,
@@ -20,10 +20,8 @@ export class EntityLet extends EntityReferenceable {
     });
   }
 
-  readonly #name: string;
   readonly #tags: Array<EntryTag>;
   readonly #args: Array<EntityArg>;
-  readonly #entities: Array<Entity>;
   readonly #returns: Type | undefined;
   readonly #contents: Expression;
   readonly #internalName = Namer.Next;
@@ -68,17 +66,11 @@ export class EntityLet extends EntityReferenceable {
       .expect(";", TokenTypeName.Punctuation)
       .finish();
 
-    super(walker.location, done, parent);
-    this.#name = name;
+    super(walker.location, done, parent, name, entities);
     this.#tags = tags ?? [];
     this.#args = args ?? [];
-    this.#entities = entities.filter((e) => e instanceof Entity);
     this.#returns = returns;
     this.#contents = contents;
-  }
-
-  get name() {
-    return this.#name;
   }
 
   get tags() {
@@ -106,35 +98,7 @@ export class EntityLet extends EntityReferenceable {
   }
 
   get namespace(): string {
-    return [this.parent()?.namespace, this.name].filter((r) => r).join("_");
-  }
-
-  possibleNames(name: string) {
-    return [
-      name,
-      [this.namespace, name].join("_"),
-      ...this.namespace
-        .split("_")
-        .reduce((current, next) => [...current, [current[current.length - 1], next].filter((f) => f).join("_")], [] as Array<string>)
-        .map((n) => [n, name].join("_")),
-      ...this.#entities.filter((e) => e instanceof EntityUse).map((e) => [e.namespace, name].join("_")),
-    ];
-  }
-
-  find(name: string): Entry | undefined {
-    for (const arg of this.#args) {
-      if (arg.name === name) return arg;
-    }
-
-    for (const possible of this.possibleNames(name)) {
-      const found = this.#entities.find((s) => s.fullName === possible);
-      if (found) return found;
-    }
-
-    for (const possible of this.possibleNames(name)) {
-      const found = super.find(possible);
-      if (found) return found;
-    }
+    return [this.parent?.namespace, this.name].filter((r) => r).join("_");
   }
 
   get type() {
@@ -160,10 +124,16 @@ export class EntityLet extends EntityReferenceable {
   }
 
   async execute(closure: Closure, args: Frame): Promise<Variable> {
-    return this.#contents.resolve(
-      this.#entities
-        .filter((entity) => entity instanceof EntityReferenceable)
-        .reduce((closure, entity) => closure.withVariable(entity.internalName, entity.reference(closure)), closure.withFrame(args)),
-    );
+    return this.#contents.resolve(this.build(closure.withFrame(args)));
+  }
+
+  dig(name: string): Entry | undefined {
+    if (name === this.name) return this;
+
+    return super.dig(name);
+  }
+
+  float(name: string): Entry | undefined {
+    return this.#args.reduce((result, arg) => result ?? arg.dig(name), undefined as Entry | undefined) ?? super.float(name);
   }
 }

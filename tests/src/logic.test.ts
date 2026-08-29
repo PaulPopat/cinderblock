@@ -16,6 +16,7 @@ describe("logic", () => {
     let total = 1;
     const code = new Inline(
       `
+        extern get_total (): int;
         let internal_let = {} -> get_total;
         let test_let = internal_let + internal_let;
       `,
