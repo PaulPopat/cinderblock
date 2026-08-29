@@ -10,6 +10,7 @@ import { TokenTypeName } from "#tokeniser";
 import type { Instruction } from "#writer";
 import { TypePrimitiveString } from "./TypePrimitiveString.ts";
 import { TypeTuple } from "./TypeTuple.ts";
+import { TypeReference } from "./TypeReference.ts";
 
 export class ExpressionOperatorIn extends ExpressionOperator {
   static {
@@ -53,7 +54,7 @@ export class ExpressionOperatorIn extends ExpressionOperator {
       throw new WriterError("String required", this.location);
     }
 
-    if (!(this.right.resolution instanceof TypeTuple)) {
+    if (!(this.right.resolution instanceof TypeTuple) && !(this.right.resolution instanceof TypeReference)) {
       throw new WriterError("Tuple required", this.location);
     }
 

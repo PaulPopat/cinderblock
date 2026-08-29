@@ -6,6 +6,7 @@ import { TypeArg } from "./TypeArg.ts";
 import { TokenTypeName } from "#tokeniser";
 import { Entity } from "./Entity.ts";
 import type { IEntityReferenceable } from "./IEntityReferenceable.ts";
+import type { CreateFunc } from "#writer";
 
 export class EntityArg extends Entity implements IEntityReferenceable {
   readonly #type: Type;
@@ -35,7 +36,7 @@ export class EntityArg extends Entity implements IEntityReferenceable {
   }
 
   async reference(closure: Closure): Promise<Variable> {
-    return closure.search(this.internalName, this.name, this.location);
+    return closure.search(this.internalName);
   }
 
   get typeArg() {
@@ -54,5 +55,9 @@ export class EntityArg extends Entity implements IEntityReferenceable {
 
   build(closure: Closure): Closure {
     return closure;
+  }
+
+  get model(): CreateFunc[] {
+    return [];
   }
 }

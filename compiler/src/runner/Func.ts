@@ -15,6 +15,7 @@ import { VariableTuple } from "./VariableTuple.ts";
 export class Func {
   readonly #model: CreateFunc;
   readonly #closure: Closure;
+  readonly #cache: Record<string, Variable | Promise<Variable>> = {};
 
   constructor(model: CreateFunc, closure: Closure) {
     this.#model = model;
@@ -22,9 +23,7 @@ export class Func {
       (closure, internal) =>
         closure.withVariable(
           internal.name,
-          internal.no_args
-            ? this.instruction(internal.returns)
-            : new VariablePipeable((args) => new Func(internal, this.#closure.withFrame(args)).execute()),
+          new VariablePipeable((args) => new Func(internal, this.#closure.withFrame(args)).execute(), internal.no_args),
         ),
       closure,
     );
@@ -86,7 +85,14 @@ export class Func {
         return new VariablePrimitiveBool(!subject);
       }
       case "reference": {
-        return this.#closure.search(input.name);
+        const result = this.#closure.search(input.name);
+        if (!(result instanceof VariablePipeable)) return result;
+        if (result.noArgs) {
+          this.#cache[input.name] ??= result.execute(new Frame({}));
+          return this.#cache[input.name]!;
+        }
+
+        return result;
       }
       case "ternary": {
         const predicate = await this.instruction(input.predicate);
@@ -102,11 +108,24 @@ export class Func {
         );
       }
       case "operator": {
-        let left = await this.instruction(input.left);
-        const right = await this.instruction(input.right);
-
         switch (input.operator) {
+          case "and": {
+            const left = await this.instruction(input.left);
+            if (!(left instanceof VariablePrimitiveBool) || !left.value) return new VariablePrimitiveBool(false);
+            const right = await this.instruction(input.right);
+            if (!(right instanceof VariablePrimitiveBool) || !right.value) return new VariablePrimitiveBool(false);
+            return new VariablePrimitiveBool(true);
+          }
+          case "or": {
+            const left = await this.instruction(input.left);
+            if (left instanceof VariablePrimitiveBool && left.value) return new VariablePrimitiveBool(true);
+            const right = await this.instruction(input.right);
+            if (right instanceof VariablePrimitiveBool && right.value) return new VariablePrimitiveBool(true);
+            return new VariablePrimitiveBool(false);
+          }
           case "pipe": {
+            let left = await this.instruction(input.left);
+            const right = await this.instruction(input.right);
             if (!(left instanceof VariableTuple)) {
               left = new VariableTuple({ _s: left });
             }
@@ -128,6 +147,8 @@ export class Func {
             return right.execute(frame);
           }
           case "partial_pipe": {
+            let left = await this.instruction(input.left);
+            const right = await this.instruction(input.right);
             if (!(left instanceof VariableTuple)) {
               left = new VariableTuple({ _s: left });
             }
@@ -149,6 +170,8 @@ export class Func {
             return new VariablePipeable((args) => right.execute(frame.merge(args)));
           }
           case "in": {
+            let left = await this.instruction(input.left);
+            const right = await this.instruction(input.right);
             if (!(left instanceof VariablePrimitiveString)) {
               throw new Error("String required");
             }
@@ -160,9 +183,12 @@ export class Func {
             return new VariablePrimitiveBool(right.has(left.value));
           }
           default: {
+            let left = await this.instruction(input.left);
+            const right = await this.instruction(input.right);
             if (!(left instanceof VariablePrimitive) || !(right instanceof VariablePrimitive)) {
               throw new Error("Primitive required");
             }
+
             return left[input.operator](right);
           }
         }

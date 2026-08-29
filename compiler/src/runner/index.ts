@@ -1,6 +1,7 @@
 export * from "./Closure.ts";
 export * from "./Frame.ts";
 export * from "./framise.ts";
+export * from "./Func.ts";
 export * from "./Variable.ts";
 export * from "./Namer.ts";
 export * from "./VariablePipeable.ts";

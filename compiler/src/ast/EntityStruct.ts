@@ -4,6 +4,7 @@ import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import type { Entry } from "./Entry.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { Closure } from "#runner";
+import type { CreateFunc } from "#writer";
 
 export class EntityStruct extends Entity {
   static {
@@ -57,5 +58,9 @@ export class EntityStruct extends Entity {
 
   build(closure: Closure): Closure {
     return closure;
+  }
+
+  get model(): CreateFunc[] {
+    return [];
   }
 }

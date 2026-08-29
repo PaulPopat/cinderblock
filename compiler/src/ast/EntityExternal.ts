@@ -4,6 +4,7 @@ import { Entity } from "./Entity.ts";
 import type { IEntityReferenceable } from "./IEntityReferenceable.ts";
 import { Type } from "./Type.ts";
 import type { Entry } from "./Entry.ts";
+import type { CreateFunc } from "#writer";
 
 export class EntityExternal extends Entity implements IEntityReferenceable {
   static {
@@ -43,7 +44,7 @@ export class EntityExternal extends Entity implements IEntityReferenceable {
   }
 
   async reference(closure: Closure): Promise<Variable> {
-    return closure.searchGlobal(this.#name, this.location);
+    return closure.searchGlobal(this.#name);
   }
 
   dig(name: string): Entry | undefined {
@@ -58,5 +59,9 @@ export class EntityExternal extends Entity implements IEntityReferenceable {
 
   build(closure: Closure): Closure {
     return closure.withVariable(this.#name, this.reference(closure));
+  }
+
+  get model(): CreateFunc[] {
+    return [];
   }
 }

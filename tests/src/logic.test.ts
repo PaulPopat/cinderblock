@@ -37,12 +37,11 @@ describe("logic", () => {
   });
 
   test("only parses the right of an && when needed", async () => {
-    // The second part of this will error as we are not passing in value
     const code = new Inline(`
-      struct Input value: string;
+      struct Input value: bool;
       let test_let (input: Input) = false && input.value;
     `);
-    const result = await code.run("test_let", { input: null });
+    const result = await code.run("test_let", { input: { value: "I am not a boolean" } });
     assert.equal(result, false);
   });
 

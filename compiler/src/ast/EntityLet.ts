@@ -142,12 +142,15 @@ export class EntityLet extends EntityNamespace implements IEntityReferenceable {
     return this.#args.reduce((result, arg) => result ?? arg.dig(name), undefined as Entry | undefined) ?? super.float(name);
   }
 
-  get model(): CreateFunc {
-    return {
-      name: this.#internalName,
-      vars: this.topLevelEntities.filter((e) => e instanceof EntityLet).map((e) => e.model),
-      returns: this.#contents.instruction,
-      no_args: this.#args.length === 0,
-    };
+  get model(): Array<CreateFunc> {
+    return [
+      {
+        name: this.#internalName,
+        vars: this.topLevelEntities.flatMap((e) => e.model),
+        returns: this.#contents.instruction,
+        no_args: this.#args.length === 0,
+        tags: Object.fromEntries(this.#tags.map((t) => [t.key, t.value?.toString() ?? ""])),
+      },
+    ];
   }
 }

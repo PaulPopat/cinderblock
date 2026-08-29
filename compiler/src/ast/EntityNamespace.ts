@@ -4,6 +4,7 @@ import type { Entry } from "./Entry.ts";
 import { TokenTypeName } from "#tokeniser";
 import { Lazy, type Location } from "#utils";
 import type { Closure } from "#runner";
+import type { CreateFunc } from "#writer";
 
 export class EntityNamespace extends Entity {
   static {
@@ -89,5 +90,9 @@ export class EntityNamespace extends Entity {
         .map((n) => [n, name].join("_")),
     ];
     return possible.reduce((result, n) => result ?? this.parent?.float(n), this.dig([this.#name, name].join("_")) as Entry | undefined);
+  }
+
+  get model(): CreateFunc[] {
+    return this.#entities.flatMap((e) => e.model);
   }
 }

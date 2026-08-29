@@ -5,4 +5,5 @@ export type CreateFunc = {
   vars: Array<CreateFunc>;
   returns: Instruction;
   no_args: boolean;
+  tags: Record<string, string>;
 };

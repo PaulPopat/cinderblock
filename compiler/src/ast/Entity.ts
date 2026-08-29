@@ -1,5 +1,6 @@
 import type { Closure } from "#runner";
 import type { TokenWalker } from "#tokeniser";
+import type { CreateFunc } from "#writer";
 import { Entry } from "./Entry.ts";
 import { ParserError } from "./ParserError.ts";
 
@@ -29,6 +30,7 @@ export abstract class Entity extends Entry {
 
   abstract get name(): string;
   abstract build(closure: Closure): Closure;
+  abstract get model(): Array<CreateFunc>;
 
   get fullName() {
     return [super.namespace, this.name].join("_");

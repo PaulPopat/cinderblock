@@ -1,11 +1,21 @@
-import { Entity, EntityLet, EntityNamespace, Entry } from "#ast";
-import { Closure, Frame, framise } from "#runner";
+import { Entity, EntityLet, EntityNamespace } from "#ast";
+import { Frame, framise } from "#runner";
 import { TokenWalker } from "#tokeniser";
 import { Lazy, Location } from "#utils";
 import * as std from "#std";
+import { CompiledApp } from "./runner/CompiledApp.ts";
 
 export abstract class App extends EntityNamespace {
   readonly #globals: Frame;
+
+  readonly #compiled = new Lazy(
+    () =>
+      new CompiledApp(
+        this.topLevelEntities.flatMap((e) => e.model),
+        Object.fromEntries(this.entities.filter((e) => e instanceof EntityLet).map((e) => [e.fullName, e.internalName])),
+        this.#globals,
+      ),
+  );
 
   constructor(entities: Array<Entity>, globals: Record<string, unknown>) {
     super(Location.empty, TokenWalker.start([]), () => undefined, "App", entities);
@@ -13,13 +23,7 @@ export abstract class App extends EntityNamespace {
   }
 
   async run(name: string | EntityLet, args: Record<string, unknown>) {
-    const closure = this.build(new Closure(this.#globals, [new Frame({})]));
-    if (name instanceof EntityLet) name = name.fullName;
-    const subject = this.dig(name.startsWith("App_") ? name : ["App", name].join("_"));
-    if (!(subject instanceof EntityLet)) throw new Error("Subject not found");
-
-    const result = await subject.execute(closure, framise(args));
-    return result.export();
+    return name instanceof EntityLet ? this.#compiled.value.runInternal(name.internalName, args) : this.#compiled.value.run(name, args);
   }
 
   get all() {

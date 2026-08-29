@@ -56,7 +56,7 @@ export class ExpressionAccess extends Expression {
     const subject = await this.#subject.resolve(closure);
     if (!(subject instanceof VariableTuple)) throw new WriterError("Subject not tuple", this.location);
 
-    return subject.get(this.#name, this.location);
+    return subject.get(this.#name);
   }
 
   get instruction(): Instruction {
