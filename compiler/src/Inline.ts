@@ -1,12 +1,11 @@
 import { Entity } from "#ast";
 import { Tokeniser, TokenType, TokenWalker } from "#tokeniser";
 import { App } from "./App.ts";
-import * as std from "#std";
 
 export class Inline extends App {
   readonly #types: Array<TokenType>;
 
-  constructor(code: string, globals: Record<string, unknown> = {}) {
+  constructor(code: string) {
     const [{ entities }, done] = TokenWalker.start([])
       .with(new Tokeniser("inline", code).tokens)
       .while(
@@ -16,7 +15,7 @@ export class Inline extends App {
       )
       .finish();
 
-    super(entities, globals);
+    super(entities);
     this.#types = done.types;
   }
 

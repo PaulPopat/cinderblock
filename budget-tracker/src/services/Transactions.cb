@@ -17,6 +17,6 @@ namespace services_Transactions {
   ) =
     {
       sql = "INSERT INTO transactions (id, user, title, category, amount, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-      parameters = [id, user_id, title, category, amount, now]
+      parameters = [id, user_id, title, category_id, amount, now]
     };
 }

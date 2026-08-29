@@ -2,7 +2,7 @@ namespace services_Users {
   extern std_array_get (_s: User[], i: int): User;
   extern database_query (sql: string, parameters: unknown[]): string;
 
-  let User (_s: string): User =
+  let UserFromId (_s: string): User =
     {
       _s =  {
         sql = "SELECT * FROM users WHERE id = ?",

@@ -7,6 +7,6 @@ struct AppContext
 namespace services_Cookies {
   let User (_s: AppCookies) =
     "session" in _s
-      ? _s.session -> Session_UserId -> Users_User
+      ? _s.session -> Session_UserId -> Users_UserFromId
       : null;
 }

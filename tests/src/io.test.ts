@@ -7,7 +7,7 @@ describe("input output", () => {
     const code = new Inline(`
       let test_let (add: (input: int): int) = { input = 2 } -> add;
     `);
-    const result = await code.run("test_let", {
+    const result = await code.binary().run("test_let", {
       add({ input }: { input: number }) {
         return input + 3;
       },
@@ -21,7 +21,7 @@ describe("input output", () => {
       let pipeable_let (input: int) = input + 3;
       let test_let = pipeable_let;
     `);
-    const result = await code.run("test_let", {});
+    const result = await code.binary().run("test_let", {});
 
     assert.equal(await result({ input: 2 }), 5);
   });

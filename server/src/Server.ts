@@ -4,23 +4,25 @@ import path from "node:path";
 import cookieParser from "cookie-parser";
 
 export class Server extends Project {
+  readonly #factories: Record<string, unknown>;
   readonly #updaters: Record<string, unknown>;
 
   constructor(root: string, factories: Record<string, unknown>, updaters: Record<string, unknown>) {
-    super(root, factories);
-
+    super(root);
+    this.#factories = factories;
     this.#updaters = updaters;
   }
 
   async start() {
+    const binary = this.binary(this.#factories);
     const server = express();
     server.use(express.json());
     server.use(express.urlencoded());
     server.use(cookieParser());
     server.use("/_", express.static(path.resolve(this.root, "_")));
 
-    for (const middleware of this.withTag("type", "middleware")) {
-      const location = middleware.tags.find((t) => t.key === "path")?.value;
+    for (const middleware of binary.withTag("type", "middleware")) {
+      const location = middleware.tags.path;
       if (typeof location !== "string") throw new Error("Invalid path");
 
       console.log(`Found handler for MIDDLEWARE:${location}`);
@@ -29,7 +31,7 @@ export class Server extends Project {
         try {
           console.log(`MIDDLEWARE:${location} Starting`);
 
-          const result = await this.run(middleware, {
+          const result = await binary.runFromModel(middleware, {
             path: request.path,
             method: request.method,
             body: request.body,
@@ -54,11 +56,11 @@ export class Server extends Project {
       });
     }
 
-    for (const handler of this.withTag("type", "handler")) {
-      const method = handler.tags.find((t) => t.key === "method")?.value ?? "get";
+    for (const handler of binary.withTag("type", "handler")) {
+      const method = handler.tags.method ?? "get";
       if (typeof method !== "string") throw new Error("Invalid method type");
 
-      const handlerPath = handler.tags.find((t) => t.key === "path")?.value;
+      const handlerPath = handler.tags.path;
       if (typeof handlerPath !== "string") throw new Error("Invalid path");
 
       console.log(`Found handler for ${method}:${handlerPath}`);
@@ -69,7 +71,7 @@ export class Server extends Project {
 
           console.log(`${request.method}:${handlerPath} Starting`);
 
-          const result = await this.run(handler, {
+          const result = await binary.runFromModel(handler, {
             path: request.path,
             method: request.method,
             body: request.body,

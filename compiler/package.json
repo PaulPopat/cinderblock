@@ -21,7 +21,8 @@
     "#writer": "./src/writer/index.ts"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./runner": "./src/runner/Binary.ts"
   },
   "prettier": {
     "printWidth": 150

@@ -8,7 +8,7 @@ describe("logic", () => {
       let test_let = internal_let;
       let internal_let = "hello";
     `);
-    const result = await code.run("test_let", {});
+    const result = await code.binary().run("test_let", {});
     assert.equal(result, "hello");
   });
 
@@ -20,11 +20,12 @@ describe("logic", () => {
         let internal_let = {} -> get_total;
         let test_let = internal_let + internal_let;
       `,
-      {
-        get_total: () => total++,
-      },
     );
-    const result = await code.run("test_let", {});
+    const result = await code
+      .binary({
+        get_total: () => total++,
+      })
+      .run("test_let", {});
     assert.equal(result, 2);
   });
 
@@ -32,7 +33,7 @@ describe("logic", () => {
     const code = new Inline(`
       let test_let = "hello" + "." + "world";
     `);
-    const result = await code.run("test_let", {});
+    const result = await code.binary().run("test_let", {});
     assert.equal(result, "hello.world");
   });
 
@@ -41,7 +42,7 @@ describe("logic", () => {
       struct Input value: bool;
       let test_let (input: Input) = false && input.value;
     `);
-    const result = await code.run("test_let", { input: { value: "I am not a boolean" } });
+    const result = await code.binary().run("test_let", { input: { value: "I am not a boolean" } });
     assert.equal(result, false);
   });
 
@@ -51,7 +52,7 @@ describe("logic", () => {
           let internal = value;
         internal;
     `);
-    const result = await code.run("test_let", { value: "hello.world" });
+    const result = await code.binary().run("test_let", { value: "hello.world" });
     assert.equal(result, "hello.world");
   });
 
@@ -66,7 +67,7 @@ describe("logic", () => {
         }
       `,
     );
-    const result = await code.run("test_test", {});
+    const result = await code.binary().run("test_test", {});
     assert.equal(result, "hellohello");
   });
 
@@ -84,7 +85,7 @@ describe("logic", () => {
         }
       `,
     );
-    const result = await code.run("test_test", {});
+    const result = await code.binary().run("test_test", {});
     assert.equal(result, "hellohello");
   });
 
@@ -100,7 +101,7 @@ describe("logic", () => {
         }
       `,
     );
-    const result = await code.run("thing_test_test", {});
+    const result = await code.binary().run("thing_test_test", {});
     assert.equal(result, "hellohello");
   });
 
@@ -114,7 +115,7 @@ describe("logic", () => {
           { right = "world" } -> partial;
       `,
     );
-    const result = await code.run("result_entry", {});
+    const result = await code.binary().run("result_entry", {});
     assert.equal(result, "hello world");
   });
 });

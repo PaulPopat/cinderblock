@@ -15,7 +15,7 @@ describe("parsing", () => {
       let main_export (data: test) = "email" in data ? "present" : "not present";
     `);
 
-    const result = await app.run("main_export", { data: { email: "hello" } });
+    const result = await app.binary().run("main_export", { data: { email: "hello" } });
 
     assert.equal(result, "present");
   });
@@ -26,7 +26,7 @@ describe("parsing", () => {
       let main_export (data: test) = "hello" == data.email ? "present" : "not present";
     `);
 
-    const result = await app.run("main_export", { data: { email: "hello" } });
+    const result = await app.binary().run("main_export", { data: { email: "hello" } });
 
     assert.equal(result, "present");
   });

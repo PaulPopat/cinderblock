@@ -2,9 +2,9 @@ import jwt from "jsonwebtoken";
 
 const secret = process.env.JWT_SECRET ?? "test-secret";
 
-export function jwt_encode(props: any) {
+export function jwt_encode(props: { data: any }) {
   return new Promise<string>((resolve, reject) =>
-    jwt.sign(props, secret, (error: Error | null, result: string | undefined) => {
+    jwt.sign(props.data, secret, (error: Error | null, result: string | undefined) => {
       if (error || !result) reject(error);
       else resolve(result);
     }),

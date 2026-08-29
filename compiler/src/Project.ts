@@ -8,7 +8,7 @@ export class Project extends App {
   readonly #root: string;
   readonly #types: Array<TokenType>;
 
-  constructor(root: string, globals: Record<string, unknown>) {
+  constructor(root: string) {
     const [{ entities }, done] = TokenWalker.start(
       fs
         .readdirSync(root, { recursive: true, encoding: "utf-8" })
@@ -23,7 +23,7 @@ export class Project extends App {
       )
       .finish();
 
-    super(entities, globals);
+    super(entities);
     this.#root = root;
     this.#types = done.types;
   }

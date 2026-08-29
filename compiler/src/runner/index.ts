@@ -1,3 +1,4 @@
+export * from "./Binary.ts";
 export * from "./Closure.ts";
 export * from "./Frame.ts";
 export * from "./framise.ts";
