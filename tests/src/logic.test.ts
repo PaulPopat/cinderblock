@@ -70,4 +70,38 @@ describe("logic", () => {
     const result = await code.run("test_test", {});
     assert.equal(result, "hellohello");
   });
+
+  test("resolves nested namespaces", async () => {
+    const code = new Inline(
+      `
+        namespace internal {
+          let item = "hello";
+        }
+
+        namespace test {
+          use internal;
+
+          let test = item + item;
+        }
+      `,
+    );
+    const result = await code.run("test_test", {});
+    assert.equal(result, "hellohello");
+  });
+
+  test("resolves nested namespaces with the same start", async () => {
+    const code = new Inline(
+      `
+        namespace thing_internal {
+          let item = "hello";
+        }
+
+        namespace thing_test {
+          let test = internal_item + internal_item;
+        }
+      `,
+    );
+    const result = await code.run("thing_test_test", {});
+    assert.equal(result, "hellohello");
+  });
 });

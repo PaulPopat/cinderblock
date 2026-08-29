@@ -70,9 +70,7 @@ export class EntityNamespace extends Entity {
   }
 
   build(closure: Closure) {
-    return this.#entities
-      .filter((entity): entity is IEntityReferenceable => "reference" in entity)
-      .reduce((closure, entity) => closure.withVariable(entity.internalName, entity.reference(closure)), closure);
+    return this.#entities.reduce((closure, entity) => entity.build(closure), closure);
   }
 
   dig(name: string): Entry | undefined {
@@ -82,13 +80,14 @@ export class EntityNamespace extends Entity {
   }
 
   float(name: string): Entry | undefined {
-    return [
+    const possible = [
       name,
-      [this.namespace, name].join("_"),
       ...this.namespace
         .split("_")
-        .reduce((current, next) => [...current, [current[current.length - 1], next].filter((f) => f).join("_")], [] as Array<string>)
+        .reverse()
+        .reduce((current, next) => [next, ...current], [] as Array<string>)
         .map((n) => [n, name].join("_")),
-    ].reduce((result, n) => result ?? this.parent?.float(n), this.dig([this.#name, name].join("_")) as Entry | undefined);
+    ];
+    return possible.reduce((result, n) => result ?? this.parent?.float(n), this.dig([this.#name, name].join("_")) as Entry | undefined);
   }
 }

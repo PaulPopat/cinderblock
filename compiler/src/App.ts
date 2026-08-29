@@ -15,7 +15,7 @@ export abstract class App extends EntityNamespace {
   async run(name: string | EntityLet, args: Record<string, unknown>) {
     const closure = this.build(new Closure(this.#globals, [new Frame({})]));
     if (name instanceof EntityLet) name = name.fullName;
-    const subject = this.dig(["App", name].join("_"));
+    const subject = this.dig(name.startsWith("App_") ? name : ["App", name].join("_"));
     if (!(subject instanceof EntityLet)) throw new Error("Subject not found");
 
     const result = await subject.execute(closure, framise(args));

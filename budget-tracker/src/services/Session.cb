@@ -1,4 +1,7 @@
 namespace services_Session {
+  extern jwt_encode (data: unknown): string;
+  extern jwt_verify (_s: string): unknown;
+
   let UserIdCookie (_s: string, now: int) =
     "session=" + ({
       user_id = _s,

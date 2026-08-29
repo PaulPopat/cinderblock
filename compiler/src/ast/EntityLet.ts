@@ -124,7 +124,11 @@ export class EntityLet extends EntityNamespace implements IEntityReferenceable {
   }
 
   async execute(closure: Closure, args: Frame): Promise<Variable> {
-    return this.#contents.resolve(this.build(closure.withFrame(args)));
+    return this.#contents.resolve(super.build(closure.withFrame(args)));
+  }
+
+  build(closure: Closure): Closure {
+    return closure.withVariable(this.#internalName, this.reference(closure));
   }
 
   dig(name: string): Entry | undefined {

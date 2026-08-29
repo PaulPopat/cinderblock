@@ -1,4 +1,6 @@
 namespace controllers_HomeController {
+  extern html_template (name: string, data: unknown): string;
+
   use services;
 
   struct GetHomeQuery

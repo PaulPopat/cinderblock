@@ -3,6 +3,7 @@ import { Entity } from "./Entity.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import type { Entry } from "./Entry.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Closure } from "#runner";
 
 export class EntityStruct extends Entity {
   static {
@@ -52,5 +53,9 @@ export class EntityStruct extends Entity {
 
   float(name: string): Entry | undefined {
     return undefined;
+  }
+
+  build(closure: Closure): Closure {
+    return closure;
   }
 }

@@ -55,4 +55,8 @@ export class EntityExternal extends Entity implements IEntityReferenceable {
   float(name: string): Entry | undefined {
     return this.parent?.float(name);
   }
+
+  build(closure: Closure): Closure {
+    return closure.withVariable(this.#name, this.reference(closure));
+  }
 }

@@ -2,6 +2,7 @@ import { Entity } from "./Entity.ts";
 import type { Entry } from "./Entry.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { Closure } from "#runner";
 
 export class EntityUse extends Entity {
   static {
@@ -44,5 +45,9 @@ export class EntityUse extends Entity {
 
   float(name: string): Entry | undefined {
     return this.parent?.float(name);
+  }
+
+  build(closure: Closure): Closure {
+    return closure;
   }
 }

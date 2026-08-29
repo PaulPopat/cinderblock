@@ -51,4 +51,8 @@ export class EntityArg extends Entity implements IEntityReferenceable {
   float(name: string): Entry | undefined {
     return this.parent?.float(name);
   }
+
+  build(closure: Closure): Closure {
+    return closure;
+  }
 }

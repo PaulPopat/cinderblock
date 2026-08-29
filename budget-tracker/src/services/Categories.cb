@@ -1,4 +1,6 @@
 namespace services_Categories {
+  extern database_query (sql: string, parameters: unknown[]): string;
+
   let List: Category[] =
     {
       sql = "select * from categories",

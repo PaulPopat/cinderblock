@@ -1,4 +1,7 @@
 namespace controllers_UsersController {
+  extern html_template (name: string, data: unknown): string;
+  extern crypto_guid (): string;
+
   use services;
 
   struct PostSessionBody

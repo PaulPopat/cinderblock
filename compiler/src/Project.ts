@@ -13,7 +13,7 @@ export class Project extends App {
       fs
         .readdirSync(root, { recursive: true, encoding: "utf-8" })
         .filter((f) => f.endsWith(".cb"))
-        .map((f) => [f, fs.readFileSync(path.resolve(this.#root, f), "utf8")] as const)
+        .map((f) => [f, fs.readFileSync(path.resolve(root, f), "utf8")] as const)
         .flatMap(([key, value]) => new Tokeniser(key, value).tokens),
     )
       .while(

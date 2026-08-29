@@ -1,4 +1,7 @@
 namespace controllers_CategoriesController {
+  extern html_template (name: string, data: unknown): string;
+  extern crypto_guid (): string;
+
   use services;
 
   let [type="handler", method="GET", path="/app/categories"] GetCategories (cookies: AppCookies) =

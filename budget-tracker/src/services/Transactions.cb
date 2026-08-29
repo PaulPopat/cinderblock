@@ -1,4 +1,6 @@
 namespace services_Transactions {
+  extern database_query (sql: string, parameters: unknown[]): string;
+  
   let List (from: int, to: int): Transaction[] =
     {
       sql = "select * from transactions where created_at > ? and created_at < ?",
