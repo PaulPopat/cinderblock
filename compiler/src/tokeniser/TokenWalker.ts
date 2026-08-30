@@ -54,13 +54,13 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
     return this.range.from;
   }
 
-  expect(expected: Array<string> | string, typeName: TokenTypeName) {
+  expect(expected: Array<string> | string, typeName: TokenTypeName, self?: () => unknown) {
     if (typeof expected === "string") expected = [expected];
     if (!expected.includes(this.data)) {
       throw new ParserError(`Expected ${expected.join(", ")} but found ${this.data}`, this);
     }
 
-    return new TokenWalker(this.#data, this.#tokens, [...this.#types, new TokenType(this.range, typeName)], this.#index + 1);
+    return new TokenWalker(this.#data, this.#tokens, [...this.#types, new TokenType(this.range, self, typeName)], this.#index + 1);
   }
 
   extract<TKey extends string, TResult extends Entry>(name: TKey, extractor: (walker: TokenWalker, soFar: TContext) => TResult) {
@@ -80,7 +80,7 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
     return extractor(this);
   }
 
-  text<TKey extends string>(name: TKey, typeName: TokenTypeName) {
+  text<TKey extends string>(name: TKey, typeName: TokenTypeName, self?: () => unknown) {
     type NewContext = TContext & {
       [key in TKey]: string;
     };
@@ -90,7 +90,7 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
         [name]: this.data,
       } as NewContext,
       this.#tokens,
-      [...this.#types, new TokenType(this.range, typeName)],
+      [...this.#types, new TokenType(this.range, self, typeName)],
       this.#index + 1,
     );
   }

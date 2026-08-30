@@ -21,7 +21,7 @@ export class ExpressionReference extends Expression {
   readonly #name: string;
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
-    const [{ value }, done] = walker.text("value", TokenTypeName.VariableName).finish();
+    const [{ value }, done] = walker.text("value", TokenTypeName.VariableName, () => this).finish();
     super(walker.location, done, parent);
     this.#name = value;
   }

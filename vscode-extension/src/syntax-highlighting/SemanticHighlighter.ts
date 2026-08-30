@@ -1,12 +1,15 @@
 import * as vscode from "vscode";
 import { Inline } from "@cinderblock/compiler";
 
-export class SemanticHighlighter implements vscode.DocumentSemanticTokensProvider {
-  static register() {
-    const instance = new SemanticHighlighter();
+export class SemanticHighlighter implements vscode.DocumentSemanticTokensProvider, vscode.Disposable {
+  readonly #clenaup: vscode.Disposable;
 
-    const selector = { language: "cinderblock", scheme: "file" };
-    return vscode.languages.registerDocumentSemanticTokensProvider(selector, instance, instance.legend);
+  constructor() {
+    this.#clenaup = vscode.languages.registerDocumentSemanticTokensProvider({ language: "cinderblock", scheme: "file" }, this, this.legend);
+  }
+
+  dispose() {
+    this.#clenaup.dispose();
   }
 
   readonly legend = new vscode.SemanticTokensLegend(

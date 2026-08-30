@@ -3,10 +3,12 @@ import type { TokenTypeName } from "./TokenTypeName.ts";
 
 export class TokenType {
   readonly #range: Range;
+  readonly #entry: (() => unknown) | undefined;
   readonly #typeName: TokenTypeName;
 
-  constructor(range: Range, typeName: TokenTypeName) {
+  constructor(range: Range, entry: (() => unknown) | undefined, typeName: TokenTypeName) {
     this.#range = range;
+    this.#entry = entry;
     this.#typeName = typeName;
   }
 
@@ -16,5 +18,9 @@ export class TokenType {
 
   get typeName() {
     return this.#typeName;
+  }
+
+  get entry() {
+    return this.#entry?.();
   }
 }

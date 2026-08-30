@@ -12,9 +12,10 @@ export class TypeReference extends Type {
       match: /^[a-zA-Z][a-zA-Z0-9_@$#:]*$/gm,
       chainable: false,
       factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
-        const [{ value }, done] = walker.text("value", TokenTypeName.StructReference).finish();
+        const [{ value }, done] = walker.text("value", TokenTypeName.StructReference, (): TypeReference => result).finish();
 
-        return new TypeReference(walker.location, done, parent, value);
+        const result = new TypeReference(walker.location, done, parent, value);
+        return result;
       },
     });
   }
