@@ -44,7 +44,7 @@ export class ExpressionArrayAdd extends Expression {
 
   get instruction(): Instruction {
     if (!(this.#subject.resolution instanceof TypeArray)) {
-      throw new WriterError("Left must be array", this.location);
+      throw new WriterError("Left must be array", this.range);
     }
 
     return {

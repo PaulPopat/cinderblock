@@ -33,11 +33,11 @@ export class ExpressionOperatorNotEquals extends ExpressionOperator {
 
   get instruction(): Instruction {
     if (!(this.left.resolution instanceof TypePrimitive)) {
-      throw new WriterError("Primitive required", this.location);
+      throw new WriterError("Primitive required", this.range);
     }
 
     if (!(this.right.resolution instanceof TypePrimitive)) {
-      throw new WriterError("Primitive required", this.location);
+      throw new WriterError("Primitive required", this.range);
     }
 
     return {

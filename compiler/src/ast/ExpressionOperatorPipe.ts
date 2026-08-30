@@ -31,7 +31,7 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
   get resolution() {
     const right = this.right.resolution;
     if (!(right instanceof TypePipeable)) {
-      throw new LinkerError("Target not pipeable", this.location);
+      throw new LinkerError("Target not pipeable", this.range);
     }
 
     let input = this.left.resolution;
@@ -49,7 +49,7 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
   get instruction(): Instruction {
     const right = this.right.resolution;
     if (!(right instanceof TypePipeable)) {
-      throw new LinkerError("Target not pipeable", this.location);
+      throw new LinkerError("Target not pipeable", this.range);
     }
 
     let input = this.left.resolution;

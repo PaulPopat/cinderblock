@@ -1,22 +1,29 @@
 import type { Location } from "./Location.ts";
+import type { Range } from "./Range.ts";
 
 export abstract class CompilerError extends Error {
-  readonly #location: Location;
+  readonly #range: Range;
+  readonly #compilerMessage: string;
 
-  constructor(message: string, location: Location) {
+  constructor(message: string, range: Range) {
     super(
       [
         ["Error", message.replace("Error: ", "")].join(": "),
-        ["Files", location.file].join(": "),
-        ["Line", location.line].join(": "),
-        ["Character", location.character].join(": "),
+        ["Files", range.from.file].join(": "),
+        ["Line", range.from.line].join(": "),
+        ["Character", range.from.character].join(": "),
       ].join("\n"),
     );
 
-    this.#location = location;
+    this.#range = range;
+    this.#compilerMessage = message;
   }
 
-  get location() {
-    return this.#location;
+  get range() {
+    return this.#range;
+  }
+
+  get compilerMessage() {
+    return this.#compilerMessage;
   }
 }

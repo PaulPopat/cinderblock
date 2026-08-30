@@ -32,11 +32,11 @@ export class ExpressionOperatorAnd extends ExpressionOperator {
 
   get instruction(): Instruction {
     if (!(this.left.resolution instanceof TypePrimitiveBool)) {
-      throw new WriterError("Boolean required", this.location);
+      throw new WriterError("Boolean required", this.range);
     }
 
     if (!(this.right.resolution instanceof TypePrimitiveBool)) {
-      throw new WriterError("Boolean required", this.location);
+      throw new WriterError("Boolean required", this.range);
     }
 
     return {

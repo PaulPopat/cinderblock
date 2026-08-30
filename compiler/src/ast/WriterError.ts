@@ -1,8 +1,8 @@
-import type { Location } from "#utils";
+import type { Range } from "#utils";
 import { CompilerError } from "../utils/CompilerError.ts";
 
 export class WriterError extends CompilerError {
-  constructor(message: string, location: Location) {
-    super(message, location);
+  constructor(message: string, range: Range) {
+    super(message, range);
   }
 }

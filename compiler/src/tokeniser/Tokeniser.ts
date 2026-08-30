@@ -1,4 +1,4 @@
-import { Location } from "#utils";
+import { Location, Range } from "#utils";
 import { Token } from "./Token.ts";
 
 const allowedLiterals = ["[]", "[", "]", "(", ")", ":", "+", "++", "-", "/", "*", "!", "&&", "||", "==", "=", "!=", "<", "<=", ">", ">=", ".", "->"];
@@ -33,7 +33,7 @@ export class Tokeniser {
     let current = "";
 
     const finish = (lineNumber: number, characterNumber: number) => {
-      const possible = new Token(current.trim(), location);
+      const possible = new Token(current.trim(), new Range(location, new Location(this.#file, lineNumber + 1, characterNumber + 1)));
       current = "";
       location = new Location(this.#file, lineNumber + 1, characterNumber + 1);
 

@@ -35,11 +35,11 @@ export class ExpressionOperatorIn extends ExpressionOperator {
 
   get instruction(): Instruction {
     if (!(this.left.resolution instanceof TypePrimitiveString)) {
-      throw new WriterError("String required", this.location);
+      throw new WriterError("String required", this.range);
     }
 
     if (!(this.right.resolution instanceof TypeTuple) && !(this.right.resolution instanceof TypeReference)) {
-      throw new WriterError("Tuple required", this.location);
+      throw new WriterError("Tuple required", this.range);
     }
 
     return {

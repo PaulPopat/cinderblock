@@ -1,4 +1,4 @@
-import { Location } from "#utils";
+import { Location, Range } from "#utils";
 import type { Entry } from "../ast/Entry.ts";
 import { ParserError } from "../ast/ParserError.ts";
 import type { Token } from "./Token.ts";
@@ -28,16 +28,6 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
     return current;
   }
 
-  get #next() {
-    return new TokenWalker(this.#data, this.#tokens, this.#types, this.#index + 1);
-  }
-
-  get location() {
-    const current = this.#tokens[this.#index];
-    if (!current) return new Location("", -1, -1);
-    return current.location;
-  }
-
   get data() {
     return this.current.data;
   }
@@ -50,13 +40,27 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
     return [...this.#types];
   }
 
+  get previous() {
+    return new TokenWalker(this.#data, this.#tokens, this.#types, this.#index - 1);
+  }
+
+  get range() {
+    const current = this.#tokens[this.#index];
+    if (!current) return new Range(Location.empty, Location.empty);
+    return current.range;
+  }
+
+  get location() {
+    return this.range.from;
+  }
+
   expect(expected: Array<string> | string, typeName: TokenTypeName) {
     if (typeof expected === "string") expected = [expected];
     if (!expected.includes(this.data)) {
       throw new ParserError(`Expected ${expected.join(", ")} but found ${this.data}`, this);
     }
 
-    return new TokenWalker(this.#data, this.#tokens, [...this.#types, new TokenType(this.location, this.#next.location, typeName)], this.#index + 1);
+    return new TokenWalker(this.#data, this.#tokens, [...this.#types, new TokenType(this.range, typeName)], this.#index + 1);
   }
 
   extract<TKey extends string, TResult extends Entry>(name: TKey, extractor: (walker: TokenWalker, soFar: TContext) => TResult) {
@@ -86,7 +90,7 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
         [name]: this.data,
       } as NewContext,
       this.#tokens,
-      [...this.#types, new TokenType(this.location, this.#next.location, typeName)],
+      [...this.#types, new TokenType(this.range, typeName)],
       this.#index + 1,
     );
   }

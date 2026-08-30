@@ -33,7 +33,7 @@ export class ExpressionReference extends Expression {
   get subject() {
     const result = this.float(this.#name);
     if (!(result instanceof EntityLet) && !(result instanceof EntityArg) && !(result instanceof EntityExternal)) {
-      throw new LinkerError("Unresolved reference", this.location);
+      throw new LinkerError("Unresolved reference", this.range);
     }
 
     return result;
@@ -53,6 +53,6 @@ export class ExpressionReference extends Expression {
       return { type: "external", name: subject.name };
     }
 
-    throw new WriterError("Unknown subject type", this.location);
+    throw new WriterError("Unknown subject type", this.range);
   }
 }

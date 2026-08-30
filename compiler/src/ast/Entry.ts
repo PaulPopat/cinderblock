@@ -1,4 +1,4 @@
-import type { Location } from "#utils";
+import { Range, type Location } from "#utils";
 import type { TokenWalker } from "#tokeniser";
 
 export abstract class Entry {
@@ -20,8 +20,8 @@ export abstract class Entry {
     return this.#location;
   }
 
-  get end() {
-    return this.#done.location;
+  get range() {
+    return new Range(this.#location, this.#done.previous.range.to);
   }
 
   get done() {

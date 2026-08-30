@@ -34,7 +34,7 @@ export class ExpressionNot extends Expression {
   get resolution() {
     let subjectType = this.#subject.resolution;
     if (!(subjectType instanceof TypePrimitiveBool)) {
-      throw new LinkerError("Boolean required", this.location);
+      throw new LinkerError("Boolean required", this.range);
     }
 
     return new TypePrimitiveBool(this.location, this.done, () => this);
@@ -42,7 +42,7 @@ export class ExpressionNot extends Expression {
 
   get instruction(): Instruction {
     if (!(this.#subject.resolution instanceof TypePrimitiveBool)) {
-      throw new LinkerError("Boolean required", this.location);
+      throw new LinkerError("Boolean required", this.range);
     }
 
     return { type: "not", subject: this.#subject.instruction };

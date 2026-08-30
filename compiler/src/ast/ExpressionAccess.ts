@@ -42,11 +42,11 @@ export class ExpressionAccess extends Expression {
   get resolution() {
     let subjectType = this.#subject.resolution;
     if (!(subjectType instanceof TypeTuple) && !(subjectType instanceof TypeReference))
-      throw new LinkerError("Subject is not accessible", this.location);
+      throw new LinkerError("Subject is not accessible", this.range);
 
     const property = subjectType.args.find((a) => a.name === this.#name);
 
-    if (!property) throw new LinkerError("Could not find property", this.location);
+    if (!property) throw new LinkerError("Could not find property", this.range);
 
     return property.type;
   }
@@ -54,11 +54,11 @@ export class ExpressionAccess extends Expression {
   get instruction(): Instruction {
     let subjectType = this.#subject.resolution;
     if (!(subjectType instanceof TypeTuple) && !(subjectType instanceof TypeReference)) {
-      throw new WriterError("Left must be array", this.location);
+      throw new WriterError("Left must be array", this.range);
     }
 
     if (!subjectType.args.some((a) => a.name === this.#name)) {
-      throw new WriterError("Could not find property", this.location);
+      throw new WriterError("Could not find property", this.range);
     }
 
     return {

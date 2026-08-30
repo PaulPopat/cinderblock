@@ -1,23 +1,17 @@
-import type { Location } from "#utils";
+import type { Range } from "#utils";
 import type { TokenTypeName } from "./TokenTypeName.ts";
 
 export class TokenType {
-  readonly #to: Location;
-  readonly #from: Location;
+  readonly #range: Range;
   readonly #typeName: TokenTypeName;
 
-  constructor(from: Location, to: Location, typeName: TokenTypeName) {
-    this.#from = from;
-    this.#to = to;
+  constructor(range: Range, typeName: TokenTypeName) {
+    this.#range = range;
     this.#typeName = typeName;
   }
 
-  get to() {
-    return this.#to;
-  }
-
-  get from() {
-    return this.#from;
+  get range() {
+    return this.#range;
   }
 
   get typeName() {

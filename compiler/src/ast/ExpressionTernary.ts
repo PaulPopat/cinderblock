@@ -52,7 +52,7 @@ export class ExpressionTernary extends Expression {
 
   get instruction(): Instruction {
     if (!(this.#predicate.resolution instanceof TypePrimitiveBool)) {
-      throw new WriterError("Boolean required", this.location);
+      throw new WriterError("Boolean required", this.range);
     }
 
     return {

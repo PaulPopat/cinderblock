@@ -37,14 +37,14 @@ export class SemanticHighlighter implements vscode.DocumentSemanticTokensProvide
       const app = new Inline(document.getText());
       for (const type of app.types) {
         const [area, ...modifiers] = type.typeName.split(".");
-        if (type.from.line === -1) {
+        if (type.range.from.line === -1) {
           continue;
         }
 
         builder.push(
           new vscode.Range(
-            new vscode.Position(type.from.line - 1, type.from.character - 1),
-            new vscode.Position(type.from.line - 1, type.from.line === type.to.line ? type.to.character - 1 : 999),
+            new vscode.Position(type.range.from.line - 1, type.range.from.character - 1),
+            new vscode.Position(type.range.from.line - 1, type.range.from.line === type.range.to.line ? type.range.to.character - 1 : 999),
           ),
           area,
           modifiers,

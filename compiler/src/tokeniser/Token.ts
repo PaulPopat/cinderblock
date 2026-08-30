@@ -1,19 +1,19 @@
-import type { Location } from "#utils";
+import type { Range } from "#utils";
 
 export class Token {
   readonly #data: string;
-  readonly #location: Location;
+  readonly #range: Range;
 
-  constructor(data: string, location: Location) {
+  constructor(data: string, range: Range) {
     this.#data = data;
-    this.#location = location;
+    this.#range = range;
   }
 
   get data() {
     return this.#data;
   }
 
-  get location() {
-    return this.#location;
+  get range() {
+    return this.#range;
   }
 }
