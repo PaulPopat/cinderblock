@@ -27,4 +27,8 @@ export class TypeArray extends Type {
   get contains() {
     return this.#contains;
   }
+
+  representation(): string {
+    return `${this.#contains.representation()}[]`;
+  }
 }

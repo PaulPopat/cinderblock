@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { SemanticHighlighter } from "./syntax-highlighting/index.ts";
 import { ErrorReporter } from "./error-reporting/index.ts";
-import { DefinitionProvider } from "./definition-provider/DefinitionProvider.ts";
+import { DefinitionProvider } from "./definition-provider/index.ts";
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(new SemanticHighlighter());

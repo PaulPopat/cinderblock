@@ -35,4 +35,8 @@ export class TypeUnion extends Type {
   get parts() {
     return this.#parts;
   }
+
+  representation(): string {
+    return this.#parts.map((p) => p.representation()).join(" | ");
+  }
 }

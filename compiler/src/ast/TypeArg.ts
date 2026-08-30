@@ -30,4 +30,8 @@ export class TypeArg extends Type {
   get name() {
     return this.#name;
   }
+
+  representation(): string {
+    return `${this.#name}: ${this.#type.representation()}`;
+  }
 }

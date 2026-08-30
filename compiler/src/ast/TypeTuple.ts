@@ -35,4 +35,8 @@ export class TypeTuple extends Type {
   get args() {
     return this.#args;
   }
+
+  representation(): string {
+    return `{ ${this.#args.map((a) => a.representation()).join(", ")} }`;
+  }
 }

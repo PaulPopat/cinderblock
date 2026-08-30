@@ -27,12 +27,12 @@ export abstract class Type extends Entry {
             throw new ParserError(`Unexpected symbol of ${w.data}`, w);
           }
 
-          return match.factory(w, parent, p);
+          return match.factory(w, parent, p as Type);
         },
       )
       .finish();
 
-    return type;
+    return type as Type;
   }
 
   float(name: string): Entry | undefined {
@@ -42,4 +42,6 @@ export abstract class Type extends Entry {
   dig(name: string): Entry | undefined {
     return undefined;
   }
+
+  abstract representation(): string;
 }

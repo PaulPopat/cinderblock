@@ -41,4 +41,8 @@ export class TypeReference extends Type {
   get args() {
     return this.struct.args;
   }
+
+  representation(): string {
+    return `{ ${this.args.map((a) => a.representation()).join(", ")} }`;
+  }
 }

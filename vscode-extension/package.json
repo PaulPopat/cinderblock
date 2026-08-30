@@ -15,7 +15,8 @@
   ],
   "main": "./dist/extension.js",
   "capabilities": {
-    "definitionProvider": "true"
+    "definitionProvider": "true",
+    "hoverProvider": "true"
   },
   "contributes": {
     "languages": [
