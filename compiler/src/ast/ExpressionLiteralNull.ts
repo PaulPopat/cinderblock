@@ -2,9 +2,9 @@ import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
-import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { Instruction } from "#writer";
+import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
 
 export class ExpressionLiteralNull extends ExpressionLiteral {
   static {
@@ -21,7 +21,7 @@ export class ExpressionLiteralNull extends ExpressionLiteral {
   }
 
   get resolution() {
-    return new TypePrimitiveBool(this.location, this.done, () => this);
+    return new TypePrimitiveUnknown(this.location, this.done, () => this);
   }
 
   get instruction(): Instruction {

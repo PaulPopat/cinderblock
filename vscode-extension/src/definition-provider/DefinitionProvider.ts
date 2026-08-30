@@ -69,25 +69,29 @@ export class DefinitionProvider implements vscode.DefinitionProvider, vscode.Hov
       const definition = found.subject;
       const range = found.range;
       const type = definition.type;
-      return {
-        contents: [type.representation()],
-        range: new vscode.Range(
+      const contents = new vscode.MarkdownString(undefined, true);
+      contents.appendCodeblock(type.representation(), "cinderblock");
+      return new vscode.Hover(
+        contents,
+        new vscode.Range(
           new vscode.Position(range.from.line - 1, range.from.character - 1),
           new vscode.Position(range.from.line - 1, range.to.character - 1),
         ),
-      };
+      );
     }
 
     // Not sure why the compiler is doing this.
     if (found instanceof TypeReference) {
       const range = found.range;
-      return {
-        contents: [found.representation()],
-        range: new vscode.Range(
+      const contents = new vscode.MarkdownString(undefined, true);
+      contents.appendCodeblock(found.representation(), "cinderblock");
+      return new vscode.Hover(
+        contents,
+        new vscode.Range(
           new vscode.Position(range.from.line - 1, range.from.character - 1),
           new vscode.Position(range.from.line - 1, range.to.character - 1),
         ),
-      };
+      );
     }
   }
 }
