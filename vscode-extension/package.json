@@ -2,7 +2,7 @@
   "name": "cinderblock-language",
   "displayName": "Cinderblock Language",
   "description": "Cinderblock languages features for VS Code",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "engines": {
     "vscode": "^1.134.0"
@@ -60,7 +60,7 @@
     "esbuild": "^0.28.1",
     "typescript": "^6.0.3",
     "@vscode/vsce": "^3.9.2",
-    "@cinderblock-lang/compiler": "0.0.1"
+    "@cinderblock-lang/compiler": "0.0.2"
   },
   "overrides": {
     "diff": "^8.0.4",

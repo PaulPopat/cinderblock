@@ -4,7 +4,7 @@
     "typecheck": "tsc --noEmit"
   },
   "repository": "https://github.com/PaulPopat/cinderblock",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "description": "The compiler for the CinderBlock programming language",
   "author": "Paul Popat",

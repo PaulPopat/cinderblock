@@ -1,6 +1,6 @@
 {
   "name": "@cinderblock-lang/server",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "description": "",
   "author": "Paul Popat",
@@ -18,7 +18,7 @@
     "printWidth": 150
   },
   "dependencies": {
-    "@cinderblock-lang/compiler": "0.0.1",
+    "@cinderblock-lang/compiler": "0.0.2",
     "cookie-parser": "^1.4.7",
     "express": "^5.2.1"
   },
