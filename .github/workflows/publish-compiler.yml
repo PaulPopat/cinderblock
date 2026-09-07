@@ -15,9 +15,9 @@ jobs:
       - run: npm install
       - run: npm run typecheck -w @cinderblock-lang/compiler
       - run: npm run test -w @cinderblock-lang/tests
-      - run: npm publish --provenance --access public -w @cinderblock-lang/compiler
+      - run: npm publish -w @cinderblock-lang/compiler
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - run: npm publish --provenance --access public -w @cinderblock-lang/server
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm publish -w @cinderblock-lang/server
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

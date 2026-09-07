@@ -27,5 +27,8 @@
   },
   "prettier": {
     "printWidth": 150
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
