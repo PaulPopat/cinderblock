@@ -42,6 +42,17 @@ export class Server extends Project {
             cookies: request.cookies,
           });
 
+          if ("status" in result) {
+            const { status, headers, body } = result;
+            response.status(status);
+
+            for (const [key, value] of Object.entries(headers ?? {})) {
+              response.setHeader(key, value as string);
+            }
+
+            return response.send(body);
+          }
+
           (request as any).ctx = result;
           next();
         } catch (err) {

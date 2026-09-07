@@ -16,7 +16,7 @@ export class Closure {
       if (possible) return possible;
     }
 
-    throw new Error(`Variable  not resolved`);
+    throw new Error(`Variable not resolved`);
   }
 
   withFrame(frame: Frame) {

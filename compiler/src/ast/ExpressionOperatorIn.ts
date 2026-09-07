@@ -10,6 +10,8 @@ import type { Instruction } from "#writer";
 import { TypePrimitiveString } from "./TypePrimitiveString.ts";
 import { TypeTuple } from "./TypeTuple.ts";
 import { TypeReference } from "./TypeReference.ts";
+import { TypeUnion } from "./TypeUnion.ts";
+import { TypeIntersection } from "./TypeIntersection.ts";
 
 export class ExpressionOperatorIn extends ExpressionOperator {
   static {
@@ -38,7 +40,12 @@ export class ExpressionOperatorIn extends ExpressionOperator {
       throw new WriterError("String required", this.range);
     }
 
-    if (!(this.right.resolution instanceof TypeTuple) && !(this.right.resolution instanceof TypeReference)) {
+    if (
+      !(this.right.resolution instanceof TypeTuple) &&
+      !(this.right.resolution instanceof TypeReference) &&
+      !(this.right.resolution instanceof TypeUnion) &&
+      !(this.right.resolution instanceof TypeIntersection)
+    ) {
       throw new WriterError("Tuple required", this.range);
     }
 

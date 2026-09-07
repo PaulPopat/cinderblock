@@ -22,9 +22,15 @@ namespace controllers_HomeController {
     };
 
   let [type="middleware", path="/app"] Authorise (cookies: AppCookies) =
-    {
-      user_id = { _s = cookies } -> Cookies_User
-    };
+      let user = { _s = cookies } -> Cookies_User;
+    "id" in user
+      ? {
+        user = user,
+      }
+      : {
+        status = 401,
+        body = "Invalid User"
+      };
 
   struct GetRegisterProps
     token: string;
