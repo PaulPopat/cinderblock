@@ -1,4 +1,4 @@
-import { Project } from "@cinderblock/compiler";
+import { Project } from "@cinderblock-lang/compiler";
 import express, { type NextFunction, type Request, type Response } from "express";
 import path from "node:path";
 import cookieParser from "cookie-parser";

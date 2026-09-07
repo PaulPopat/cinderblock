@@ -1,0 +1,20 @@
+name: Publish Compiler
+on: [push]
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '26.x'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm install
+      - run: npm run typescript -w @cinderblock-lang/compiler
+      - run: npm run test -w @cinderblock-lang/tests
+      - run: npm publish --provenance --access public -w @cinderblock-lang/compiler
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm publish --provenance --access public -w @cinderblock-lang/server
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

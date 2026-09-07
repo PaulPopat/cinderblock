@@ -60,7 +60,7 @@
     "esbuild": "^0.28.1",
     "typescript": "^6.0.3",
     "@vscode/vsce": "^3.9.2",
-    "@cinderblock/compiler": "*"
+    "@cinderblock-lang/compiler": "0.0.1"
   },
   "overrides": {
     "diff": "^8.0.4",

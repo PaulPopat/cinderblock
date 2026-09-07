@@ -1,4 +1,4 @@
-import { Server } from "@cinderblock/server";
+import { Server } from "@cinderblock-lang/server";
 import path from "node:path";
 import * as factories from "./factories/index.ts";
 import * as updaters from "./updaters/index.ts";

@@ -1,4 +1,4 @@
-import { Inline } from "@cinderblock/compiler";
+import { Inline } from "@cinderblock-lang/compiler";
 import assert from "node:assert";
 import test, { describe } from "node:test";
 

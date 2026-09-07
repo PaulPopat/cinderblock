@@ -1,11 +1,12 @@
 {
-  "name": "@cinderblock/compiler",
+  "name": "@cinderblock-lang/compiler",
   "scripts": {
     "typecheck": "tsc --noEmit"
   },
-  "version": "1.0.0",
+  "repository": "https://github.com/PaulPopat/cinderblock",
+  "version": "0.0.1",
   "type": "module",
-  "description": "",
+  "description": "The compiler for the CinderBlock programming language",
   "author": "Paul Popat",
   "devDependencies": {
     "@types/node": "^25.6.0",
