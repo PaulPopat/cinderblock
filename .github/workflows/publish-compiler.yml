@@ -10,7 +10,7 @@ jobs:
           node-version: '26.x'
           registry-url: 'https://registry.npmjs.org'
       - run: npm install
-      - run: npm run typescript -w @cinderblock-lang/compiler
+      - run: npm run typecheck -w @cinderblock-lang/compiler
       - run: npm run test -w @cinderblock-lang/tests
       - run: npm publish --provenance --access public -w @cinderblock-lang/compiler
         env:
