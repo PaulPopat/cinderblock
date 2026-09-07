@@ -1,5 +1,8 @@
 name: Publish Compiler
-on: [push]
+on:
+  push:
+    tags:        
+      - '**' 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest

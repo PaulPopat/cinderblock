@@ -1,6 +1,6 @@
 {
   "name": "@cinderblock-lang/tests",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "type": "module",
   "description": "",
   "author": "Paul Popat",
@@ -12,7 +12,7 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
-    "@cinderblock-lang/compiler": "0.0.2"
+    "@cinderblock-lang/compiler": "*"
   },
   "prettier": {
     "printWidth": 150

@@ -1,6 +1,6 @@
 {
   "name": "@cinderblock-lang/budget-tracker",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "type": "module",
   "description": "",
   "author": "Paul Popat",
@@ -23,7 +23,7 @@
     "printWidth": 150
   },
   "dependencies": {
-    "@cinderblock-lang/server": "0.0.2",
+    "@cinderblock-lang/server": "*",
     "jsonwebtoken": "^9.0.3",
     "pug": "^3.0.4"
   }
