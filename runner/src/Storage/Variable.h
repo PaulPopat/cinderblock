@@ -1,0 +1,6 @@
+namespace Storage
+{
+  class Variable
+  {
+  };
+}

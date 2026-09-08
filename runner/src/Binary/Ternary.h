@@ -5,6 +5,7 @@ namespace Binary
   class Ternary : Instruction
   {
   public:
+    const static int TypeName = 16;
     Ternary(char *binary, int offset);
     const int get_end() const;
 

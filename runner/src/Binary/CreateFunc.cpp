@@ -9,7 +9,7 @@ namespace Binary
     this->no_args = binary[end] != 0;
     end += 1;
 
-    this->vars = List<CreateFunc *>();
+    this->vars = Core::List<CreateFunc *>();
     while (binary[end] != 0)
     {
       auto next = new CreateFunc(binary, end + 1);

@@ -24,6 +24,7 @@ namespace Binary
   class Operator : Instruction
   {
   public:
+    const static int TypeName = 14;
     Operator(char *binary, int offset);
     const int get_end() const;
 

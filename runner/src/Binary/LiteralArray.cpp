@@ -5,7 +5,7 @@ namespace Binary
   LiteralArray::LiteralArray(char *binary, int offset)
   {
     int end = offset;
-    auto values = List<Instruction *>();
+    auto values = Core::List<Instruction *>();
     while (binary[end] != 0)
     {
       auto next = Instruction::Parse(binary, end + 1);

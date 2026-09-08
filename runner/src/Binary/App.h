@@ -1,4 +1,4 @@
-#include "./List.h"
+#include "../Core/List.h"
 #include "./CreateFunc.h"
 
 namespace Binary
@@ -9,6 +9,6 @@ namespace Binary
     App(char *binary);
 
   private:
-    List<CreateFunc *> *functions;
+    Core::List<CreateFunc *> *functions;
   };
 }

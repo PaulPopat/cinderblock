@@ -1,19 +1,20 @@
 #include "./Instruction.h"
 #include "./LiteralString.h"
-#include "./List.h"
+#include "../Core/List.h"
 
 namespace Binary
 {
   class Tuple : Instruction
   {
   public:
+    const static int TypeName = 17;
     Tuple(char *binary, int offset);
 
     const int get_end() const;
 
   private:
-    List<LiteralString *> names;
-    List<Instruction *> values;
+    Core::List<LiteralString *> names;
+    Core::List<Instruction *> values;
     int end;
   };
 }

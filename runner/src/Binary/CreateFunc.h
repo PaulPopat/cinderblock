@@ -1,6 +1,6 @@
 #include "./Instruction.h"
 #include "./LiteralString.h"
-#include "./List.h"
+#include "../Core/List.h"
 
 namespace Binary
 {
@@ -13,7 +13,7 @@ namespace Binary
   private:
     LiteralString *name;
     bool no_args;
-    List<CreateFunc *> vars;
+    Core::List<CreateFunc *> vars;
     Instruction *returns;
     int end;
   };

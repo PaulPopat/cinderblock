@@ -5,6 +5,7 @@ namespace Binary
   class LiteralString : Instruction
   {
   public:
+    const static int TypeName = 12;
     LiteralString(char *binary, int offset);
 
     const int get_end() const;

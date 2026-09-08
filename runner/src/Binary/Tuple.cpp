@@ -6,8 +6,8 @@ namespace Binary
   Tuple::Tuple(char *binary, int offset)
   {
     int end = offset;
-    auto names = List<LiteralString *>();
-    auto values = List<Instruction *>();
+    auto names = Core::List<LiteralString *>();
+    auto values = Core::List<Instruction *>();
     while (binary[end] != 0)
     {
       auto name = new LiteralString(binary, end + 1);

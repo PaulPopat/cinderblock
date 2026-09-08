@@ -1,5 +1,5 @@
 #include "./Instruction.h"
-#include "./List.h"
+#include "../Core/List.h"
 
 namespace Binary
 {
@@ -9,7 +9,7 @@ namespace Binary
     Instruction *(*init)(char *binary, int offset);
   };
 
-  List<ParserInfo *> parsers = List<ParserInfo *>();
+  Core::List<ParserInfo *> parsers = Core::List<ParserInfo *>();
 
   Instruction *Instruction::Parse(char *binary, int offset)
   {

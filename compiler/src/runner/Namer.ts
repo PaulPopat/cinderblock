@@ -3,8 +3,8 @@ let current: Array<number> = [];
 export const Namer = Object.freeze({
   get Next() {
     const subject = current[current.length - 1];
-    if (typeof subject !== "number" || subject === 127) {
-      current = [...current, 0];
+    if (typeof subject !== "number" || subject === 126) {
+      current = [...current, 33];
     } else {
       current = [...current.slice(0, -1), subject + 1];
     }
