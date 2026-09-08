@@ -6,7 +6,6 @@ namespace Binary
   class ArrayAdd : Instruction
   {
   public:
-    const static char Index = 0;
     ArrayAdd(char *binary, int offset);
     const int get_end() const;
 

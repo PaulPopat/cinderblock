@@ -24,7 +24,6 @@ namespace Binary
   class Operator : Instruction
   {
   public:
-    const static char Index = 0;
     Operator(char *binary, int offset);
     const int get_end() const;
 

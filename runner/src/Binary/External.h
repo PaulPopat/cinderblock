@@ -6,7 +6,6 @@ namespace Binary
   class External : Instruction
   {
   public:
-    const static char Index = 1;
     External(char *binary, int offset);
     const int get_end() const;
 

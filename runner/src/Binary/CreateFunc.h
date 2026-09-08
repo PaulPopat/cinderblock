@@ -1,16 +1,20 @@
 #include "./Instruction.h"
 #include "./LiteralString.h"
+#include "./List.h"
 
 namespace Binary
 {
-  class Arg : Instruction
+  class CreateFunc
   {
   public:
-    Arg(char *binary, int offset);
+    CreateFunc(char *binary, int offset);
     const int get_end() const;
 
   private:
     LiteralString *name;
+    bool no_args;
+    List<CreateFunc *> vars;
+    Instruction *returns;
     int end;
   };
 }

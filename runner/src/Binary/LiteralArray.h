@@ -1,4 +1,5 @@
 #include "./Instruction.h"
+#include "./List.h"
 
 namespace Binary
 {
@@ -10,8 +11,7 @@ namespace Binary
     const int get_end() const;
 
   private:
-    int length;
-    Instruction **values;
+    List<Instruction *> values;
     int end;
   };
 }

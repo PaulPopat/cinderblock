@@ -1,5 +1,6 @@
 #include "./Instruction.h"
 #include "./LiteralString.h"
+#include "./List.h"
 
 namespace Binary
 {
@@ -11,9 +12,8 @@ namespace Binary
     const int get_end() const;
 
   private:
-    int length;
-    LiteralString **names;
-    Instruction **values;
+    List<LiteralString *> names;
+    List<Instruction *> values;
     int end;
   };
 }

@@ -6,7 +6,6 @@ namespace Binary
   class Reference : Instruction
   {
   public:
-    const static char Index = 1;
     Reference(char *binary, int offset);
     const int get_end() const;
 
