@@ -1,4 +1,4 @@
-#include "./extract.h"
+#include "extract.h"
 #include <cstdlib>
 
 namespace Binary

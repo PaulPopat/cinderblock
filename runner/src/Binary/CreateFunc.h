@@ -1,6 +1,10 @@
-#include "./Instruction.h"
-#include "./LiteralString.h"
+#pragma once
+
+#include "Instruction.h"
+#include "LiteralString.h"
 #include <vector>
+#include "../Storage/Variable.h"
+#include "../Storage/Closure.h"
 
 namespace Binary
 {
@@ -10,6 +14,9 @@ namespace Binary
     CreateFunc(char *binary, int offset);
     ~CreateFunc();
     const int get_end() const;
+
+    std::string get_name();
+    Storage::Variable *exec(Storage::Closure *closure);
 
   private:
     LiteralString *name;

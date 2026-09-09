@@ -1,8 +1,10 @@
-#include "./Instruction.h"
+#pragma once
+
+#include "Instruction.h"
 
 namespace Binary
 {
-  class LiteralInt : Instruction
+  class LiteralInt : public Instruction
   {
   public:
     const static char TypeName = 9;
@@ -10,6 +12,7 @@ namespace Binary
     ~LiteralInt();
 
     const int get_end() const;
+    const Variable *resolve(Closure *closure) const;
 
   private:
     int *value;

@@ -1,4 +1,5 @@
-#include "./LiteralBool.h"
+#include "LiteralBool.h"
+#include "../Storage/VariablePrimitiveBool.h"
 
 namespace Binary
 {
@@ -11,5 +12,10 @@ namespace Binary
   const int LiteralBool::get_end() const
   {
     return this->end;
+  }
+
+  const Variable *LiteralBool::resolve(Closure *closure) const
+  {
+    return new VariablePrimitiveBool(this->value);
   }
 }

@@ -1,4 +1,4 @@
-#include "./Closure.h"
+#include "Closure.h"
 
 namespace Storage
 {
@@ -18,7 +18,7 @@ namespace Storage
     delete this->globals;
   }
 
-  Variable *Closure::search(char *name)
+  Variable *Closure::search(std::string name)
   {
     for (const auto &frame : this->frames)
     {
@@ -45,14 +45,14 @@ namespace Storage
     return new Closure(this->globals, input);
   }
 
-  Closure *Closure::add_variable(char *name, Variable *value)
+  Closure *Closure::add_variable(std::string name, Variable *value)
   {
     auto frame = *this->frames.end();
     frame->add_variable(name, value);
     return this;
   }
 
-  Variable *Closure::search_global(char *name)
+  Variable *Closure::search_global(std::string name)
   {
     auto possible = this->globals->search(name);
     if (possible != nullptr)

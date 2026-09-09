@@ -17,4 +17,9 @@ namespace Storage
   {
     return val(this->value);
   }
+
+  float VariablePrimitiveFloat::get_value() const
+  {
+    return this->value;
+  }
 }

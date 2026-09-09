@@ -1,5 +1,6 @@
-#include "./LiteralDouble.h"
-#include "./extract.h"
+#include "LiteralDouble.h"
+#include "extract.h"
+#include "../Storage/VariablePrimitiveDouble.h"
 
 namespace Binary
 {
@@ -17,5 +18,10 @@ namespace Binary
   const int LiteralDouble::get_end() const
   {
     return this->end;
+  }
+
+  const Variable *LiteralDouble::resolve(Closure *closure) const
+  {
+    return new VariablePrimitiveDouble(*this->value);
   }
 }

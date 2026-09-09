@@ -1,9 +1,11 @@
-#include "./Instruction.h"
+#pragma once
+
+#include "Instruction.h"
 #include <vector>
 
 namespace Binary
 {
-  class LiteralArray : Instruction
+  class LiteralArray : public Instruction
   {
   public:
     const static char TypeName = 4;
@@ -11,6 +13,7 @@ namespace Binary
     ~LiteralArray();
 
     const int get_end() const;
+    const Variable *resolve(Closure *closure) const;
 
   private:
     std::vector<Instruction *> values;

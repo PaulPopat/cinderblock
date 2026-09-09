@@ -1,4 +1,4 @@
-#include "./CreateFunc.h"
+#include "CreateFunc.h"
 
 namespace Binary
 {

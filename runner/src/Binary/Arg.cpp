@@ -1,4 +1,4 @@
-#include "./Arg.h"
+#include "Arg.h"
 
 namespace Binary
 {
@@ -16,5 +16,10 @@ namespace Binary
   const int Arg::get_end() const
   {
     return this->end;
+  }
+
+  const Storage::Variable *Arg::resolve(Storage::Closure *closure) const
+  {
+    return closure->search(this->name->get_value());
   }
 }

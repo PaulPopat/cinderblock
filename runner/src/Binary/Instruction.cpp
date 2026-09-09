@@ -1,4 +1,4 @@
-#include "./Instruction.h"
+#include "Instruction.h"
 #include <vector>
 
 namespace Binary
@@ -6,7 +6,7 @@ namespace Binary
   struct ParserInfo
   {
     char identifier;
-    Instruction *(*init)(char *binary, int offset);
+    std::function<Instruction *(char *binary, int offset)> init;
   };
 
   std::vector<ParserInfo *> parsers = std::vector<ParserInfo *>();
@@ -24,7 +24,7 @@ namespace Binary
     throw "Invalid instruction. Check compiler version vs runner version.";
   }
 
-  void Instruction::Register(char identifier, Instruction *init(char *binary, int offset))
+  void Instruction::Register(char identifier, std::function<Instruction *(char *binary, int offset)> init)
   {
     auto info = new ParserInfo();
     info->identifier = identifier;

@@ -1,4 +1,4 @@
-#include "./External.h"
+#include "External.h"
 
 namespace Binary
 {
@@ -16,5 +16,10 @@ namespace Binary
   const int External::get_end() const
   {
     return this->end;
+  }
+
+  const Variable *External::resolve(Closure *closure) const
+  {
+    return closure->search_global(this->name->get_value());
   }
 }

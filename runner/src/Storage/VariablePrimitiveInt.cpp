@@ -16,4 +16,9 @@ namespace Storage
   {
     return val(this->value);
   }
+
+  int VariablePrimitiveInt::get_value() const
+  {
+    return this->value;
+  }
 }

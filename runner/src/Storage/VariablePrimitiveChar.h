@@ -1,16 +1,29 @@
-#include "./Variable.h"
-#include "./Frame.h"
+#pragma once
+
+#include "VariablePrimitive.h"
 
 namespace Storage
 {
-  class VariablePrimitiveChar : Variable
+  class VariablePrimitiveChar : public VariablePrimitive<char>
   {
   public:
+    static const VariablePrimitiveChar *FromVariable(const Variable *var)
+    {
+      if (var->TypeName != VariablePrimitiveChar::TypeName)
+      {
+        return nullptr;
+      }
+
+      return (VariablePrimitiveChar *)var;
+    }
+
     const static char TypeName = 7;
+    const char TypeName = 7;
     VariablePrimitiveChar(char value);
     VariablePrimitiveChar(val value);
 
     const val raw() const;
+    char get_value() const;
 
   private:
     char value;

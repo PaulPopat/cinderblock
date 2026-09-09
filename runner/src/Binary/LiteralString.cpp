@@ -1,4 +1,5 @@
-#include "./LiteralString.h"
+#include "LiteralString.h"
+#include "../Storage/VariablePrimitiveString.h"
 
 namespace Binary
 {
@@ -14,8 +15,32 @@ namespace Binary
     this->end = end + 2;
   }
 
+  std::string LiteralString::get_value() const
+  {
+    auto string_length = this->end - this->offset - 2;
+    auto input = new char[string_length + 1]();
+    for (unsigned int i = 0; i < string_length; i++)
+    {
+      input[i] = this->binary[this->offset + i];
+    }
+
+    input[string_length] = 0;
+
+    return std::string(input);
+  }
+
+  const Variable *LiteralString::resolve(Closure *closure) const
+  {
+    return new Storage::VariablePrimitiveString(this->get_value());
+  }
+
   const int LiteralString::get_end() const
   {
     return this->end;
+  }
+
+  const Variable *LiteralString::resolve(Closure *closure) const
+  {
+    return new VariablePrimitiveString(this->get_value());
   }
 }

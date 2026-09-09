@@ -1,4 +1,8 @@
-#include "./Access.h"
+#include "Access.h"
+#include "../Storage/VariableTuple.h";
+#include "../Storage/VariablePrimitiveNull.h";
+
+using namespace Storage;
 
 namespace Binary
 {
@@ -18,5 +22,16 @@ namespace Binary
   const int Access::get_end() const
   {
     return this->end;
+  }
+
+  const Variable *Access::resolve(Closure *closure) const
+  {
+    auto subject = VariableTuple::FromVariable(this->subject->resolve(closure));
+    if (subject == nullptr)
+    {
+      return new VariablePrimitiveNull();
+    }
+
+    return subject->get(this->key->get_value());
   }
 }

@@ -1,4 +1,6 @@
-#include "./Variable.h"
+#pragma once
+
+#include "Variable.h"
 
 namespace Storage
 {

@@ -1,9 +1,19 @@
 #include "Frame.h"
 #include <string>
-#include "../Core/string_equals.h"
 
 namespace Storage
 {
+  Frame *Frame::From(val data)
+  {
+    auto result = new Frame();
+    for (const auto &pair : vecFromJSArray<val>(data))
+    {
+      result->add_variable(pair["name"].as<std::string>(), Variable::Parse(pair["value"]));
+    }
+
+    return result;
+  }
+
   Frame::Frame()
   {
     this->data = std::vector<VariableTuplePart>();
@@ -11,18 +21,13 @@ namespace Storage
 
   Frame::~Frame()
   {
-    for (const auto &part : this->data)
-    {
-      delete part.name;
-      delete part.value;
-    }
   }
 
-  Variable *Frame::search(char *name)
+  Variable *Frame::search(std::string name)
   {
     for (const auto &variable : this->data)
     {
-      if (Core::string_equals(variable.name, name))
+      if (variable.name.compare(name))
       {
         return variable.value;
       }
@@ -31,7 +36,7 @@ namespace Storage
     return nullptr;
   }
 
-  Frame *Frame::add_variable(char *name, Variable *value)
+  Frame *Frame::add_variable(std::string name, Variable *value)
   {
     this->data.push_back({name, value});
     return this;
@@ -45,5 +50,17 @@ namespace Storage
     }
 
     return this;
+  }
+
+  const val Frame::raw() const
+  {
+    auto result = val::object();
+
+    for (const auto &part : this->data)
+    {
+      result.set(part.name, part.value->raw());
+    }
+
+    return result;
   }
 }

@@ -1,5 +1,6 @@
-#include "./LiteralNull.h"
-#include "./extract.h"
+#include "LiteralNull.h"
+#include "extract.h"
+#include "../Storage/VariablePrimitiveNull.h"
 
 namespace Binary
 {
@@ -11,5 +12,10 @@ namespace Binary
   const int LiteralNull::get_end() const
   {
     return this->end;
+  }
+
+  const Variable *LiteralNull::resolve(Closure *closure) const
+  {
+    return new VariablePrimitiveNull();
   }
 }

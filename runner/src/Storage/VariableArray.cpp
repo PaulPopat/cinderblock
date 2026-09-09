@@ -1,8 +1,9 @@
+#include "Variable.h"
 #include "VariableArray.h"
 
 namespace Storage
 {
-  VariableArray::VariableArray(std::vector<Variable *> values)
+  VariableArray::VariableArray(std::vector<const Variable *> values)
   {
     this->values = values;
   }
@@ -22,7 +23,7 @@ namespace Storage
       throw "Value not array";
     }
 
-    auto values = std::vector<Variable *>();
+    auto values = std::vector<const Variable *>();
     for (const auto &v : convertJSArrayToNumberVector<val>(value))
     {
       values.push_back(Variable::Parse(v));
@@ -40,5 +41,16 @@ namespace Storage
     }
 
     return val::array();
+  }
+
+  const std::vector<const Variable *> VariableArray::get_values() const
+  {
+    auto result = std::vector<const Variable *>();
+    for (const auto &var : this->values)
+    {
+      result.push_back(var);
+    }
+
+    return result;
   }
 }

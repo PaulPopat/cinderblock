@@ -1,5 +1,6 @@
-#include "./LiteralLong.h"
-#include "./extract.h"
+#include "LiteralLong.h"
+#include "extract.h"
+#include "../Storage/VariablePrimitiveLong.h"
 
 namespace Binary
 {
@@ -17,5 +18,10 @@ namespace Binary
   const int LiteralLong::get_end() const
   {
     return this->end;
+  }
+
+  const Variable *LiteralLong::resolve(Closure *closure) const
+  {
+    return new VariablePrimitiveLong(*this->value);
   }
 }

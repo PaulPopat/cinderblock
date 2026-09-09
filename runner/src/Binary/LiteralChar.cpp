@@ -1,4 +1,5 @@
-#include "./LiteralChar.h"
+#include "LiteralChar.h"
+#include "../Storage/VariablePrimitiveChar.h"
 
 namespace Binary
 {
@@ -11,5 +12,10 @@ namespace Binary
   const int LiteralChar::get_end() const
   {
     return this->end;
+  }
+
+  const Variable *LiteralChar::resolve(Closure *closure) const
+  {
+    return new VariablePrimitiveChar(this->value);
   }
 }

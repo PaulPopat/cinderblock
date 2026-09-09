@@ -1,4 +1,6 @@
-#include "./Instruction.h"
+#pragma once
+
+#include "Instruction.h"
 
 namespace Binary
 {
@@ -18,16 +20,18 @@ namespace Binary
     Or = 11,
     PartialPipe = 12,
     Pipe = 13,
-    Subtract = 14
+    Subtract = 14,
+    Modulo = 15
   };
 
-  class Operator : Instruction
+  class Operator : public Instruction
   {
   public:
     const static char TypeName = 14;
     Operator(char *binary, int offset);
     ~Operator();
     const int get_end() const;
+    const Variable *resolve(Closure *closure) const;
 
   private:
     OperatorType type;

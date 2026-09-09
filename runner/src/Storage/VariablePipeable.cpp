@@ -4,7 +4,7 @@
 
 namespace Storage
 {
-  VariablePipeable::VariablePipeable(Variable *(*implementation)(Frame *args), bool no_args)
+  VariablePipeable::VariablePipeable(std::function<const Variable *(const VariableTuple *)> implementation, bool no_args)
   {
     this->implementation = implementation;
     this->no_args = no_args;
@@ -13,7 +13,7 @@ namespace Storage
   VariablePipeable::VariablePipeable(val value)
   {
     this->no_args = false;
-    this->implementation = [value](Frame *args)
+    this->implementation = [value](const VariableTuple *args)
     {
       return Variable::Parse(value(args->raw()));
     };
@@ -22,5 +22,10 @@ namespace Storage
   const val VariablePipeable::raw() const
   {
     throw "Cannot return functions to JavaScript";
+  }
+
+  const Variable *VariablePipeable::invoke(const VariableTuple *args) const
+  {
+    return this->implementation(args);
   }
 }

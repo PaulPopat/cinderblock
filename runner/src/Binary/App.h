@@ -1,5 +1,8 @@
+#pragma once
+
 #include <vector>
-#include "./CreateFunc.h"
+#include <string>
+#include "CreateFunc.h"
 
 namespace Binary
 {
@@ -9,7 +12,9 @@ namespace Binary
     App(char *binary);
     ~App();
 
+    CreateFunc *find(std::string name);
+
   private:
-    std::vector<CreateFunc *> *functions;
+    std::vector<CreateFunc *> functions;
   };
 }

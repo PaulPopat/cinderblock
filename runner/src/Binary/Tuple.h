@@ -1,11 +1,13 @@
-#include "./Instruction.h"
-#include "./LiteralString.h"
+#pragma once
+
+#include "Instruction.h"
+#include "LiteralString.h"
 #include <vector>
 
 namespace Binary
 {
 
-  class Tuple : Instruction
+  class Tuple : public Instruction
   {
   public:
     const static char TypeName = 17;
@@ -13,6 +15,7 @@ namespace Binary
     ~Tuple();
 
     const int get_end() const;
+    const Variable *resolve(Closure *closure) const;
 
   private:
     std::vector<TuplePart> values;

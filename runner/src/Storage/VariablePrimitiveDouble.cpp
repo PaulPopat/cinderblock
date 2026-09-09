@@ -17,4 +17,9 @@ namespace Storage
   {
     return val(this->value);
   }
+
+  double VariablePrimitiveDouble::get_value() const
+  {
+    return this->value;
+  }
 }

@@ -1,8 +1,10 @@
-#include "./Instruction.h"
+#pragma once
+
+#include "Instruction.h"
 
 namespace Binary
 {
-  class LiteralFloat : Instruction
+  class LiteralFloat : public Instruction
   {
   public:
     const static char TypeName = 8;
@@ -10,6 +12,7 @@ namespace Binary
     ~LiteralFloat();
 
     const int get_end() const;
+    const Variable *resolve(Closure *closure) const;
 
   private:
     float *value;

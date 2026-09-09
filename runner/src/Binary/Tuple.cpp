@@ -1,5 +1,5 @@
-#include "./Tuple.h"
-#include "./LiteralString.h"
+#include "Tuple.h"
+#include "LiteralString.h"
 
 namespace Binary
 {

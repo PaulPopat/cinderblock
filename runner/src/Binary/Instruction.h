@@ -1,3 +1,10 @@
+#pragma once
+
+#include "../Storage/Closure.h"
+#include "../Storage/Variable.h"
+#include <functional>
+
+using namespace Storage;
 
 namespace Binary
 {
@@ -5,7 +12,9 @@ namespace Binary
   {
   public:
     static Instruction *Parse(char *binary, int offset);
-    static void Register(char identifier, Instruction *init(char *binary, int offset));
+    static void Register(char identifier, std::function<Instruction *(char *binary, int offset)> init);
     virtual const int get_end() const = 0;
+
+    virtual const Variable *resolve(Closure *closure) const = 0;
   };
 }

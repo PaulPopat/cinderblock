@@ -1,4 +1,4 @@
-#include "./Ternary.h"
+#include "Ternary.h"
 
 namespace Binary
 {

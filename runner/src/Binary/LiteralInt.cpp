@@ -1,5 +1,6 @@
-#include "./LiteralInt.h"
-#include "./extract.h"
+#include "LiteralInt.h"
+#include "extract.h"
+#include "../Storage/VariablePrimitiveInt.h"
 
 namespace Binary
 {
@@ -17,5 +18,10 @@ namespace Binary
   const int LiteralInt::get_end() const
   {
     return this->end;
+  }
+
+  const Variable *LiteralInt::resolve(Closure *closure) const
+  {
+    return new VariablePrimitiveInt(*this->value);
   }
 }

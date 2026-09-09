@@ -16,4 +16,9 @@ namespace Storage
   {
     return val(this->value);
   }
+
+  long VariablePrimitiveLong::get_value() const
+  {
+    return this->value;
+  }
 }

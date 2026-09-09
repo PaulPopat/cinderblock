@@ -1,4 +1,5 @@
-#include "./LiteralArray.h"
+#include "LiteralArray.h"
+#include "../Storage/VariableArray.h"
 
 namespace Binary
 {
@@ -28,5 +29,16 @@ namespace Binary
   const int LiteralArray::get_end() const
   {
     return this->end;
+  }
+
+  const Variable *LiteralArray::resolve(Closure *closure) const
+  {
+    auto input = std::vector<const Variable *>();
+    for (const auto &instruction : this->values)
+    {
+      input.push_back(instruction->resolve(closure));
+    }
+
+    return new VariableArray(input);
   }
 }
