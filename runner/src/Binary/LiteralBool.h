@@ -5,7 +5,7 @@ namespace Binary
   class LiteralBool : Instruction
   {
   public:
-    const static int TypeName = 5;
+    const static char TypeName = 5;
     LiteralBool(char *binary, int offset);
 
     const int get_end() const;

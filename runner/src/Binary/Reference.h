@@ -6,8 +6,9 @@ namespace Binary
   class Reference : Instruction
   {
   public:
-    const static int TypeName = 15;
+    const static char TypeName = 15;
     Reference(char *binary, int offset);
+    ~Reference();
     const int get_end() const;
 
   private:

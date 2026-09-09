@@ -9,6 +9,12 @@ namespace Binary
     this->end = this->right->get_end();
   }
 
+  ArrayAdd::~ArrayAdd()
+  {
+    delete this->left;
+    delete this->right;
+  }
+
   const int ArrayAdd::get_end() const
   {
     return this->end;

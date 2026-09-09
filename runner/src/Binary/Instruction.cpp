@@ -1,5 +1,5 @@
 #include "./Instruction.h"
-#include "../Core/List.h"
+#include <vector>
 
 namespace Binary
 {
@@ -9,17 +9,15 @@ namespace Binary
     Instruction *(*init)(char *binary, int offset);
   };
 
-  Core::List<ParserInfo *> parsers = Core::List<ParserInfo *>();
+  std::vector<ParserInfo *> parsers = std::vector<ParserInfo *>();
 
   Instruction *Instruction::Parse(char *binary, int offset)
   {
-    for (unsigned int i = 0; i < parsers.get_length(); i++)
+    for (const auto &parser : parsers)
     {
-      auto item = parsers.get_item(i);
-
-      if (item->identifier = binary[offset])
+      if (parser->identifier = binary[offset])
       {
-        return item->init(binary, offset + 1);
+        return parser->init(binary, offset + 1);
       }
     }
 
@@ -31,6 +29,6 @@ namespace Binary
     auto info = new ParserInfo();
     info->identifier = identifier;
     info->init = init;
-    parsers.push(info);
+    parsers.push_back(info);
   }
 }

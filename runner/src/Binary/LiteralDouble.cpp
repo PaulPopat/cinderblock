@@ -9,6 +9,11 @@ namespace Binary
     this->value = (double *)extract(binary, offset, sizeof(double));
   }
 
+  LiteralDouble::~LiteralDouble()
+  {
+    delete this->value;
+  }
+
   const int LiteralDouble::get_end() const
   {
     return this->end;

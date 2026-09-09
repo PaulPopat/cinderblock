@@ -9,6 +9,11 @@ namespace Binary
     this->value = (long *)extract(binary, offset, sizeof(long));
   }
 
+  LiteralLong::~LiteralLong()
+  {
+    delete this->value;
+  }
+
   const int LiteralLong::get_end() const
   {
     return this->end;

@@ -8,6 +8,11 @@ namespace Binary
     this->end = this->name->get_end();
   }
 
+  External::~External()
+  {
+    delete this->name;
+  }
+
   const int External::get_end() const
   {
     return this->end;

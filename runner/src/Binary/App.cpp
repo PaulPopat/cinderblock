@@ -72,4 +72,12 @@ namespace Binary
 
     Core::loaded_binary();
   }
+
+  App::~App()
+  {
+    for (const auto &func : this->functions)
+    {
+      delete func;
+    }
+  }
 }

@@ -1,20 +1,30 @@
 #include "Frame.h"
+#include <string>
 #include "../Core/string_equals.h"
 
 namespace Storage
 {
   Frame::Frame()
   {
-    this->data = Core::List<FrameVariable *>();
+    this->data = std::vector<VariableTuplePart>();
+  }
+
+  Frame::~Frame()
+  {
+    for (const auto &part : this->data)
+    {
+      delete part.name;
+      delete part.value;
+    }
   }
 
   Variable *Frame::search(char *name)
   {
     for (const auto &variable : this->data)
     {
-      if (Core::string_equals(variable->name, name))
+      if (Core::string_equals(variable.name, name))
       {
-        return variable->value;
+        return variable.value;
       }
     }
 
@@ -23,10 +33,7 @@ namespace Storage
 
   Frame *Frame::add_variable(char *name, Variable *value)
   {
-    auto input = new FrameVariable();
-    input->name = name;
-    input->value = value;
-    this->data.push(input);
+    this->data.push_back({name, value});
     return this;
   }
 
@@ -34,7 +41,7 @@ namespace Storage
   {
     for (const auto &variable : input->data)
     {
-      this->add_variable(variable->name, variable->value);
+      this->add_variable(variable.name, variable.value);
     }
 
     return this;

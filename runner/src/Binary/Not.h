@@ -5,8 +5,9 @@ namespace Binary
   class Not : Instruction
   {
   public:
-    const static int TypeName = 13;
+    const static char TypeName = 13;
     Not(char *binary, int offset);
+    ~Not();
     const int get_end() const;
 
   private:

@@ -5,8 +5,9 @@ namespace Binary
   class LiteralFloat : Instruction
   {
   public:
-    const static int TypeName = 8;
+    const static char TypeName = 8;
     LiteralFloat(char *binary, int offset);
+    ~LiteralFloat();
 
     const int get_end() const;
 

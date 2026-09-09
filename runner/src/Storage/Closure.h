@@ -1,13 +1,14 @@
 #include "./Frame.h"
 #include "./Variable.h"
-#include "../Core/List.h"
+#include <vector>
 
 namespace Storage
 {
   class Closure
   {
   public:
-    Closure(Frame *globals, Core::List<Frame *> frames);
+    Closure(Frame *globals, std::vector<Frame *> frames);
+    ~Closure();
 
     Variable *search(char *name);
     Closure *with_frame(Frame *frame);
@@ -16,6 +17,6 @@ namespace Storage
 
   private:
     Frame *globals;
-    Core::List<Frame *> frames;
+    std::vector<Frame *> frames;
   };
 }

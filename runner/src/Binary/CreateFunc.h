@@ -1,6 +1,6 @@
 #include "./Instruction.h"
 #include "./LiteralString.h"
-#include "../Core/List.h"
+#include <vector>
 
 namespace Binary
 {
@@ -8,12 +8,13 @@ namespace Binary
   {
   public:
     CreateFunc(char *binary, int offset);
+    ~CreateFunc();
     const int get_end() const;
 
   private:
     LiteralString *name;
     bool no_args;
-    Core::List<CreateFunc *> vars;
+    std::vector<CreateFunc *> vars;
     Instruction *returns;
     int end;
   };

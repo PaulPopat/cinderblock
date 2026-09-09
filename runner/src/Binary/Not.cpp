@@ -8,6 +8,11 @@ namespace Binary
     this->end = this->subject->get_end();
   }
 
+  Not::~Not()
+  {
+    delete this->subject;
+  }
+
   const int Not::get_end() const
   {
     return this->end;

@@ -9,6 +9,12 @@ namespace Binary
     this->end = this->key->get_end();
   }
 
+  Access::~Access()
+  {
+    delete this->subject;
+    delete this->key;
+  }
+
   const int Access::get_end() const
   {
     return this->end;

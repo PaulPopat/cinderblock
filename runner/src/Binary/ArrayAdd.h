@@ -6,8 +6,9 @@ namespace Binary
   class ArrayAdd : Instruction
   {
   public:
-    const static int TypeName = 2;
+    const static char TypeName = 2;
     ArrayAdd(char *binary, int offset);
+    ~ArrayAdd();
     const int get_end() const;
 
   private:

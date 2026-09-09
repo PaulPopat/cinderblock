@@ -10,6 +10,13 @@ namespace Binary
     this->end = this->negative->get_end();
   }
 
+  Ternary::~Ternary()
+  {
+    delete this->predicate;
+    delete this->positive;
+    delete this->negative;
+  }
+
   const int Ternary::get_end() const
   {
     return this->end;

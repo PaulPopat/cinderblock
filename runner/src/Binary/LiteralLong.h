@@ -5,13 +5,14 @@ namespace Binary
   class LiteralLong : Instruction
   {
   public:
-    const static int TypeName = 10;
+    const static char TypeName = 10;
     LiteralLong(char *binary, int offset);
+    ~LiteralLong();
 
     const int get_end() const;
 
   private:
-    long* value;
+    long *value;
     int end;
   };
 }

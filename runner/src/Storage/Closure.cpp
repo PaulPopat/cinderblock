@@ -2,10 +2,20 @@
 
 namespace Storage
 {
-  Closure::Closure(Frame *globals, Core::List<Frame *> frames)
+  Closure::Closure(Frame *globals, std::vector<Frame *> frames)
   {
     this->globals = globals;
     this->frames = frames;
+  }
+
+  Closure::~Closure()
+  {
+    for (const auto &frame : this->frames)
+    {
+      delete frame;
+    }
+
+    delete this->globals;
   }
 
   Variable *Closure::search(char *name)
@@ -24,13 +34,13 @@ namespace Storage
 
   Closure *Closure::with_frame(Frame *frame)
   {
-    auto input = Core::List<Frame *>();
+    auto input = std::vector<Frame *>();
     for (const auto &frame : this->frames)
     {
-      input.push(frame);
+      input.push_back(frame);
     }
 
-    input.push(frame);
+    input.push_back(frame);
 
     return new Closure(this->globals, input);
   }

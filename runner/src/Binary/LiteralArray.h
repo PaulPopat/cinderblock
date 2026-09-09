@@ -1,18 +1,19 @@
 #include "./Instruction.h"
-#include "../Core/List.h"
+#include <vector>
 
 namespace Binary
 {
   class LiteralArray : Instruction
   {
   public:
-    const static int TypeName = 4;
+    const static char TypeName = 4;
     LiteralArray(char *binary, int offset);
+    ~LiteralArray();
 
     const int get_end() const;
 
   private:
-    Core::List<Instruction *> values;
+    std::vector<Instruction *> values;
     int end;
   };
 }

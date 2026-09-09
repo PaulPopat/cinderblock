@@ -6,8 +6,9 @@ namespace Binary
   class Access : Instruction
   {
   public:
-    const static int TypeName = 0;
+    const static char TypeName = 0;
     Access(char *binary, int offset);
+    ~Access();
     const int get_end() const;
 
   private:

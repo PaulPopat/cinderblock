@@ -1,4 +1,4 @@
-#include "../Core/List.h"
+#include <vector>
 #include "./CreateFunc.h"
 
 namespace Binary
@@ -7,8 +7,9 @@ namespace Binary
   {
   public:
     App(char *binary);
+    ~App();
 
   private:
-    Core::List<CreateFunc *> *functions;
+    std::vector<CreateFunc *> *functions;
   };
 }

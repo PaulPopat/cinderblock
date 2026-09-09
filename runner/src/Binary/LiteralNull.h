@@ -5,7 +5,7 @@ namespace Binary
   class LiteralNull : Instruction
   {
   public:
-    const static int TypeName = 11;
+    const static char TypeName = 11;
     LiteralNull(char *binary, int offset);
 
     const int get_end() const;

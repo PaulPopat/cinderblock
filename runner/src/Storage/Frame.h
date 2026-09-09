@@ -1,23 +1,23 @@
 #include "./Variable.h"
-#include "../Core/List.h"
+#include "./VariableTuplePart.h"
+#include <vector>
 
 namespace Storage
 {
-  struct FrameVariable
-  {
-    char *name;
-    Variable *value;
-  };
-
   class Frame
   {
   public:
+    static Frame *From(char *data);
+
     Frame();
+    ~Frame();
     Variable *search(char *name);
     Frame *add_variable(char *name, Variable *value);
     Frame *merge(const Frame *input);
 
+    const val raw() const;
+
   private:
-    Core::List<FrameVariable *> data;
+    std::vector<VariableTuplePart *> data;
   };
 }

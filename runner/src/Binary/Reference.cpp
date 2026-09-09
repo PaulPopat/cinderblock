@@ -8,6 +8,11 @@ namespace Binary
     this->end = this->name->get_end();
   }
 
+  Reference::~Reference()
+  {
+    delete this->name;
+  }
+
   const int Reference::get_end() const
   {
     return this->end;

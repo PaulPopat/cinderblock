@@ -9,6 +9,11 @@ namespace Binary
     this->value = (float *)extract(binary, offset, sizeof(float));
   }
 
+  LiteralFloat::~LiteralFloat()
+  {
+    this->value = value;
+  }
+
   const int LiteralFloat::get_end() const
   {
     return this->end;

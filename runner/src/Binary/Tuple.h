@@ -1,20 +1,27 @@
 #include "./Instruction.h"
 #include "./LiteralString.h"
-#include "../Core/List.h"
+#include <vector>
 
 namespace Binary
 {
+
   class Tuple : Instruction
   {
   public:
-    const static int TypeName = 17;
+    const static char TypeName = 17;
     Tuple(char *binary, int offset);
+    ~Tuple();
 
     const int get_end() const;
 
   private:
-    Core::List<LiteralString *> names;
-    Core::List<Instruction *> values;
+    std::vector<TuplePart> values;
     int end;
+  };
+
+  struct TuplePart
+  {
+    LiteralString *name;
+    Instruction *value;
   };
 }
