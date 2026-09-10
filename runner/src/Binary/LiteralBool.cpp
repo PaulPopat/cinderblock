@@ -1,21 +1,20 @@
 #include "LiteralBool.h"
 #include "../Storage/VariablePrimitiveBool.h"
 
-namespace Binary
+namespace Binary {
+LiteralBool::LiteralBool(char* binary, int offset)
 {
-  LiteralBool::LiteralBool(char *binary, int offset)
-  {
-    this->value = binary[offset] != 0;
-    this->end = offset + 1;
-  }
+  this->value = binary[offset] != 0;
+  this->end = offset + 1;
+}
 
-  const int LiteralBool::get_end() const
-  {
-    return this->end;
-  }
+const int LiteralBool::get_end() const
+{
+  return this->end;
+}
 
-  const Variable *LiteralBool::resolve(Closure *closure) const
-  {
-    return new VariablePrimitiveBool(this->value);
-  }
+const Variable* LiteralBool::resolve(Closure* closure) const
+{
+  return closure->add_temp_variable(new VariablePrimitiveBool(this->value));
+}
 }

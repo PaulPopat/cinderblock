@@ -1,0 +1,27 @@
+{
+  "name": "@cinderblock-lang/runner",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "emsdk": "docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) emscripten/emsdk",
+    "compile:start": "npm run emsdk emcmake cmake . -B build",
+    "compile:finish": "npm run emsdk emmake make",
+    "compile": "npm run compile:start && npm run compile:finish"
+  },
+  "repository": "https://github.com/PaulPopat/cinderblock",
+  "version": "0.0.2",
+  "type": "module",
+  "description": "The runner for the CinderBlock programming language",
+  "author": "Paul Popat",
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "typescript": "^6.0.3"
+  },
+  "imports": {},
+  "exports": {},
+  "prettier": {
+    "printWidth": 150
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

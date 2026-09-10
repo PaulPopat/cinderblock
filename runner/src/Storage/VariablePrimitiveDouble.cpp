@@ -1,25 +1,24 @@
 #include "VariablePrimitiveDouble.h"
 #include "../Binary/extract.h"
 
-namespace Storage
+namespace Storage {
+VariablePrimitiveDouble::VariablePrimitiveDouble(double value)
 {
-  VariablePrimitiveDouble::VariablePrimitiveDouble(double value)
-  {
-    this->value = value;
-  }
+  this->value = value;
+}
 
-  VariablePrimitiveDouble::VariablePrimitiveDouble(val value)
-  {
-    this->value = value.as<double>();
-  }
+VariablePrimitiveDouble::VariablePrimitiveDouble(val value)
+{
+  this->value = value.as<double>();
+}
 
-  const val VariablePrimitiveDouble::raw() const
-  {
-    return val(this->value);
-  }
+const val VariablePrimitiveDouble::raw() const
+{
+  return val(this->value);
+}
 
-  double VariablePrimitiveDouble::get_value() const
-  {
-    return this->value;
-  }
+double VariablePrimitiveDouble::get_value() const
+{
+  return this->value;
+}
 }

@@ -1,56 +1,50 @@
-#include "Variable.h"
 #include "VariableArray.h"
+#include "Variable.h"
 
-namespace Storage
+namespace Storage {
+VariableArray::VariableArray(std::vector<const Variable*> values)
 {
-  VariableArray::VariableArray(std::vector<const Variable *> values)
-  {
-    this->values = values;
+  this->values = values;
+}
+
+VariableArray::~VariableArray()
+{
+  for (const auto& value : this->values) {
+    delete value;
+  }
+}
+
+VariableArray::VariableArray(val value)
+{
+  if (!value.isArray()) {
+    throw "Value not array";
   }
 
-  VariableArray::~VariableArray()
-  {
-    for (const auto &value : this->values)
-    {
-      delete value;
-    }
+  auto values = std::vector<const Variable*>();
+  for (const auto& v : vecFromJSArray<val>(value)) {
+    values.push_back(Variable::Parse(v));
   }
 
-  VariableArray::VariableArray(val value)
-  {
-    if (!value.isArray())
-    {
-      throw "Value not array";
-    }
+  this->values = values;
+}
 
-    auto values = std::vector<const Variable *>();
-    for (const auto &v : convertJSArrayToNumberVector<val>(value))
-    {
-      values.push_back(Variable::Parse(v));
-    }
-
-    this->values = values;
+const val VariableArray::raw() const
+{
+  auto result = std::vector<val>();
+  for (const auto& value : this->values) {
+    result.push_back(value->raw());
   }
 
-  const val VariableArray::raw() const
-  {
-    auto result = std::vector<val>();
-    for (const auto &value : this->values)
-    {
-      result.push_back(value->raw());
-    }
+  return val::array();
+}
 
-    return val::array();
+const std::vector<const Variable*> VariableArray::get_values() const
+{
+  auto result = std::vector<const Variable*>();
+  for (const auto& var : this->values) {
+    result.push_back(var);
   }
 
-  const std::vector<const Variable *> VariableArray::get_values() const
-  {
-    auto result = std::vector<const Variable *>();
-    for (const auto &var : this->values)
-    {
-      result.push_back(var);
-    }
-
-    return result;
-  }
+  return result;
+}
 }

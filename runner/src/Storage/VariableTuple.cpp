@@ -1,69 +1,69 @@
 #include "VariableTuple.h"
 #include "VariablePrimitiveNull.h"
 
-namespace Storage
+namespace Storage {
+VariableTuple::VariableTuple(const std::vector<VariableTuplePart>& value)
 {
-  VariableTuple::VariableTuple(std::vector<VariableTuplePart> value)
-  {
-    this->value = value;
+  this->value = std::vector<VariableTuplePart>();
+  for (const auto& part : value) {
+    this->value.push_back(part);
+  }
+}
+
+VariableTuple::VariableTuple(val value)
+{
+  this->value = std::vector<VariableTuplePart>();
+  for (const auto& pair : vecFromJSArray<val>(value)) {
+    this->value.push_back({ pair["name"].as<std::string>(), Variable::Parse(pair["value"]) });
+  }
+}
+
+VariableTuple::~VariableTuple()
+{
+  for (const auto& part : this->value) {
+    delete part.value;
+  }
+}
+
+const VariableTuple* VariableTuple::merge(const VariableTuple* input) const
+{
+  auto result = std::vector<VariableTuplePart>();
+  for (const auto& part : this->value) {
+    result.push_back(part);
   }
 
-  VariableTuple::VariableTuple(val value)
-  {
-    this->value = std::vector<VariableTuplePart>();
-    for (const auto &pair : vecFromJSArray<val>(value))
-    {
-      this->value.push_back({pair["name"].as<std::string>(), Variable::Parse(pair["value"])});
+  for (const auto& part : input->value) {
+    result.push_back(part);
+  }
+
+  return new VariableTuple(result);
+}
+
+const Variable* VariableTuple::get(std::string name) const
+{
+
+  for (const auto& part : this->value) {
+    if (part.name.compare(name)) {
+      return part.value;
     }
   }
 
-  VariableTuple::~VariableTuple()
-  {
-    for (const auto &part : this->value)
-    {
-      delete part.value;
-    }
+  return (Variable*)new VariablePrimitiveNull();
+}
+
+const val VariableTuple::raw() const
+{
+  auto result = val::object();
+
+  for (const auto& part : this->value) {
+    result.set(part.name, part.value->raw());
   }
 
-  const VariableTuple *VariableTuple::merge(const VariableTuple *input) const
-  {
-    auto result = std::vector<VariableTuplePart>();
-    for (const auto &part : this->value)
-    {
-      result.push_back(part);
-    }
+  return result;
+}
 
-    for (const auto &part : input->value)
-    {
-      result.push_back(part);
-    }
-
-    return new VariableTuple(result);
-  }
-
-  const Variable *VariableTuple::get(std::string name) const
-  {
-
-    for (const auto &part : this->value)
-    {
-      if (part.name.compare(name))
-      {
-        return part.value;
-      }
-    }
-
-    return (Variable *)new VariablePrimitiveNull();
-  }
-
-  const val VariableTuple::raw() const
-  {
-    auto result = val::object();
-
-    for (const auto &part : this->value)
-    {
-      result.set(part.name, part.value->raw());
-    }
-
-    return result;
-  }
+const std::vector<VariableTuplePart> VariableTuple::get_parts() const
+{
+  return this->value;
+}
 }

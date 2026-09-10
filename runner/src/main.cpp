@@ -1,41 +1,92 @@
+#include "Binary/App.h"
+#include "Storage/Closure.h"
+#include "Storage/Frame.h"
+#include "Storage/Variable.h"
+#include "Storage/VariableArray.h"
+#include "Storage/VariablePipeable.h"
+#include "Storage/VariablePrimitive.h"
+#include "Storage/VariablePrimitiveBool.h"
+#include "Storage/VariablePrimitiveChar.h"
+#include "Storage/VariablePrimitiveDouble.h"
+#include "Storage/VariablePrimitiveFloat.h"
+#include "Storage/VariablePrimitiveInt.h"
+#include "Storage/VariablePrimitiveLong.h"
+#include "Storage/VariablePrimitiveNull.h"
+#include "Storage/VariablePrimitiveString.h"
+#include "Storage/VariableTuple.h"
 #include <emscripten/bind.h>
 #include <emscripten/val.h>
 #include <vector>
-#include "Binary/App.h"
-#include "Storage/Frame.h"
-#include "Storage/Closure.h"
-#include "Storage/Variable.h"
 
 using namespace emscripten;
 
-Binary::App *app;
-Storage::Frame *globals;
+EMSCRIPTEN_DECLARE_VAL_TYPE(CinderBlockVal);
+EMSCRIPTEN_DECLARE_VAL_TYPE(CinderBlockFrame);
 
-extern "C"
+Binary::App* app;
+Storage::Frame* globals;
+
+void LoadApp(std::string buf)
 {
-  void LoadApp(char *buf)
-  {
-    app = new Binary::App(buf);
-  }
+  app = new Binary::App(buf.data());
+  Variable::Register(VariableArray::TypeName, [](val value) {
+    return new VariableArray(value);
+  });
+  Variable::Register(VariablePipeable::TypeName, [](val value) {
+    return new VariablePipeable(value);
+  });
+  Variable::Register(VariablePrimitiveBool::TypeName, [](val value) {
+    return new VariablePrimitiveBool(value);
+  });
+  Variable::Register(VariablePrimitiveChar::TypeName, [](val value) {
+    return new VariablePrimitiveChar(value);
+  });
+  Variable::Register(VariablePrimitiveDouble::TypeName, [](val value) {
+    return new VariablePrimitiveDouble(value);
+  });
+  Variable::Register(VariablePrimitiveFloat::TypeName, [](val value) {
+    return new VariablePrimitiveFloat(value);
+  });
+  Variable::Register(VariablePrimitiveInt::TypeName, [](val value) {
+    return new VariablePrimitiveInt(value);
+  });
+  Variable::Register(VariablePrimitiveLong::TypeName, [](val value) {
+    return new VariablePrimitiveLong(value);
+  });
+  Variable::Register(VariablePrimitiveNull::TypeName, [](val value) {
+    return new VariablePrimitiveNull(value);
+  });
+  Variable::Register(VariablePrimitiveString::TypeName, [](val value) {
+    return new VariablePrimitiveString(value);
+  });
+  Variable::Register(VariableTuple::TypeName, [](val value) {
+    return new VariableTuple(value);
+  });
 }
 
-void LoadGlobals(val subject)
+void LoadGlobals(CinderBlockFrame subject)
 {
   globals = Storage::Frame::From(subject);
 }
 
-val Run(std::string name, val args)
+CinderBlockVal Run(std::string name, CinderBlockFrame args)
 {
-  auto frame = Storage::Frame::From(args);
   auto func = app->find(name);
-  auto frames = std::vector<Storage::Frame *>();
-  frames.push_back(frame);
+  auto frames = std::vector<Storage::Frame*>();
   auto closure = new Storage::Closure(globals, frames);
-  auto var = func->exec(closure);
+  auto var = func->exec(closure, new VariableTuple(args));
 
   auto result = var->raw();
-  delete frame;
   delete closure;
-  Storage::Variable::Cleanup();
-  return result;
+  return (CinderBlockVal)result;
+}
+
+EMSCRIPTEN_BINDINGS(my_module)
+{
+  function("Run", &Run);
+  function("LoadGlobals", &LoadGlobals);
+  function("LoadApp", &LoadApp);
+
+  register_type<CinderBlockVal>("{ type: number, data: any }");
+  register_type<CinderBlockFrame>("Record<string, { type: number, data: any }>");
 }

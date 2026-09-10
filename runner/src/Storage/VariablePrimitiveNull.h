@@ -2,26 +2,23 @@
 
 #include "Variable.h"
 
-namespace Storage
-{
-  class VariablePrimitiveNull : public Variable
-  {
+namespace Storage {
+class VariablePrimitiveNull : public Variable {
   public:
-    static const VariablePrimitiveNull *FromVariable(const Variable *var)
-    {
-      if (var->TypeName != VariablePrimitiveNull::TypeName)
-      {
-        return nullptr;
-      }
-
-      return (VariablePrimitiveNull *)var;
+  static const VariablePrimitiveNull* FromVariable(const Variable* var)
+  {
+    if (var->IsType != VariablePrimitiveNull::TypeName) {
+      return nullptr;
     }
 
-    const static char TypeName = 5;
-    const char TypeName = 5;
-    VariablePrimitiveNull();
-    VariablePrimitiveNull(val value);
+    return (VariablePrimitiveNull*)var;
+  }
 
-    const val raw() const;
-  };
+  const static char TypeName = 5;
+  const char IsType = 5;
+  VariablePrimitiveNull();
+  VariablePrimitiveNull(val value);
+
+  const val raw() const;
+};
 }

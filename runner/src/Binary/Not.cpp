@@ -1,27 +1,26 @@
 #include "Not.h"
 #include "../Storage/VariablePrimitiveBool.h"
 
-namespace Binary
+namespace Binary {
+Not::Not(char* binary, int offset)
 {
-  Not::Not(char *binary, int offset)
-  {
-    this->subject = Instruction::Parse(binary, offset);
-    this->end = this->subject->get_end();
-  }
+  this->subject = Instruction::Parse(binary, offset);
+  this->end = this->subject->get_end();
+}
 
-  Not::~Not()
-  {
-    delete this->subject;
-  }
+Not::~Not()
+{
+  delete this->subject;
+}
 
-  const int Not::get_end() const
-  {
-    return this->end;
-  }
+const int Not::get_end() const
+{
+  return this->end;
+}
 
-  const Variable *Not::resolve(Closure *closure) const
-  {
-    auto value = VariablePrimitiveBool::FromVariable(this->subject->resolve(closure));
-    return new VariablePrimitiveBool(!value->get_value());
-  }
+const Variable* Not::resolve(Closure* closure) const
+{
+  auto value = VariablePrimitiveBool::FromVariable(this->subject->resolve(closure));
+  return closure->add_temp_variable(new VariablePrimitiveBool(!value->get_value()));
+}
 }

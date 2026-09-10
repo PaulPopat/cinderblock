@@ -3,30 +3,27 @@
 #include "Variable.h"
 #include <string>
 
-namespace Storage
-{
-  class VariablePrimitiveString : public Variable
-  {
+namespace Storage {
+class VariablePrimitiveString : public Variable {
   public:
-    static const VariablePrimitiveString *FromVariable(const Variable *var)
-    {
-      if (var->TypeName != VariablePrimitiveString::TypeName)
-      {
-        return nullptr;
-      }
-
-      return (VariablePrimitiveString *)var;
+  static const VariablePrimitiveString* FromVariable(const Variable* var)
+  {
+    if (var->IsType != VariablePrimitiveString::TypeName) {
+      return nullptr;
     }
 
-    const static char TypeName = 6;
-    const char TypeName = 6;
-    VariablePrimitiveString(std::string value);
-    VariablePrimitiveString(val value);
+    return (VariablePrimitiveString*)var;
+  }
 
-    const val raw() const;
-    std::string get_value() const;
+  const static char TypeName = 6;
+  const char IsType = 6;
+  VariablePrimitiveString(std::string value);
+  VariablePrimitiveString(val value);
+
+  const val raw() const;
+  std::string get_value() const;
 
   private:
-    std::string value;
-  };
+  std::string value;
+};
 }

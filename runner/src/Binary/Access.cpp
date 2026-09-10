@@ -1,37 +1,35 @@
 #include "Access.h"
-#include "../Storage/VariableTuple.h";
-#include "../Storage/VariablePrimitiveNull.h";
+#include "../Storage/VariablePrimitiveNull.h"
+#include "../Storage/VariableTuple.h"
 
 using namespace Storage;
 
-namespace Binary
+namespace Binary {
+Access::Access(char* binary, int offset)
 {
-  Access::Access(char *binary, int offset)
-  {
-    this->subject = Instruction::Parse(binary, offset);
-    this->key = new LiteralString(binary, this->subject->get_end());
-    this->end = this->key->get_end();
+  this->subject = Instruction::Parse(binary, offset);
+  this->key = new LiteralString(binary, this->subject->get_end());
+  this->end = this->key->get_end();
+}
+
+Access::~Access()
+{
+  delete this->subject;
+  delete this->key;
+}
+
+const int Access::get_end() const
+{
+  return this->end;
+}
+
+const Variable* Access::resolve(Closure* closure) const
+{
+  auto subject = VariableTuple::FromVariable(this->subject->resolve(closure));
+  if (subject == nullptr) {
+    return closure->add_temp_variable(new VariablePrimitiveNull());
   }
 
-  Access::~Access()
-  {
-    delete this->subject;
-    delete this->key;
-  }
-
-  const int Access::get_end() const
-  {
-    return this->end;
-  }
-
-  const Variable *Access::resolve(Closure *closure) const
-  {
-    auto subject = VariableTuple::FromVariable(this->subject->resolve(closure));
-    if (subject == nullptr)
-    {
-      return new VariablePrimitiveNull();
-    }
-
-    return subject->get(this->key->get_value());
-  }
+  return subject->get(this->key->get_value());
+}
 }

@@ -2,20 +2,18 @@
 
 #include "Instruction.h"
 
-namespace Binary
-{
-  class LiteralLong : public Instruction
-  {
+namespace Binary {
+class LiteralLong : public Instruction {
   public:
-    const static char TypeName = 10;
-    LiteralLong(char *binary, int offset);
-    ~LiteralLong();
+  const static char TypeName = 10;
+  LiteralLong(char* binary, int offset);
+  ~LiteralLong();
 
-    const int get_end() const;
-    const Variable *resolve(Closure *closure) const;
+  const int get_end() const;
+  const Variable* resolve(Closure* closure) const;
 
   private:
-    long *value;
-    int end;
-  };
+  long* value;
+  int end;
+};
 }

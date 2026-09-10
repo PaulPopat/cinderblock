@@ -1,21 +1,20 @@
 #include "LiteralNull.h"
-#include "extract.h"
 #include "../Storage/VariablePrimitiveNull.h"
+#include "extract.h"
 
-namespace Binary
+namespace Binary {
+LiteralNull::LiteralNull(char* binary, int offset)
 {
-  LiteralNull::LiteralNull(char *binary, int offset)
-  {
-    this->end = offset;
-  }
+  this->end = offset;
+}
 
-  const int LiteralNull::get_end() const
-  {
-    return this->end;
-  }
+const int LiteralNull::get_end() const
+{
+  return this->end;
+}
 
-  const Variable *LiteralNull::resolve(Closure *closure) const
-  {
-    return new VariablePrimitiveNull();
-  }
+const Variable* LiteralNull::resolve(Closure* closure) const
+{
+  return closure->add_temp_variable(new VariablePrimitiveNull());
+}
 }

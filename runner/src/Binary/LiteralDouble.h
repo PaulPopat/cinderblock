@@ -2,20 +2,18 @@
 
 #include "Instruction.h"
 
-namespace Binary
-{
-  class LiteralDouble : public Instruction
-  {
+namespace Binary {
+class LiteralDouble : public Instruction {
   public:
-    const static char TypeName = 7;
-    LiteralDouble(char *binary, int offset);
-    ~LiteralDouble();
+  const static char TypeName = 7;
+  LiteralDouble(char* binary, int offset);
+  ~LiteralDouble();
 
-    const int get_end() const;
-    const Variable *resolve(Closure *closure) const;
+  const int get_end() const;
+  const Variable* resolve(Closure* closure) const;
 
   private:
-    double *value;
-    int end;
-  };
+  double* value;
+  int end;
+};
 }

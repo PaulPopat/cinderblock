@@ -2,30 +2,27 @@
 
 #include "VariablePrimitive.h"
 
-namespace Storage
-{
-  class VariablePrimitiveBool : public VariablePrimitive<bool>
-  {
+namespace Storage {
+class VariablePrimitiveBool : public VariablePrimitive<bool> {
   public:
-    static const VariablePrimitiveBool *FromVariable(const Variable *var)
-    {
-      if (var->TypeName != VariablePrimitiveBool::TypeName)
-      {
-        return nullptr;
-      }
-
-      return (VariablePrimitiveBool *)var;
+  static const VariablePrimitiveBool* FromVariable(const Variable* var)
+  {
+    if (var->IsType != VariablePrimitiveBool::TypeName) {
+      return nullptr;
     }
 
-    const static char TypeName = 2;
-    const char TypeName = 2;
-    VariablePrimitiveBool(bool value);
-    VariablePrimitiveBool(val value);
+    return (VariablePrimitiveBool*)var;
+  }
 
-    const val raw() const;
-    bool get_value() const;
+  const static char TypeName = 2;
+  const char IsType = 2;
+  VariablePrimitiveBool(bool value);
+  VariablePrimitiveBool(val value);
+
+  const val raw() const;
+  bool get_value() const;
 
   private:
-    bool value;
-  };
+  bool value;
+};
 }

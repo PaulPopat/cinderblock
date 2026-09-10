@@ -1,27 +1,26 @@
 #include "LiteralDouble.h"
-#include "extract.h"
 #include "../Storage/VariablePrimitiveDouble.h"
+#include "extract.h"
 
-namespace Binary
+namespace Binary {
+LiteralDouble::LiteralDouble(char* binary, int offset)
 {
-  LiteralDouble::LiteralDouble(char *binary, int offset)
-  {
-    this->end = offset + sizeof(double);
-    this->value = (double *)extract(binary, offset, sizeof(double));
-  }
+  this->end = offset + sizeof(double);
+  this->value = (double*)extract(binary, offset, sizeof(double));
+}
 
-  LiteralDouble::~LiteralDouble()
-  {
-    delete this->value;
-  }
+LiteralDouble::~LiteralDouble()
+{
+  delete this->value;
+}
 
-  const int LiteralDouble::get_end() const
-  {
-    return this->end;
-  }
+const int LiteralDouble::get_end() const
+{
+  return this->end;
+}
 
-  const Variable *LiteralDouble::resolve(Closure *closure) const
-  {
-    return new VariablePrimitiveDouble(*this->value);
-  }
+const Variable* LiteralDouble::resolve(Closure* closure) const
+{
+  return closure->add_temp_variable(new VariablePrimitiveDouble(*this->value));
+}
 }

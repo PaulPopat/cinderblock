@@ -2,25 +2,25 @@
 
 #include "Variable.h"
 #include "VariableTuplePart.h"
-#include <vector>
 #include <string>
+#include <vector>
 
-namespace Storage
-{
-  class Frame
-  {
+namespace Storage {
+class Frame {
   public:
-    static Frame *From(val data);
+  static Frame* From(val data);
 
-    Frame();
-    ~Frame();
-    Variable *search(std::string name);
-    Frame *add_variable(std::string name, Variable *value);
-    Frame *merge(const Frame *input);
+  Frame();
+  ~Frame();
+  const Variable* search(std::string name) const;
+  Frame* add_variable(std::string name, const Variable* value);
+  Frame* add_temp_variable(const Variable* value);
+  Frame* merge(const Frame* input);
 
-    const val raw() const;
+  const val raw() const;
 
   private:
-    std::vector<VariableTuplePart> data;
-  };
+  std::vector<VariableTuplePart> data;
+  std::vector<const Variable*> temp;
+};
 }

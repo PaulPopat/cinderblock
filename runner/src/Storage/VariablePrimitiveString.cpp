@@ -1,24 +1,23 @@
 #include "VariablePrimitiveString.h"
 
-namespace Storage
+namespace Storage {
+VariablePrimitiveString::VariablePrimitiveString(std::string value)
 {
-  VariablePrimitiveString::VariablePrimitiveString(std::string value)
-  {
-    this->value = value;
-  }
+  this->value = value;
+}
 
-  VariablePrimitiveString::VariablePrimitiveString(val value)
-  {
-    this->value = value.as<std::string>();
-  }
+VariablePrimitiveString::VariablePrimitiveString(val value)
+{
+  this->value = value.as<std::string>();
+}
 
-  const val VariablePrimitiveString::raw() const
-  {
-    return val(this->value);
-  }
+const val VariablePrimitiveString::raw() const
+{
+  return val(this->value);
+}
 
-  std::string VariablePrimitiveString::get_value() const
-  {
-    return this->value;
-  }
+std::string VariablePrimitiveString::get_value() const
+{
+  return this->value;
+}
 }

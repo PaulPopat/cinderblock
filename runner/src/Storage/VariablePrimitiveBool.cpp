@@ -1,24 +1,23 @@
 #include "VariablePrimitiveBool.h"
 
-namespace Storage
+namespace Storage {
+VariablePrimitiveBool::VariablePrimitiveBool(bool value)
 {
-  VariablePrimitiveBool::VariablePrimitiveBool(bool value)
-  {
-    this->value = value;
-  }
+  this->value = value;
+}
 
-  VariablePrimitiveBool::VariablePrimitiveBool(val value)
-  {
-    this->value = value.as<bool>();
-  }
+VariablePrimitiveBool::VariablePrimitiveBool(val value)
+{
+  this->value = value.as<bool>();
+}
 
-  const val VariablePrimitiveBool::raw() const
-  {
-    return val(this->value);
-  }
+const val VariablePrimitiveBool::raw() const
+{
+  return val(this->value);
+}
 
-  bool VariablePrimitiveBool::get_value() const
-  {
-    return this->value;
-  }
+bool VariablePrimitiveBool::get_value() const
+{
+  return this->value;
+}
 }

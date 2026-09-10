@@ -2,11 +2,9 @@
 
 #include "Variable.h"
 
-namespace Storage
-{
-  struct VariableTuplePart
-  {
-    std::string name;
-    Variable *value;
-  };
+namespace Storage {
+struct VariableTuplePart {
+  const std::string name;
+  const Variable* value;
+};
 }

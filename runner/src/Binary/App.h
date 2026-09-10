@@ -1,20 +1,18 @@
 #pragma once
 
-#include <vector>
-#include <string>
 #include "CreateFunc.h"
+#include <string>
+#include <vector>
 
-namespace Binary
-{
-  class App
-  {
+namespace Binary {
+class App {
   public:
-    App(char *binary);
-    ~App();
+  App(char* binary);
+  ~App();
 
-    CreateFunc *find(std::string name);
+  CreateFunc* find(std::string name);
 
   private:
-    std::vector<CreateFunc *> functions;
-  };
+  std::vector<CreateFunc*> functions;
+};
 }

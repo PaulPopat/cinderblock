@@ -4,32 +4,30 @@
 #include "VariableTuplePart.h"
 #include <vector>
 
-namespace Storage
-{
-  class VariableTuple : public Variable
-  {
+namespace Storage {
+class VariableTuple : public Variable {
   public:
-    static const VariableTuple *FromVariable(const Variable *var)
-    {
-      if (var->TypeName != VariableTuple::TypeName)
-      {
-        return nullptr;
-      }
-
-      return (VariableTuple *)var;
+  static const VariableTuple* FromVariable(const Variable* var)
+  {
+    if (var->IsType != VariableTuple::TypeName) {
+      return nullptr;
     }
 
-    const static char TypeName = 10;
-    const char TypeName = 10;
-    VariableTuple(std::vector<VariableTuplePart> value);
-    VariableTuple(val value);
-    ~VariableTuple();
+    return (VariableTuple*)var;
+  }
 
-    const VariableTuple *merge(const VariableTuple *input) const;
-    const Variable *get(std::string name) const;
-    const val raw() const;
+  const static char TypeName = 10;
+  const char IsType = 10;
+  VariableTuple(const std::vector<VariableTuplePart>& value);
+  VariableTuple(val value);
+  ~VariableTuple();
+
+  const VariableTuple* merge(const VariableTuple* input) const;
+  const Variable* get(std::string name) const;
+  const val raw() const;
+  const std::vector<VariableTuplePart> get_parts() const;
 
   private:
-    std::vector<VariableTuplePart> value;
-  };
+  std::vector<VariableTuplePart> value;
+};
 }

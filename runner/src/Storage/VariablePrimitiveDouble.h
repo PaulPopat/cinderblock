@@ -2,30 +2,27 @@
 
 #include "VariablePrimitive.h"
 
-namespace Storage
-{
-  class VariablePrimitiveDouble : public VariablePrimitive<double>
-  {
+namespace Storage {
+class VariablePrimitiveDouble : public VariablePrimitive<double> {
   public:
-    static const VariablePrimitiveDouble *FromVariable(const Variable *var)
-    {
-      if (var->TypeName != VariablePrimitiveDouble::TypeName)
-      {
-        return nullptr;
-      }
-
-      return (VariablePrimitiveDouble *)var;
+  static const VariablePrimitiveDouble* FromVariable(const Variable* var)
+  {
+    if (var->IsType != VariablePrimitiveDouble::TypeName) {
+      return nullptr;
     }
 
-    const static char TypeName = 9;
-    const char TypeName = 9;
-    VariablePrimitiveDouble(double value);
-    VariablePrimitiveDouble(val value);
+    return (VariablePrimitiveDouble*)var;
+  }
 
-    const val raw() const;
-    double get_value() const;
+  const static char TypeName = 9;
+  const char IsType = 9;
+  VariablePrimitiveDouble(double value);
+  VariablePrimitiveDouble(val value);
+
+  const val raw() const;
+  double get_value() const;
 
   private:
-    double value;
-  };
+  double value;
+};
 }
