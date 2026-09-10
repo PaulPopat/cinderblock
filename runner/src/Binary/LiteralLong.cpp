@@ -3,7 +3,7 @@
 #include "extract.h"
 
 namespace Binary {
-LiteralLong::LiteralLong(char* binary, int offset)
+LiteralLong::LiteralLong(const char*binary, int offset)
 {
   this->end = offset + sizeof(long);
   this->value = (long*)extract(binary, offset, sizeof(long));

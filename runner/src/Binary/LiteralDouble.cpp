@@ -3,7 +3,7 @@
 #include "extract.h"
 
 namespace Binary {
-LiteralDouble::LiteralDouble(char* binary, int offset)
+LiteralDouble::LiteralDouble(const char*binary, int offset)
 {
   this->end = offset + sizeof(double);
   this->value = (double*)extract(binary, offset, sizeof(double));

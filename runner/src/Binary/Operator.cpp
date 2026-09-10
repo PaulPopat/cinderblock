@@ -12,7 +12,7 @@
 #include "../Storage/VariableTuple.h"
 
 namespace Binary {
-Operator::Operator(char* binary, int offset)
+Operator::Operator(const char*binary, int offset)
 {
   this->type = (OperatorType)binary[offset];
   this->left = Instruction::Parse(binary, offset + 1);

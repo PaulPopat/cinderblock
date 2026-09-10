@@ -1,7 +1,7 @@
 #include "Reference.h"
 
 namespace Binary {
-Reference::Reference(char* binary, int offset)
+Reference::Reference(const char*binary, int offset)
 {
   this->name = new LiteralString(binary, offset);
   this->end = this->name->get_end();

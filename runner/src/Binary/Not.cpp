@@ -2,7 +2,7 @@
 #include "../Storage/VariablePrimitiveBool.h"
 
 namespace Binary {
-Not::Not(char* binary, int offset)
+Not::Not(const char*binary, int offset)
 {
   this->subject = Instruction::Parse(binary, offset);
   this->end = this->subject->get_end();

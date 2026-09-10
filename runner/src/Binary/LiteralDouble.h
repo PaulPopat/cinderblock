@@ -6,7 +6,7 @@ namespace Binary {
 class LiteralDouble : public Instruction {
   public:
   const static char TypeName = 7;
-  LiteralDouble(char* binary, int offset);
+  LiteralDouble(const char*binary, int offset);
   ~LiteralDouble();
 
   const int get_end() const;

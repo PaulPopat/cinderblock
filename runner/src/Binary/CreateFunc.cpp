@@ -2,7 +2,7 @@
 #include "../Storage/VariablePipeable.h"
 
 namespace Binary {
-CreateFunc::CreateFunc(char* binary, int offset)
+CreateFunc::CreateFunc(const char*binary, int offset)
 {
   this->name = new LiteralString(binary, offset);
   auto end = this->name->get_end();

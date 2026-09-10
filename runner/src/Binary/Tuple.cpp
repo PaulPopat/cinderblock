@@ -3,7 +3,7 @@
 #include "LiteralString.h"
 
 namespace Binary {
-Tuple::Tuple(char* binary, int offset)
+Tuple::Tuple(const char*binary, int offset)
 {
   int end = offset;
   auto values = std::vector<TuplePart>();

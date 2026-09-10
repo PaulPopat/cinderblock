@@ -13,7 +13,7 @@ struct TuplePart {
 class Tuple : public Instruction {
   public:
   const static char TypeName = 17;
-  Tuple(char* binary, int offset);
+  Tuple(const char*binary, int offset);
   ~Tuple();
 
   const int get_end() const;

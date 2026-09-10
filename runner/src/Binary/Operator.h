@@ -25,7 +25,7 @@ enum OperatorType {
 class Operator : public Instruction {
   public:
   const static char TypeName = 14;
-  Operator(char* binary, int offset);
+  Operator(const char*binary, int offset);
   ~Operator();
   const int get_end() const;
   const Variable* resolve(Closure* closure) const;

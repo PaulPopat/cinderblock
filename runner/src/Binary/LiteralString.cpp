@@ -2,7 +2,7 @@
 #include "../Storage/VariablePrimitiveString.h"
 
 namespace Binary {
-LiteralString::LiteralString(char* binary, int offset)
+LiteralString::LiteralString(const char*binary, int offset)
   : binary(binary)
   , offset(offset)
 {

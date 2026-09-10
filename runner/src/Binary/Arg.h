@@ -7,7 +7,7 @@ namespace Binary {
 class Arg : public Instruction {
   public:
   const static char TypeName = 1;
-  Arg(char* binary, int offset);
+  Arg(const char*binary, int offset);
   ~Arg();
   const int get_end() const;
   const Storage::Variable* resolve(Storage::Closure* closure) const;

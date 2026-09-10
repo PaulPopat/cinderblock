@@ -2,7 +2,7 @@
 #include "../Storage/VariablePrimitiveChar.h"
 
 namespace Binary {
-LiteralChar::LiteralChar(char* binary, int offset)
+LiteralChar::LiteralChar(const char*binary, int offset)
 {
   this->value = binary[offset];
   this->end = offset + 1;

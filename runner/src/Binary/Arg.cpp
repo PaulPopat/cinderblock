@@ -1,7 +1,7 @@
 #include "Arg.h"
 
 namespace Binary {
-Arg::Arg(char* binary, int offset)
+Arg::Arg(const char*binary, int offset)
 {
   this->name = new LiteralString(binary, offset);
   this->end = this->name->get_end();

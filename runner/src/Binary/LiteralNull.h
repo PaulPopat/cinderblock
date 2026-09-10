@@ -6,7 +6,7 @@ namespace Binary {
 class LiteralNull : public Instruction {
   public:
   const static char TypeName = 11;
-  LiteralNull(char* binary, int offset);
+  LiteralNull(const char*binary, int offset);
 
   const int get_end() const;
   const Variable* resolve(Closure* closure) const;

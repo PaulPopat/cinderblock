@@ -5,7 +5,7 @@
 using namespace Storage;
 
 namespace Binary {
-Access::Access(char* binary, int offset)
+Access::Access(const char*binary, int offset)
 {
   this->subject = Instruction::Parse(binary, offset);
   this->key = new LiteralString(binary, this->subject->get_end());

@@ -2,7 +2,7 @@
 #include "../Storage/VariableArray.h"
 
 namespace Binary {
-LiteralArray::LiteralArray(char* binary, int offset)
+LiteralArray::LiteralArray(const char*binary, int offset)
 {
   int end = offset;
   auto values = std::vector<Instruction*>();

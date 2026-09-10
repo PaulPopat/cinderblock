@@ -7,7 +7,7 @@
 namespace Binary {
 class App {
   public:
-  App(char* binary);
+  App(const char* binary);
   ~App();
 
   CreateFunc* find(std::string name);

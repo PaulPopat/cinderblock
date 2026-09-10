@@ -2,7 +2,7 @@
 #include "../Storage/VariablePrimitiveBool.h"
 
 namespace Binary {
-LiteralBool::LiteralBool(char* binary, int offset)
+LiteralBool::LiteralBool(const char*binary, int offset)
 {
   this->value = binary[offset] != 0;
   this->end = offset + 1;

@@ -6,7 +6,7 @@ namespace Binary {
 class LiteralLong : public Instruction {
   public:
   const static char TypeName = 10;
-  LiteralLong(char* binary, int offset);
+  LiteralLong(const char*binary, int offset);
   ~LiteralLong();
 
   const int get_end() const;

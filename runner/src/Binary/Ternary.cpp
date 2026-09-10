@@ -2,7 +2,7 @@
 #include "../Storage/VariablePrimitiveBool.h"
 
 namespace Binary {
-Ternary::Ternary(char* binary, int offset)
+Ternary::Ternary(const char*binary, int offset)
 {
   this->predicate = Instruction::Parse(binary, offset);
   this->positive = Instruction::Parse(binary, this->predicate->get_end());

@@ -9,8 +9,8 @@ using namespace Storage;
 namespace Binary {
 class Instruction {
   public:
-  static Instruction* Parse(char* binary, int offset);
-  static void Register(char identifier, std::function<Instruction*(char* binary, int offset)> init);
+  static Instruction* Parse(const char*binary, int offset);
+  static void Register(char identifier, std::function<Instruction*(const char*binary, int offset)> init);
   virtual ~Instruction() { }
 
   virtual const int get_end() const = 0;

@@ -4,12 +4,12 @@
 namespace Binary {
 struct ParserInfo {
   char identifier;
-  std::function<Instruction*(char* binary, int offset)> init;
+  std::function<Instruction*(const char*binary, int offset)> init;
 };
 
 std::vector<ParserInfo*> parsers = std::vector<ParserInfo*>();
 
-Instruction* Instruction::Parse(char* binary, int offset)
+Instruction* Instruction::Parse(const char*binary, int offset)
 {
   for (const auto& parser : parsers) {
     if (parser->identifier == binary[offset]) {
@@ -20,7 +20,7 @@ Instruction* Instruction::Parse(char* binary, int offset)
   throw "Invalid instruction. Check compiler version vs runner version.";
 }
 
-void Instruction::Register(char identifier, std::function<Instruction*(char* binary, int offset)> init)
+void Instruction::Register(char identifier, std::function<Instruction*(const char*binary, int offset)> init)
 {
   auto info = new ParserInfo();
   info->identifier = identifier;

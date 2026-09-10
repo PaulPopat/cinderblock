@@ -2,7 +2,7 @@
 #include <cstdlib>
 
 namespace Binary {
-void* extract(char* binary, int offset, unsigned long size)
+void* extract(const char*binary, int offset, unsigned long size)
 {
   void* value = malloc(size);
   char* value_char = (char*)value;

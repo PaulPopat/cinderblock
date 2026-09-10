@@ -3,7 +3,7 @@
 #include "extract.h"
 
 namespace Binary {
-LiteralNull::LiteralNull(char* binary, int offset)
+LiteralNull::LiteralNull(const char*binary, int offset)
 {
   this->end = offset;
 }

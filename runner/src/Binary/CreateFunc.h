@@ -12,7 +12,7 @@ using namespace Storage;
 namespace Binary {
 class CreateFunc {
   public:
-  CreateFunc(char* binary, int offset);
+  CreateFunc(const char*binary, int offset);
   ~CreateFunc();
   const int get_end() const;
 
