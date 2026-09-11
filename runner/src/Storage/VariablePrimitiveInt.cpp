@@ -13,7 +13,11 @@ VariablePrimitiveInt::VariablePrimitiveInt(val value)
 
 const val VariablePrimitiveInt::raw() const
 {
-  return val(this->value);
+  auto result = val::object();
+  result.set("type", this->IsType);
+  result.set("data", val(this->value));
+
+  return result;
 }
 
 int VariablePrimitiveInt::get_value() const

@@ -81,7 +81,9 @@ App::App(const char* binary)
   this->functions = std::vector<CreateFunc*>();
   auto offset = 0;
   while (binary[offset] != 0) {
-    this->functions.push_back(new CreateFunc(binary, offset + 1));
+    auto func = new CreateFunc(binary, offset + 1);
+    this->functions.push_back(func);
+    offset = func->get_end();
   }
 }
 

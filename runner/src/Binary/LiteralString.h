@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Instruction.h"
+#include <string>
 
 namespace Binary {
 class LiteralString : public Instruction {
@@ -13,8 +14,7 @@ class LiteralString : public Instruction {
   const int get_end() const;
 
   private:
-  const char* binary;
-  const int offset;
+  std::string data;
   int end;
 };
 }

@@ -13,7 +13,11 @@ VariablePrimitiveLong::VariablePrimitiveLong(val value)
 
 const val VariablePrimitiveLong::raw() const
 {
-  return val(this->value);
+  auto result = val::object();
+  result.set("type", this->IsType);
+  result.set("data", val(this->value));
+
+  return result;
 }
 
 long VariablePrimitiveLong::get_value() const

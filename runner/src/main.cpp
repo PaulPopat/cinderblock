@@ -22,6 +22,7 @@ using namespace emscripten;
 
 EMSCRIPTEN_DECLARE_VAL_TYPE(CinderBlockVal);
 EMSCRIPTEN_DECLARE_VAL_TYPE(CinderBlockFrame);
+EMSCRIPTEN_DECLARE_VAL_TYPE(CinderBlockTuple);
 
 Binary::App* app;
 Storage::Frame* globals;
@@ -69,12 +70,12 @@ void LoadGlobals(CinderBlockFrame subject)
   globals = Storage::Frame::From(subject);
 }
 
-CinderBlockVal Run(std::string name, CinderBlockFrame args)
+CinderBlockVal Run(std::string name, CinderBlockTuple args)
 {
   auto func = app->find(name);
   auto frames = std::vector<Storage::Frame*>();
   auto closure = new Storage::Closure(globals, frames);
-  auto var = func->exec(closure, new VariableTuple(args));
+  auto var = func->exec(closure, new VariableTuple(args["data"]));
 
   auto result = var->raw();
   delete closure;
@@ -88,5 +89,6 @@ EMSCRIPTEN_BINDINGS(my_module)
   function("LoadApp", &LoadApp);
 
   register_type<CinderBlockVal>("{ type: number, data: any }");
-  register_type<CinderBlockFrame>("Record<string, { type: number, data: any }>");
+  register_type<CinderBlockFrame>("Array<{ name: string, value: any }>");
+  register_type<CinderBlockTuple>("{ type: 10, data: Array<any> }");
 }

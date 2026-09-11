@@ -2,7 +2,7 @@
   "name": "@cinderblock-lang/runner",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "emsdk": "docker run --rm -v $(pwd):/src -u $(id -u):$(id -g) emscripten/emsdk",
+    "emsdk": "docker run --rm -v $(pwd):$(pwd) -u $(id -u):$(id -g) -w $(pwd) emscripten/emsdk",
     "compile:start": "npm run emsdk emcmake cmake . -B build",
     "compile:finish": "npm run emsdk emmake make",
     "compile": "npm run compile:start && npm run compile:finish"
@@ -16,8 +16,12 @@
     "@types/node": "^25.6.0",
     "typescript": "^6.0.3"
   },
-  "imports": {},
-  "exports": {},
+  "imports": {
+    "#variable": "./src/variable/index.ts"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "prettier": {
     "printWidth": 150
   },

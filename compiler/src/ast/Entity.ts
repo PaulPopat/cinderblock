@@ -1,4 +1,3 @@
-import type { Closure } from "#runner";
 import type { TokenWalker } from "#tokeniser";
 import type { CreateFunc } from "#writer";
 import { Entry } from "./Entry.ts";

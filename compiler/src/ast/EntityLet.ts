@@ -3,13 +3,13 @@ import { Expression } from "./Expression.ts";
 import { Entity } from "./Entity.ts";
 import { Type } from "./Type.ts";
 import { TypePipeable } from "./TypePipeable.ts";
-import { Namer } from "#runner";
 import { EntryTag } from "./EntryTag.ts";
 import { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import type { Entry } from "./Entry.ts";
 import { TokenTypeName } from "#tokeniser";
 import { EntityNamespace } from "./EntityNamespace.ts";
 import type { CreateFunc } from "#writer";
+import { Namer } from "./Namer.ts";
 
 export class EntityLet extends EntityNamespace {
   static {

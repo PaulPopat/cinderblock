@@ -13,7 +13,12 @@ VariablePrimitiveString::VariablePrimitiveString(val value)
 
 const val VariablePrimitiveString::raw() const
 {
-  return val(this->value);
+  auto result = val::object();
+  result.set("type", this->IsType);
+  auto c_str = this->value.c_str();
+  result.set("data", val(this->value));
+
+  return result;
 }
 
 std::string VariablePrimitiveString::get_value() const

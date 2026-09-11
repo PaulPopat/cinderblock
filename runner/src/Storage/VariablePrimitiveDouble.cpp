@@ -14,7 +14,11 @@ VariablePrimitiveDouble::VariablePrimitiveDouble(val value)
 
 const val VariablePrimitiveDouble::raw() const
 {
-  return val(this->value);
+  auto result = val::object();
+  result.set("type", this->IsType);
+  result.set("data", val(this->value));
+
+  return result;
 }
 
 double VariablePrimitiveDouble::get_value() const

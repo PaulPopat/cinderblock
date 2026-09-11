@@ -13,7 +13,11 @@ VariablePrimitiveBool::VariablePrimitiveBool(val value)
 
 const val VariablePrimitiveBool::raw() const
 {
-  return val(this->value);
+  auto result = val::object();
+  result.set("type", this->IsType);
+  result.set("data", val(this->value));
+
+  return result;
 }
 
 bool VariablePrimitiveBool::get_value() const

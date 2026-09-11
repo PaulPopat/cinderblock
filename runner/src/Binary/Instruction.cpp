@@ -11,8 +11,9 @@ std::vector<ParserInfo*> parsers = std::vector<ParserInfo*>();
 
 Instruction* Instruction::Parse(const char*binary, int offset)
 {
+  auto identifier = binary[offset];
   for (const auto& parser : parsers) {
-    if (parser->identifier == binary[offset]) {
+    if (parser->identifier == identifier) {
       return parser->init(binary, offset + 1);
     }
   }

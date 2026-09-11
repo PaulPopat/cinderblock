@@ -14,7 +14,11 @@ VariablePrimitiveFloat::VariablePrimitiveFloat(val value)
 
 const val VariablePrimitiveFloat::raw() const
 {
-  return val(this->value);
+  auto result = val::object();
+  result.set("type", this->IsType);
+  result.set("data", val(this->value));
+
+  return result;
 }
 
 float VariablePrimitiveFloat::get_value() const

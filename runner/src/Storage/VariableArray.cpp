@@ -30,12 +30,16 @@ VariableArray::VariableArray(val value)
 
 const val VariableArray::raw() const
 {
-  auto result = std::vector<val>();
+  auto vec = std::vector<val>();
   for (const auto& value : this->values) {
-    result.push_back(value->raw());
+    vec.push_back(value->raw());
   }
 
-  return val::array();
+  auto result = val::object();
+  result.set("type", this->IsType);
+  result.set("data", val::array(vec));
+
+  return result;
 }
 
 const std::vector<const Variable*> VariableArray::get_values() const

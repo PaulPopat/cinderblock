@@ -53,11 +53,18 @@ const Variable* VariableTuple::get(std::string name) const
 
 const val VariableTuple::raw() const
 {
-  auto result = val::object();
+  auto vec = std::vector<val>();
 
   for (const auto& part : this->value) {
-    result.set(part.name, part.value->raw());
+    auto input = val::object();
+    input.set("name", part.name);
+    input.set("value", part.value->raw());
+    vec.push_back(input);
   }
+
+  auto result = val::object();
+  result.set("type", this->IsType);
+  result.set("data", val::array(vec));
 
   return result;
 }

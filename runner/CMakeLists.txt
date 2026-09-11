@@ -34,10 +34,18 @@ if(EMSCRIPTEN)
     SUFFIX ".js"
   )
   
+  target_compile_options(CinderBlockRunner PRIVATE
+    "SHELL:-g"
+    "SHELL:-gsource-map"
+  )
+  
   target_link_options(CinderBlockRunner PRIVATE
+    "SHELL:-g"
+    "SHELL:-gsource-map"
     "SHELL:-s WASM=1"
     "SHELL:-l embind"
     "SHELL:-s ALLOW_MEMORY_GROWTH=1"
+    "SHELL:-s NO_DISABLE_EXCEPTION_CATCHING=1"
     "SHELL:-s MODULARIZE=1"
     "SHELL:-s EXPORT_ES6=1"
     "SHELL:--bind"

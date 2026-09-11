@@ -14,7 +14,7 @@
     "exactOptionalPropertyTypes": true,
     "erasableSyntaxOnly": true,
     "allowImportingTsExtensions": true,
-    
+
     "noEmit": true,
     "strict": true,
     "jsx": "react-jsx",
@@ -22,11 +22,6 @@
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
-    "skipLibCheck": true,
-
-    "paths": {
-      "#ast": ["./src/ast/index.ts"],
-      "#tokeniser": ["./src/tokeniser/index.ts"]
-    }
+    "skipLibCheck": true
   }
 }

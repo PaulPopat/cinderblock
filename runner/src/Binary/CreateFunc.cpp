@@ -16,7 +16,7 @@ CreateFunc::CreateFunc(const char*binary, int offset)
     end = next->get_end();
   }
 
-  this->returns = Instruction::Parse(binary, end);
+  this->returns = Instruction::Parse(binary, end + 1);
   this->end = this->returns->get_end();
 }
 
