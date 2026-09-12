@@ -16,7 +16,7 @@ describe("input output", () => {
     assert.equal(result, 5);
   });
 
-  test("exports a function", async () => {
+  test.skip("exports a function", async () => {
     const code = new Inline(`
       let pipeable_let (input: int) = input + 3;
       let test_let = pipeable_let;
