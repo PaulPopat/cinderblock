@@ -17,8 +17,9 @@ describe("logic", () => {
     const code = new Inline(
       `
         extern get_total (): int;
-        let internal_let = {} -> get_total;
-        let test_let = internal_let + internal_let;
+        let test_let =
+            let internal_let = {} -> get_total;
+          internal_let + internal_let;
       `,
     );
     const result = await code

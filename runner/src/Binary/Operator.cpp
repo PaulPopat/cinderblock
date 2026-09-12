@@ -443,7 +443,7 @@ const Variable* Operator::resolve(Closure* closure) const
       throw "Invalid maths";
     }
 
-    if (left->get_type_name() != VariablePipeable::TypeName) {
+    if (right->get_type_name() != VariablePipeable::TypeName) {
       throw "Invalid maths";
     }
 
@@ -463,10 +463,12 @@ const Variable* Operator::resolve(Closure* closure) const
     auto right = this->right->resolve(closure);
 
     if (left->get_type_name() != VariableTuple::TypeName) {
-      throw "Invalid maths";
+      auto input = std::vector<VariableTuplePart>();
+      input.push_back({ std::string("_s"), left });
+      left = closure->add_temp_variable(new VariableTuple(input));
     }
 
-    if (left->get_type_name() != VariablePipeable::TypeName) {
+    if (right->get_type_name() != VariablePipeable::TypeName) {
       throw "Invalid maths";
     }
 

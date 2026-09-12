@@ -16,7 +16,7 @@ export class CinderBlockBinary {
     const module = CinderBlockRunner().then((m) => {
       m.LoadApp(data);
       m.LoadGlobals(
-        Object.keys(globals)
+        Object.entries(globals)
           .filter(([key]) => typeof key === "string")
           .map(([key, value]) => ({ name: key as string, value: variablise(value) })),
       );

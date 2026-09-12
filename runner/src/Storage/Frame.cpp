@@ -6,7 +6,8 @@ Frame* Frame::From(val data)
 {
   auto result = new Frame();
   for (const auto& pair : vecFromJSArray<val>(data)) {
-    result->add_variable(pair["name"].as<std::string>(), Variable::Parse(pair["value"]));
+    auto name = pair["name"].as<std::string>();
+    result->add_variable(name, Variable::Parse(pair["value"]));
   }
 
   return result;

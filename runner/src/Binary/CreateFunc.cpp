@@ -58,15 +58,22 @@ const Variable* CreateFunc::exec(Closure* closure, const VariableTuple* args) co
   }
 
   for (const auto& var : this->vars) {
-    frame->add_variable(
-      var->get_name(),
-      new VariablePipeable(
-        [closure, var](const VariableTuple* inner_args) {
-          return var->exec(closure, inner_args);
-        },
-        var->no_args
-      )
-    );
+    if (var->get_no_args()) {
+      frame->add_variable(
+        var->get_name(),
+        var->exec(closure, VariableTuple::FromVariable(closure->add_temp_variable(new VariableTuple())))
+      );
+    } else {
+      frame->add_variable(
+        var->get_name(),
+        new VariablePipeable(
+          [closure, var](const VariableTuple* inner_args) {
+            return var->exec(closure, inner_args);
+          },
+          var->no_args
+        )
+      );
+    }
   }
 
   return this->returns->resolve(closure);
