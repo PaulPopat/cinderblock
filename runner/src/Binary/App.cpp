@@ -18,6 +18,7 @@
 #include "Reference.h"
 #include "Ternary.h"
 #include "Tuple.h"
+#include "extract.h"
 #include <string>
 
 namespace Binary {
@@ -78,13 +79,17 @@ App::App(const char* binary)
     return new Tuple(binary, offset);
   });
 
-  this->functions = std::vector<CreateFunc*>();
-  auto offset = 0;
-  while (binary[offset] != 0) {
-    auto func = new CreateFunc(binary, offset + 1);
-    this->functions.push_back(func);
-    offset = func->get_end();
-  }
+  auto functions = extract_array<const CreateFunc*>(binary, 0, [](const char* binary, int offset) {
+    auto final = new CreateFunc(binary, offset);
+    ExtractArrayItemResult<const CreateFunc*> result = {
+      final,
+      final->get_end()
+    };
+
+    return result;
+  });
+
+  this->functions = functions.data;
 }
 
 App::~App()
@@ -94,7 +99,7 @@ App::~App()
   }
 }
 
-CreateFunc* App::find(std::string name)
+const CreateFunc* App::find(std::string name) const
 {
   for (const auto& func : this->functions) {
     if (func->get_name().compare(name)) {

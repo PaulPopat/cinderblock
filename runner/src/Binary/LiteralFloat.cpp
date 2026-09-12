@@ -3,15 +3,14 @@
 #include "extract.h"
 
 namespace Binary {
-LiteralFloat::LiteralFloat(const char*binary, int offset)
+LiteralFloat::LiteralFloat(const char* binary, int offset)
 {
   this->end = offset + sizeof(float);
-  this->value = (float*)extract(binary, offset, sizeof(float));
+  this->value = *extract<float>(binary, offset);
 }
 
 LiteralFloat::~LiteralFloat()
 {
-  delete this->value;
 }
 
 const int LiteralFloat::get_end() const
@@ -21,6 +20,6 @@ const int LiteralFloat::get_end() const
 
 const Variable* LiteralFloat::resolve(Closure* closure) const
 {
-  return closure->add_temp_variable(new VariablePrimitiveFloat(*this->value));
+  return closure->add_temp_variable(new VariablePrimitiveFloat(this->value));
 }
 }

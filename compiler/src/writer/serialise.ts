@@ -18,12 +18,20 @@ import type { InstructionReference } from "./InstructionReference.ts";
 import type { InstructionTernary } from "./InstructionTernary.ts";
 import type { InstructionTuple } from "./InstructionTuple.ts";
 
+function makeArray<T>(input: Array<T>, mapper: (item: T) => Buffer) {
+  const length = Buffer.from(new Uint8Array(4));
+  length.writeUInt32LE(input.length, 0);
+  return Buffer.concat([length, ...input.map(mapper)]);
+}
+
 function makeString(data: string) {
-  return Buffer.concat([Buffer.from(data, "utf8"), new Uint8Array([0])]);
+  const length = Buffer.from(new Uint8Array(4));
+  length.writeUInt32LE(data.length, 0);
+  return Buffer.concat([length, Buffer.from(data, "utf8")]);
 }
 
 function serialiseAccess(data: InstructionAccess): Buffer {
-  return Buffer.concat([new Uint8Array([0]), serialise(data.subject), makeString(data.key)]);
+  return Buffer.concat([new Uint8Array([0]), makeString(data.key), serialise(data.subject)]);
 }
 
 function serialiseArg(data: InstructionArg): Buffer {
@@ -39,7 +47,7 @@ function serialiseExternal(data: InstructionExternal): Buffer {
 }
 
 function serialiseLiteralArray(data: InstructionLiteralArray): Buffer {
-  return Buffer.concat([new Uint8Array([4]), ...data.subject.flatMap((value) => [new Uint8Array([1]), serialise(value)]), new Uint8Array([0])]);
+  return Buffer.concat([new Uint8Array([4]), makeArray(data.subject, (d) => serialise(d))]);
 }
 
 function serialiseLiteralBool(data: InstructionLiteralBool): Buffer {
@@ -57,19 +65,19 @@ function serialiseLiteralDouble(data: InstructionLiteralDouble): Buffer {
 function serialiseLiteralFloat(data: InstructionLiteralFloat): Buffer {
   const result = Buffer.from(new Uint8Array(4));
   result.writeFloatLE(data.value, 0);
-  return Buffer.concat([new Uint8Array([8]), new Uint8Array([data.value])]);
+  return Buffer.concat([new Uint8Array([8]), result]);
 }
 
 function serialiseLiteralInt(data: InstructionLiteralInt): Buffer {
   const result = Buffer.from(new Uint8Array(4));
   result.writeInt32LE(data.value, 0);
-  return Buffer.concat([new Uint8Array([9]), new Uint8Array([data.value])]);
+  return Buffer.concat([new Uint8Array([9]), result]);
 }
 
 function serialiseLiteralLong(data: InstructionLiteralInt): Buffer {
   const result = Buffer.from(new Uint8Array(8));
   result.writeBigInt64LE(BigInt(data.value), 0);
-  return Buffer.concat([new Uint8Array([10]), new Uint8Array([data.value])]);
+  return Buffer.concat([new Uint8Array([10]), result]);
 }
 
 function serialiseLiteralNull(data: InstructionLiteralNull): Buffer {
@@ -116,7 +124,7 @@ function serialiseTernary(data: InstructionTernary): Buffer {
 }
 
 function serialiseTuple(data: InstructionTuple): Buffer {
-  return Buffer.concat([new Uint8Array([17]), ...data.parts.flatMap(([name, inst]) => [makeString(name), serialise(inst)])]);
+  return Buffer.concat([new Uint8Array([17]), makeArray(data.parts, ([name, inst]) => Buffer.concat([makeString(name), serialise(inst)]))]);
 }
 
 const serialisers = Object.freeze({
@@ -145,14 +153,7 @@ function serialise(data: Instruction): Buffer {
 }
 
 export function serialiseApp(data: Array<CreateFunc>): Buffer {
-  return Buffer.concat([
-    ...data.flatMap((func) => [
-      new Uint8Array([1]),
-      makeString(func.name),
-      new Uint8Array([func.no_args ? 1 : 0]),
-      serialiseApp(func.vars),
-      serialise(func.returns),
-    ]),
-    new Uint8Array([0]),
-  ]);
+  return makeArray(data, (func) =>
+    Buffer.concat([makeString(func.name), new Uint8Array([func.no_args ? 1 : 0]), serialiseApp(func.vars), serialise(func.returns)]),
+  );
 }

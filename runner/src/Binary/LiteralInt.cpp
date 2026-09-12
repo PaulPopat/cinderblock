@@ -3,15 +3,14 @@
 #include "extract.h"
 
 namespace Binary {
-LiteralInt::LiteralInt(const char*binary, int offset)
+LiteralInt::LiteralInt(const char* binary, int offset)
 {
   this->end = offset + sizeof(int);
-  this->value = (int*)extract(binary, offset, sizeof(int));
+  this->value = *extract<int>(binary, offset);
 }
 
 LiteralInt::~LiteralInt()
 {
-  delete this->value;
 }
 
 const int LiteralInt::get_end() const
@@ -21,6 +20,6 @@ const int LiteralInt::get_end() const
 
 const Variable* LiteralInt::resolve(Closure* closure) const
 {
-  return closure->add_temp_variable(new VariablePrimitiveInt(*this->value));
+  return closure->add_temp_variable(new VariablePrimitiveInt(this->value));
 }
 }

@@ -21,5 +21,6 @@
       "extensions": ["mjs", "cjs", "js", "ts"],
       "parameters": []
     }
-  ]
+  ],
+  "cmake.sourceDirectory": "/Users/paul/Dev/cinderblock/runner"
 }

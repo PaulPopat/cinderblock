@@ -13,7 +13,7 @@ class LiteralLong : public Instruction {
   const Variable* resolve(Closure* closure) const;
 
   private:
-  long* value;
+  long value;
   int end;
 };
 }

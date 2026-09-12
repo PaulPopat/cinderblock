@@ -1,25 +1,20 @@
 #include "LiteralString.h"
 #include "../Storage/VariablePrimitiveString.h"
+#include "extract.h"
 
 namespace Binary {
 LiteralString::LiteralString(const char* binary, int offset)
 {
-  auto end = offset;
+  auto length = extract<unsigned int>(binary, offset);
 
-  while (binary[end] != 0) {
-    end += 1;
-  }
-
+  offset += sizeof(unsigned int);
   this->data = std::string();
-  auto string_length = end - offset;
-  auto input = new char[string_length + 1]();
-  for (unsigned int i = 0; i < string_length; i++) {
+  for (unsigned int i = 0; i < *length; i++) {
     this->data += binary[offset + i];
   }
 
   this->data += '\0';
-
-  this->end = end + 1;
+  this->end = offset + *length;
 }
 
 std::string LiteralString::get_value() const

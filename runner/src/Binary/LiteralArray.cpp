@@ -1,19 +1,18 @@
 #include "LiteralArray.h"
 #include "../Storage/VariableArray.h"
+#include "extract.h"
 
 namespace Binary {
-LiteralArray::LiteralArray(const char*binary, int offset)
+LiteralArray::LiteralArray(const char* binary, int offset)
 {
-  int end = offset;
-  auto values = std::vector<Instruction*>();
-  while (binary[end] != 0) {
-    auto next = Instruction::Parse(binary, end + 1);
-    values.push_back(next);
-    end = next->get_end();
-  }
+  auto result = extract_array<const Instruction*>(binary, offset, [](const char* binary, int offset) {
+    auto next = Instruction::Parse(binary, offset);
+    ExtractArrayItemResult<const Instruction*> result = { next, next->get_end() };
+    return result;
+  });
 
-  this->end = end + 1;
-  this->values = values;
+  this->end = result.offset;
+  this->values = result.data;
 }
 
 LiteralArray::~LiteralArray()

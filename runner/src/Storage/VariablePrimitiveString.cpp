@@ -13,10 +13,11 @@ VariablePrimitiveString::VariablePrimitiveString(val value)
 
 const val VariablePrimitiveString::raw() const
 {
+  auto str = std::string(this->value);
+  str.pop_back();
   auto result = val::object();
   result.set("type", this->IsType);
-  auto c_str = this->value.c_str();
-  result.set("data", val(this->value));
+  result.set("data", val(str));
 
   return result;
 }

@@ -59,13 +59,6 @@ function extractChar(input: VariablePrimitiveChar) {
   return input.data;
 }
 
-function variabliseDouble(input: number): VariablePrimitiveDouble {
-  return {
-    type: 9,
-    data: input,
-  };
-}
-
 function extractDouble(input: VariablePrimitiveDouble) {
   return input.data;
 }
@@ -122,7 +115,7 @@ function variabliseString(input: string): VariablePrimitiveString {
 }
 
 function extractString(input: VariablePrimitiveString) {
-  return input.data.slice(0, input.data.length - 1);
+  return input.data;
 }
 
 export function variabliseTuple(input: Record<string, unknown>): VariableTuple {

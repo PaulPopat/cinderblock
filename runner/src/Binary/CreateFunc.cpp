@@ -1,22 +1,25 @@
 #include "CreateFunc.h"
 #include "../Storage/VariablePipeable.h"
+#include "extract.h"
 
 namespace Binary {
-CreateFunc::CreateFunc(const char*binary, int offset)
+CreateFunc::CreateFunc(const char* binary, int offset)
 {
   this->name = new LiteralString(binary, offset);
-  auto end = this->name->get_end();
-  this->no_args = binary[end] != 0;
-  end += 1;
+  this->no_args = binary[this->name->get_end()] != 0;
 
-  this->vars = std::vector<CreateFunc*>();
-  while (binary[end] != 0) {
-    auto next = new CreateFunc(binary, end + 1);
-    this->vars.push_back(next);
-    end = next->get_end();
-  }
+  auto vars = extract_array<const CreateFunc*>(binary, this->name->get_end() + 1, [](const char* binary, int offset) {
+    auto final = new CreateFunc(binary, offset);
+    ExtractArrayItemResult<const CreateFunc*> result = {
+      final,
+      final->get_end()
+    };
 
-  this->returns = Instruction::Parse(binary, end + 1);
+    return result;
+  });
+
+  this->vars = vars.data;
+  this->returns = Instruction::Parse(binary, vars.offset);
   this->end = this->returns->get_end();
 }
 
@@ -35,12 +38,12 @@ const int CreateFunc::get_end() const
   return this->end;
 }
 
-std::string CreateFunc::get_name()
+std::string CreateFunc::get_name() const
 {
   return this->name->get_value();
 }
 
-const Variable* CreateFunc::exec(Closure* closure, const VariableTuple* args)
+const Variable* CreateFunc::exec(Closure* closure, const VariableTuple* args) const
 {
   auto frame = new Frame();
   frame->add_temp_variable(args);

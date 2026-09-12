@@ -1,22 +1,23 @@
 #include "Tuple.h"
 #include "../Storage/VariableTuple.h"
 #include "LiteralString.h"
+#include "extract.h"
 
 namespace Binary {
-Tuple::Tuple(const char*binary, int offset)
+Tuple::Tuple(const char* binary, int offset)
 {
-  int end = offset;
-  auto values = std::vector<TuplePart>();
-  while (binary[end] != 0) {
-    auto name = new LiteralString(binary, end + 1);
+  auto result = extract_array<TuplePart>(binary, offset, [](const char* binary, int offset) {
+    auto name = new LiteralString(binary, offset);
     auto value = Instruction::Parse(binary, name->get_end());
+    ExtractArrayItemResult<TuplePart> result = {
+      { name, value },
+      value->get_end()
+    };
+    return result;
+  });
 
-    values.push_back({ name, value });
-    end = value->get_end();
-  }
-
-  this->end = end + 1;
-  this->values = values;
+  this->end = result.offset;
+  this->values = result.data;
 }
 
 Tuple::~Tuple()

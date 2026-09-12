@@ -1,5 +1,6 @@
 #include "VariableTuple.h"
 #include "VariablePrimitiveNull.h"
+#include <string>
 
 namespace Storage {
 VariableTuple::VariableTuple(const std::vector<VariableTuplePart>& value)
@@ -56,8 +57,11 @@ const val VariableTuple::raw() const
   auto vec = std::vector<val>();
 
   for (const auto& part : this->value) {
+    auto str = std::string(part.name);
+    str.pop_back();
+
     auto input = val::object();
-    input.set("name", part.name);
+    input.set("name", str);
     input.set("value", part.value->raw());
     vec.push_back(input);
   }

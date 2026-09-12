@@ -5,11 +5,11 @@
 using namespace Storage;
 
 namespace Binary {
-Access::Access(const char*binary, int offset)
+Access::Access(const char* binary, int offset)
 {
-  this->subject = Instruction::Parse(binary, offset);
-  this->key = new LiteralString(binary, this->subject->get_end());
-  this->end = this->key->get_end();
+  this->key = new LiteralString(binary, offset);
+  this->subject = Instruction::Parse(binary, this->key->get_end());
+  this->end = this->subject->get_end();
 }
 
 Access::~Access()

@@ -3,15 +3,14 @@
 #include "extract.h"
 
 namespace Binary {
-LiteralDouble::LiteralDouble(const char*binary, int offset)
+LiteralDouble::LiteralDouble(const char* binary, int offset)
 {
   this->end = offset + sizeof(double);
-  this->value = (double*)extract(binary, offset, sizeof(double));
+  this->value = *extract<double>(binary, offset);
 }
 
 LiteralDouble::~LiteralDouble()
 {
-  delete this->value;
 }
 
 const int LiteralDouble::get_end() const
@@ -21,6 +20,6 @@ const int LiteralDouble::get_end() const
 
 const Variable* LiteralDouble::resolve(Closure* closure) const
 {
-  return closure->add_temp_variable(new VariablePrimitiveDouble(*this->value));
+  return closure->add_temp_variable(new VariablePrimitiveDouble(this->value));
 }
 }

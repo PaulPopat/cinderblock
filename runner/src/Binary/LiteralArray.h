@@ -7,14 +7,14 @@ namespace Binary {
 class LiteralArray : public Instruction {
   public:
   const static char TypeName = 4;
-  LiteralArray(const char*binary, int offset);
+  LiteralArray(const char* binary, int offset);
   ~LiteralArray();
 
   const int get_end() const;
   const Variable* resolve(Closure* closure) const;
 
   private:
-  std::vector<Instruction*> values;
+  std::vector<const Instruction*> values;
   int end;
 };
 }

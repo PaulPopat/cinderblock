@@ -13,7 +13,7 @@ class LiteralFloat : public Instruction {
   const Variable* resolve(Closure* closure) const;
 
   private:
-  float* value;
+  float value;
   int end;
 };
 }

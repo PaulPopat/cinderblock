@@ -13,7 +13,7 @@ class LiteralDouble : public Instruction {
   const Variable* resolve(Closure* closure) const;
 
   private:
-  double* value;
+  double value;
   int end;
 };
 }

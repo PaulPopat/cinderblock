@@ -13,7 +13,7 @@ class LiteralInt : public Instruction {
   const Variable* resolve(Closure* closure) const;
 
   private:
-  int* value;
+  int value;
   int end;
 };
 }
