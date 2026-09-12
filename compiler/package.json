@@ -19,7 +19,6 @@
     "#ast": "./src/ast/index.ts",
     "#tokeniser": "./src/tokeniser/index.ts",
     "#utils": "./src/utils/index.ts",
-    "#std": "./src/std/index.ts",
     "#struct": "./src/struct/index.ts",
     "#writer": "./src/writer/index.ts"
   },

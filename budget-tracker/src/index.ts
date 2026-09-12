@@ -5,4 +5,5 @@ import * as updaters from "./updaters/index.ts";
 
 const server = new Server(path.resolve(import.meta.dirname), factories, updaters);
 
+server.compile();
 server.start();

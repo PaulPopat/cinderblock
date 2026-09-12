@@ -17,7 +17,8 @@
     "typescript": "^6.0.3"
   },
   "imports": {
-    "#variable": "./src/variable/index.ts"
+    "#variable": "./src/variable/index.ts",
+    "#std": "./src/std/index.ts"
   },
   "exports": {
     ".": "./src/index.ts"

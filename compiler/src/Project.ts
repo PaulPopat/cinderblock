@@ -28,6 +28,16 @@ export class Project extends App {
     this.#types = done.types;
   }
 
+  compile() {
+    try {
+      fs.mkdirSync(path.resolve(this.#root, ".cinder"), { recursive: true });
+    } catch {}
+
+    const { data, metadata } = this.binaryData;
+    fs.writeFileSync(path.resolve(this.#root, ".cinder/app.block"), data);
+    fs.writeFileSync(path.resolve(this.#root, ".cinder/metadata.json"), JSON.stringify(metadata));
+  }
+
   get root() {
     return this.#root;
   }
