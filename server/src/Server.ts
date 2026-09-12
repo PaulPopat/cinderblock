@@ -31,15 +31,15 @@ export class Server extends Project {
         try {
           console.log(`MIDDLEWARE:${location} Starting`);
 
-          const result = await binary.runFromModel(middleware, {
-            path: request.path,
-            method: request.method,
-            body: request.body,
-            headers: request.headers,
-            params: request.params,
-            query: request.query,
+          const result: any = await binary.run(middleware.name, {
+            path: request.path ?? null,
+            method: request.method ?? null,
+            body: request.body ?? null,
+            headers: request.headers ?? null,
+            params: request.params ?? null,
+            query: request.query ?? null,
             now: Date.now(),
-            cookies: request.cookies,
+            cookies: request.cookies ?? null,
           });
 
           if ("status" in result) {
@@ -82,16 +82,16 @@ export class Server extends Project {
 
           console.log(`${request.method}:${handlerPath} Starting`);
 
-          const result = await binary.runFromModel(handler, {
-            path: request.path,
-            method: request.method,
-            body: request.body,
-            headers: request.headers,
-            params: request.params,
-            query: request.query,
-            now: Date.now(),
-            cookies: request.cookies,
-            context: (request as any).ctx,
+          const result: any = await binary.run(handler.name, {
+            path: request.path ?? null,
+            method: request.method ?? null,
+            body: request.body ?? null,
+            headers: request.headers ?? null,
+            params: request.params ?? null,
+            query: request.query ?? null,
+            now: Date.now() ?? null,
+            cookies: request.cookies ?? null,
+            context: (request as any).ctx ?? null,
           });
 
           const updates = "updates" in result ? result.updates : {};

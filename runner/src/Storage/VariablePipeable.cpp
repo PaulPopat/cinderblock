@@ -13,7 +13,8 @@ VariablePipeable::VariablePipeable(val value)
 {
   this->no_args = false;
   this->implementation = [value](const VariableTuple* args) {
-    return Variable::Parse(value(args->raw()));
+    auto result = value(args->raw()).await();
+    return Variable::Parse(result);
   };
 }
 

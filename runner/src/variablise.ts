@@ -24,17 +24,17 @@ function extractArray(input: VariableArray): Array<unknown> {
   return input.data.map((d) => extract(d));
 }
 
-type PipeableFunc = (args: Record<string, unknown>) => unknown;
+type PipeableFunc = (args: Record<string, unknown>) => unknown | Promise<unknown>;
 
 function variablisePipeable(input: PipeableFunc): VariablePipeable {
   return {
     type: 1,
-    data: (args) => variablise(input(extractTuple(args))),
+    data: async (args) => variablise(await input(extractTuple(args))),
   };
 }
 
 function extractPipeable(input: VariablePipeable): PipeableFunc {
-  return (args: Record<string, unknown>) => extract(input.data(variabliseTuple(args)));
+  return async (args: Record<string, unknown>) => extract(await input.data(variabliseTuple(args)));
 }
 
 function variabliseBool(input: boolean): VariablePrimitiveBool {
@@ -166,7 +166,7 @@ export function variablise(input: unknown): Variable {
 
       return variabliseTuple(input as Record<string, unknown>);
     default:
-      throw new Error("Unsupported type");
+      throw new Error("Unsupported type of " + typeof input);
   }
 }
 

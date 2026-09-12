@@ -39,12 +39,17 @@ export class CinderBlockBinary {
     const module = await this.#module;
     const target = this.#metadata.funcs[["App", letName].join("_")];
     if (!target) throw new Error(`Could not find name ${letName}`);
-    return extract(module.Run(target.id, variabliseTuple(args)) as Variable);
+    const response = await module.Run(target.id, variabliseTuple(args));
+    return extract(response as Variable);
   }
 
   withTag(key: string, value: string) {
     return Object.entries(this.#metadata.funcs)
-      .filter(([, funcMetadat]) => funcMetadat.tags.find((t) => t.key === key && t.value === value))
-      .map(([funcName]) => funcName);
+      .filter(([, funcMetadata]) => funcMetadata.tags.find((t) => t.key === key && t.value === value))
+      .map(([funcName, funcMetadata]) => ({
+        ...funcMetadata,
+        name: funcName.replace("App_", ""),
+        tags: Object.fromEntries(funcMetadata.tags.map((t) => [t.key, t.value])),
+      }));
   }
 }

@@ -49,6 +49,8 @@ if(EMSCRIPTEN)
     "SHELL:-s MODULARIZE=1"
     "SHELL:-s EXPORT_ES6=1"
     "SHELL:-s STACK_SIZE=262144"
+    "SHELL:-s JSPI=1"
+    "SHELL:-s JSPI_EXPORTS=Run"
     "SHELL:--bind"
     "SHELL:--emit-tsd CinderBlockRunner.d.ts"
   )

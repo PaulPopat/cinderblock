@@ -98,7 +98,7 @@ CinderBlockVal Run(std::string name, CinderBlockTuple args)
 
 EMSCRIPTEN_BINDINGS(my_module)
 {
-  function("Run", &Run);
+  function("Run", &Run, async());
   function("LoadGlobals", &LoadGlobals);
   function("LoadApp", &LoadApp);
 
