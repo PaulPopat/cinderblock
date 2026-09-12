@@ -43,6 +43,11 @@ std::string CreateFunc::get_name() const
   return this->name->get_value();
 }
 
+bool CreateFunc::get_no_args() const
+{
+  return this->no_args;
+}
+
 const Variable* CreateFunc::exec(Closure* closure, const VariableTuple* args) const
 {
   auto frame = new Frame();
@@ -64,9 +69,6 @@ const Variable* CreateFunc::exec(Closure* closure, const VariableTuple* args) co
     );
   }
 
-  auto result = this->returns->resolve(closure);
-
-  delete frame;
-  return result;
+  return this->returns->resolve(closure);
 }
 }

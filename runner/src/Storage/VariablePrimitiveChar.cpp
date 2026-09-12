@@ -14,7 +14,7 @@ VariablePrimitiveChar::VariablePrimitiveChar(val value)
 const val VariablePrimitiveChar::raw() const
 {
   auto result = val::object();
-  result.set("type", this->IsType);
+  result.set("type", this->get_type_name());
   result.set("data", val(this->value));
 
   return result;

@@ -37,14 +37,14 @@ Closure* Closure::with_frame(Frame* frame)
 
 Closure* Closure::add_variable(std::string name, const Variable* value)
 {
-  auto frame = *this->frames.end();
+  auto frame = this->frames[this->frames.size() - 1];
   frame->add_variable(name, value);
   return this;
 }
 
 const Variable* Closure::add_temp_variable(const Variable* value)
 {
-  auto frame = *this->frames.end();
+  auto frame = this->frames[this->frames.size() - 1];
   frame->add_temp_variable(value);
   return value;
 }

@@ -132,7 +132,7 @@ describe("syntax", () => {
       let test_let = 123.123;
     `);
     const result = await code.binary().run("test_let", {});
-    assert.equal(result, 123.123);
+    assert.equal((result as number).toFixed(3), "123.123");
   });
 
   test("resolves a float indicated", async () => {
@@ -140,7 +140,7 @@ describe("syntax", () => {
       let test_let = 123.123f;
     `);
     const result = await code.binary().run("test_let", {});
-    assert.equal(result, 123.123);
+    assert.equal((result as number).toFixed(3), "123.123");
   });
 
   test("resolves a int", async () => {

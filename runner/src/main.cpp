@@ -74,11 +74,25 @@ CinderBlockVal Run(std::string name, CinderBlockTuple args)
 {
   auto func = app->find(name);
   auto frames = std::vector<Storage::Frame*>();
+  auto frame = new Frame();
+  frames.push_back(frame);
   auto closure = new Storage::Closure(globals, frames);
+
+  for (const auto& func : app->get_functions()) {
+    frame->add_variable(
+      func->get_name(),
+      new VariablePipeable(
+        [closure, func](const VariableTuple* inner_args) {
+          return func->exec(closure, inner_args);
+        },
+        func->get_no_args()
+      )
+    );
+  }
+
   auto var = func->exec(closure, new VariableTuple(args["data"]));
 
   auto result = var->raw();
-  delete closure;
   return (CinderBlockVal)result;
 }
 

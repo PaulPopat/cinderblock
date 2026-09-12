@@ -17,6 +17,11 @@ VariablePipeable::VariablePipeable(val value)
   };
 }
 
+const bool VariablePipeable::get_no_args() const
+{
+  return this->no_args;
+}
+
 const val VariablePipeable::raw() const
 {
   throw "Cannot return functions to JavaScript";

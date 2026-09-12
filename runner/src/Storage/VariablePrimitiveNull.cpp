@@ -15,7 +15,7 @@ VariablePrimitiveNull::VariablePrimitiveNull(val value)
 const val VariablePrimitiveNull::raw() const
 {
   auto result = val::object();
-  result.set("type", this->IsType);
+  result.set("type", this->get_type_name());
   result.set("data", val::null());
 
   return result;

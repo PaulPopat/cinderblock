@@ -9,7 +9,7 @@ class VariableTuple : public Variable {
   public:
   static const VariableTuple* FromVariable(const Variable* var)
   {
-    if (var->IsType != VariableTuple::TypeName) {
+    if (var->get_type_name() != VariableTuple::TypeName) {
       return nullptr;
     }
 
@@ -18,9 +18,15 @@ class VariableTuple : public Variable {
 
   const static char TypeName = 10;
   const char IsType = 10;
+  VariableTuple();
   VariableTuple(const std::vector<VariableTuplePart>& value);
   VariableTuple(val value);
   ~VariableTuple();
+
+  const char get_type_name() const
+  {
+    return VariableTuple::TypeName;
+  }
 
   const VariableTuple* merge(const VariableTuple* input) const;
   const Variable* get(std::string name) const;

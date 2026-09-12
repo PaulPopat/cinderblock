@@ -20,7 +20,7 @@ class Frame {
   const val raw() const;
 
   private:
-  std::vector<VariableTuplePart> data;
-  std::vector<const Variable*> temp;
+  std::vector<VariableTuplePart>* data;
+  std::vector<const Variable*>* temp;
 };
 }

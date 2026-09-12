@@ -3,6 +3,11 @@
 #include <string>
 
 namespace Storage {
+VariableTuple::VariableTuple()
+{
+  this->value = std::vector<VariableTuplePart>();
+}
+
 VariableTuple::VariableTuple(const std::vector<VariableTuplePart>& value)
 {
   this->value = std::vector<VariableTuplePart>();
@@ -21,9 +26,6 @@ VariableTuple::VariableTuple(val value)
 
 VariableTuple::~VariableTuple()
 {
-  for (const auto& part : this->value) {
-    delete part.value;
-  }
 }
 
 const VariableTuple* VariableTuple::merge(const VariableTuple* input) const
@@ -44,7 +46,7 @@ const Variable* VariableTuple::get(std::string name) const
 {
 
   for (const auto& part : this->value) {
-    if (part.name.compare(name)) {
+    if (part.name.compare(name) == 0) {
       return part.value;
     }
   }
@@ -57,17 +59,14 @@ const val VariableTuple::raw() const
   auto vec = std::vector<val>();
 
   for (const auto& part : this->value) {
-    auto str = std::string(part.name);
-    str.pop_back();
-
     auto input = val::object();
-    input.set("name", str);
+    input.set("name", part.name);
     input.set("value", part.value->raw());
     vec.push_back(input);
   }
 
   auto result = val::object();
-  result.set("type", this->IsType);
+  result.set("type", this->get_type_name());
   result.set("data", val::array(vec));
 
   return result;

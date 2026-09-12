@@ -2,7 +2,7 @@
 #include "../Storage/VariableArray.h"
 
 namespace Binary {
-ArrayAdd::ArrayAdd(const char*binary, int offset)
+ArrayAdd::ArrayAdd(const char* binary, int offset)
 {
   this->left = Instruction::Parse(binary, offset);
   this->right = Instruction::Parse(binary, this->left->get_end());
@@ -11,8 +11,6 @@ ArrayAdd::ArrayAdd(const char*binary, int offset)
 
 ArrayAdd::~ArrayAdd()
 {
-  delete this->left;
-  delete this->right;
 }
 
 const int ArrayAdd::get_end() const
@@ -26,7 +24,7 @@ const Variable* ArrayAdd::resolve(Closure* closure) const
   auto raw_right = this->right->resolve(closure);
 
   auto result = std::vector<const Variable*>();
-  if (raw_left->IsType == VariableArray::TypeName) {
+  if (raw_left->get_type_name() == VariableArray::TypeName) {
     for (auto var : VariableArray::FromVariable(raw_left)->get_values()) {
       result.push_back(var);
     }
@@ -34,7 +32,7 @@ const Variable* ArrayAdd::resolve(Closure* closure) const
     result.push_back(raw_left);
   }
 
-  if (raw_right->IsType == VariableArray::TypeName) {
+  if (raw_right->get_type_name() == VariableArray::TypeName) {
     for (auto var : VariableArray::FromVariable(raw_right)->get_values()) {
       result.push_back(var);
     }

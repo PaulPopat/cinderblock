@@ -7,7 +7,7 @@ class VariablePrimitiveBool : public VariablePrimitive<bool> {
   public:
   static const VariablePrimitiveBool* FromVariable(const Variable* var)
   {
-    if (var->IsType != VariablePrimitiveBool::TypeName) {
+    if (var->get_type_name() != VariablePrimitiveBool::TypeName) {
       return nullptr;
     }
 
@@ -15,9 +15,13 @@ class VariablePrimitiveBool : public VariablePrimitive<bool> {
   }
 
   const static char TypeName = 2;
-  const char IsType = 2;
   VariablePrimitiveBool(bool value);
   VariablePrimitiveBool(val value);
+
+  const char get_type_name() const
+  {
+    return VariablePrimitiveBool::TypeName;
+  }
 
   const val raw() const;
   bool get_value() const;

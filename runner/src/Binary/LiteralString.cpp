@@ -13,7 +13,6 @@ LiteralString::LiteralString(const char* binary, int offset)
     this->data += binary[offset + i];
   }
 
-  this->data += '\0';
   this->end = offset + *length;
 }
 

@@ -12,7 +12,7 @@
 #include "../Storage/VariableTuple.h"
 
 namespace Binary {
-Operator::Operator(const char*binary, int offset)
+Operator::Operator(const char* binary, int offset)
 {
   this->type = (OperatorType)binary[offset];
   this->left = Instruction::Parse(binary, offset + 1);
@@ -37,9 +37,9 @@ const Variable* Operator::resolve(Closure* closure) const
   case OperatorType::Add: {
     auto left = this->left->resolve(closure);
     auto right = this->right->resolve(closure);
-    switch (left->IsType) {
+    switch (left->get_type_name()) {
     case VariablePrimitiveString::TypeName: {
-      if (right->IsType != VariablePrimitiveString::TypeName) {
+      if (right->get_type_name() != VariablePrimitiveString::TypeName) {
         throw "Invalid maths";
       }
       auto result = VariablePrimitiveString::FromVariable(left)->get_value();
@@ -77,7 +77,7 @@ const Variable* Operator::resolve(Closure* closure) const
   }
   case OperatorType::And: {
     auto left = this->left->resolve(closure);
-    switch (left->IsType) {
+    switch (left->get_type_name()) {
     case VariablePrimitiveBool::TypeName: {
       if (!VariablePrimitiveBool::FromVariable(left)->get_value()) {
         return closure->add_temp_variable(new VariablePrimitiveBool(false));
@@ -94,7 +94,7 @@ const Variable* Operator::resolve(Closure* closure) const
   case OperatorType::Divide: {
     auto left = this->left->resolve(closure);
     auto right = this->right->resolve(closure);
-    switch (left->IsType) {
+    switch (left->get_type_name()) {
     case VariablePrimitiveChar::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveChar(
         VariablePrimitiveChar::FromVariable(left)->get_value() / VariablePrimitive<char>::GetValue(right)
@@ -128,19 +128,20 @@ const Variable* Operator::resolve(Closure* closure) const
   case OperatorType::Equals: {
     auto left = this->left->resolve(closure);
     auto right = this->right->resolve(closure);
-    switch (left->IsType) {
+    switch (left->get_type_name()) {
     case VariablePrimitiveString::TypeName: {
-      if (right->IsType != VariablePrimitiveString::TypeName) {
+      if (right->get_type_name() != VariablePrimitiveString::TypeName) {
         throw "Invalid maths";
       }
       return closure->add_temp_variable(new VariablePrimitiveBool(
         VariablePrimitiveString::FromVariable(left)->get_value().compare(
           VariablePrimitiveString::FromVariable(right)->get_value()
         )
+        == 0
       ));
     }
     case VariablePrimitiveNull::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(left->IsType == right->IsType));
+      return closure->add_temp_variable(new VariablePrimitiveBool(left->get_type_name() == right->get_type_name()));
     }
     case VariablePrimitiveBool::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveBool(
@@ -180,7 +181,7 @@ const Variable* Operator::resolve(Closure* closure) const
   case OperatorType::GreaterThan: {
     auto left = this->left->resolve(closure);
     auto right = this->right->resolve(closure);
-    switch (left->IsType) {
+    switch (left->get_type_name()) {
     case VariablePrimitiveChar::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveChar(
         VariablePrimitiveChar::FromVariable(left)->get_value() > VariablePrimitive<char>::GetValue(right)
@@ -214,7 +215,7 @@ const Variable* Operator::resolve(Closure* closure) const
   case OperatorType::GreaterThanOrEqualTo: {
     auto left = this->left->resolve(closure);
     auto right = this->right->resolve(closure);
-    switch (left->IsType) {
+    switch (left->get_type_name()) {
     case VariablePrimitiveChar::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveChar(
         VariablePrimitiveChar::FromVariable(left)->get_value() >= VariablePrimitive<char>::GetValue(right)
@@ -248,25 +249,25 @@ const Variable* Operator::resolve(Closure* closure) const
   case OperatorType::In: {
     auto left = this->left->resolve(closure);
     auto right = this->right->resolve(closure);
-    if (left->IsType != VariablePrimitiveString::TypeName) {
+    if (left->get_type_name() != VariablePrimitiveString::TypeName) {
       throw "Invalid maths";
     }
 
-    if (right->IsType != VariableTuple::TypeName) {
+    if (right->get_type_name() != VariableTuple::TypeName) {
       throw "Invalid maths";
     }
 
     return closure->add_temp_variable(new VariablePrimitiveBool(
       VariableTuple::FromVariable(right)
         ->get(VariablePrimitiveString::FromVariable(left)->get_value())
-        ->IsType
+        ->get_type_name()
       != VariablePrimitiveNull::TypeName
     ));
   }
   case OperatorType::LessThan: {
     auto left = this->left->resolve(closure);
     auto right = this->right->resolve(closure);
-    switch (left->IsType) {
+    switch (left->get_type_name()) {
     case VariablePrimitiveChar::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveChar(
         VariablePrimitiveChar::FromVariable(left)->get_value() < VariablePrimitive<char>::GetValue(right)
@@ -300,7 +301,7 @@ const Variable* Operator::resolve(Closure* closure) const
   case OperatorType::LessThanOrEqualTo: {
     auto left = this->left->resolve(closure);
     auto right = this->right->resolve(closure);
-    switch (left->IsType) {
+    switch (left->get_type_name()) {
     case VariablePrimitiveChar::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveChar(
         VariablePrimitiveChar::FromVariable(left)->get_value() <= VariablePrimitive<char>::GetValue(right)
@@ -334,7 +335,7 @@ const Variable* Operator::resolve(Closure* closure) const
   case OperatorType::Multiply: {
     auto left = this->left->resolve(closure);
     auto right = this->right->resolve(closure);
-    switch (left->IsType) {
+    switch (left->get_type_name()) {
     case VariablePrimitiveChar::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveChar(
         VariablePrimitiveChar::FromVariable(left)->get_value() * VariablePrimitive<char>::GetValue(right)
@@ -368,19 +369,20 @@ const Variable* Operator::resolve(Closure* closure) const
   case OperatorType::NotEquals: {
     auto left = this->left->resolve(closure);
     auto right = this->right->resolve(closure);
-    switch (left->IsType) {
+    switch (left->get_type_name()) {
     case VariablePrimitiveString::TypeName: {
-      if (right->IsType != VariablePrimitiveString::TypeName) {
+      if (right->get_type_name() != VariablePrimitiveString::TypeName) {
         throw "Invalid maths";
       }
       return closure->add_temp_variable(new VariablePrimitiveBool(
-        !VariablePrimitiveString::FromVariable(left)->get_value().compare(
+        VariablePrimitiveString::FromVariable(left)->get_value().compare(
           VariablePrimitiveString::FromVariable(right)->get_value()
         )
+        != 0
       ));
     }
     case VariablePrimitiveNull::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(left->IsType != right->IsType));
+      return closure->add_temp_variable(new VariablePrimitiveBool(left->get_type_name() != right->get_type_name()));
     }
     case VariablePrimitiveBool::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveBool(
@@ -419,7 +421,7 @@ const Variable* Operator::resolve(Closure* closure) const
   }
   case OperatorType::Or: {
     auto left = this->left->resolve(closure);
-    switch (left->IsType) {
+    switch (left->get_type_name()) {
     case VariablePrimitiveBool::TypeName: {
       if (VariablePrimitiveBool::FromVariable(left)->get_value()) {
         return closure->add_temp_variable(new VariablePrimitiveBool(true));
@@ -437,11 +439,11 @@ const Variable* Operator::resolve(Closure* closure) const
     auto left = this->left->resolve(closure);
     auto right = this->right->resolve(closure);
 
-    if (left->IsType != VariableTuple::TypeName) {
+    if (left->get_type_name() != VariableTuple::TypeName) {
       throw "Invalid maths";
     }
 
-    if (left->IsType != VariablePipeable::TypeName) {
+    if (left->get_type_name() != VariablePipeable::TypeName) {
       throw "Invalid maths";
     }
 
@@ -460,11 +462,11 @@ const Variable* Operator::resolve(Closure* closure) const
     auto left = this->left->resolve(closure);
     auto right = this->right->resolve(closure);
 
-    if (left->IsType != VariableTuple::TypeName) {
+    if (left->get_type_name() != VariableTuple::TypeName) {
       throw "Invalid maths";
     }
 
-    if (left->IsType != VariablePipeable::TypeName) {
+    if (left->get_type_name() != VariablePipeable::TypeName) {
       throw "Invalid maths";
     }
 
@@ -477,7 +479,7 @@ const Variable* Operator::resolve(Closure* closure) const
   case OperatorType::Subtract: {
     auto left = this->left->resolve(closure);
     auto right = this->right->resolve(closure);
-    switch (left->IsType) {
+    switch (left->get_type_name()) {
     case VariablePrimitiveChar::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveChar(
         VariablePrimitiveChar::FromVariable(left)->get_value() - VariablePrimitive<char>::GetValue(right)
@@ -511,7 +513,7 @@ const Variable* Operator::resolve(Closure* closure) const
   case OperatorType::Modulo: {
     auto left = this->left->resolve(closure);
     auto right = this->right->resolve(closure);
-    switch (left->IsType) {
+    switch (left->get_type_name()) {
     case VariablePrimitiveChar::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveChar(
         VariablePrimitiveChar::FromVariable(left)->get_value() % VariablePrimitive<char>::GetValue(right)

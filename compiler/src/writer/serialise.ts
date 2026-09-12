@@ -51,7 +51,7 @@ function serialiseLiteralArray(data: InstructionLiteralArray): Buffer {
 }
 
 function serialiseLiteralBool(data: InstructionLiteralBool): Buffer {
-  return Buffer.concat([new Uint8Array([5]), new Uint8Array(data.value ? 1 : 0)]);
+  return Buffer.concat([new Uint8Array([5]), new Uint8Array([data.value ? 1 : 0])]);
 }
 
 function serialiseLiteralChar(data: InstructionLiteralChar): Buffer {
@@ -112,7 +112,7 @@ const operators = Object.freeze({
 });
 
 function serialiseOperator(data: InstructionOperator): Buffer {
-  return Buffer.concat([new Uint8Array([14]), new Uint8Array(operators[data.operator]), serialise(data.left), serialise(data.right)]);
+  return Buffer.concat([new Uint8Array([14]), new Uint8Array([operators[data.operator]]), serialise(data.left), serialise(data.right)]);
 }
 
 function serialiseReference(data: InstructionReference): Buffer {

@@ -14,8 +14,6 @@ Access::Access(const char* binary, int offset)
 
 Access::~Access()
 {
-  delete this->subject;
-  delete this->key;
 }
 
 const int Access::get_end() const

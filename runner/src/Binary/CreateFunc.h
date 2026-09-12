@@ -17,6 +17,7 @@ class CreateFunc {
   const int get_end() const;
 
   std::string get_name() const;
+  bool get_no_args() const;
   const Variable* exec(Closure* closure, const VariableTuple* args) const;
 
   private:

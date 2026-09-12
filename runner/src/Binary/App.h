@@ -10,6 +10,7 @@ class App {
   App(const char* binary);
   ~App();
 
+  std::vector<const CreateFunc*> get_functions() const;
   const CreateFunc* find(std::string name) const;
 
   private:

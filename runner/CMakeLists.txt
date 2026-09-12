@@ -48,6 +48,7 @@ if(EMSCRIPTEN)
     "SHELL:-s NO_DISABLE_EXCEPTION_CATCHING=1"
     "SHELL:-s MODULARIZE=1"
     "SHELL:-s EXPORT_ES6=1"
+    "SHELL:-s STACK_SIZE=262144"
     "SHELL:--bind"
     "SHELL:--emit-tsd CinderBlockRunner.d.ts"
   )

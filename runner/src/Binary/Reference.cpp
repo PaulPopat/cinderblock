@@ -1,4 +1,5 @@
 #include "Reference.h"
+#include "../Storage/VariablePipeable.h"
 
 namespace Binary {
 Reference::Reference(const char*binary, int offset)
@@ -19,6 +20,13 @@ const int Reference::get_end() const
 
 const Variable* Reference::resolve(Closure* closure) const
 {
-  return closure->search(this->name->get_value());
+  auto result = closure->search(this->name->get_value());
+  auto pipeable_result = VariablePipeable::FromVariable(result);
+  if (pipeable_result != nullptr && pipeable_result->get_no_args())
+  {
+    return pipeable_result->invoke(new VariableTuple());
+  }
+
+  return result;
 }
 }

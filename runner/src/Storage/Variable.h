@@ -13,7 +13,7 @@ class Variable {
   static void Register(char identifier, std::function<Variable*(val data)> init);
 
   virtual ~Variable() { }
+  virtual const char get_type_name() const = 0;
   virtual const val raw() const = 0;
-  const char IsType = 0;
 };
 }

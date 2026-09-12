@@ -9,9 +9,6 @@ VariableArray::VariableArray(std::vector<const Variable*> values)
 
 VariableArray::~VariableArray()
 {
-  for (const auto& value : this->values) {
-    delete value;
-  }
 }
 
 VariableArray::VariableArray(val value)
@@ -36,7 +33,7 @@ const val VariableArray::raw() const
   }
 
   auto result = val::object();
-  result.set("type", this->IsType);
+  result.set("type", this->get_type_name());
   result.set("data", val::array(vec));
 
   return result;

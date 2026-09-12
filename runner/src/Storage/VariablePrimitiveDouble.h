@@ -7,7 +7,7 @@ class VariablePrimitiveDouble : public VariablePrimitive<double> {
   public:
   static const VariablePrimitiveDouble* FromVariable(const Variable* var)
   {
-    if (var->IsType != VariablePrimitiveDouble::TypeName) {
+    if (var->get_type_name() != VariablePrimitiveDouble::TypeName) {
       return nullptr;
     }
 
@@ -18,6 +18,11 @@ class VariablePrimitiveDouble : public VariablePrimitive<double> {
   const char IsType = 9;
   VariablePrimitiveDouble(double value);
   VariablePrimitiveDouble(val value);
+
+  const char get_type_name() const
+  {
+    return VariablePrimitiveDouble::TypeName;
+  }
 
   const val raw() const;
   double get_value() const;

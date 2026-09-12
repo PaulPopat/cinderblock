@@ -19,6 +19,7 @@
 #include "Ternary.h"
 #include "Tuple.h"
 #include "extract.h"
+#include "../Storage/VariablePipeable.h"
 #include <string>
 
 namespace Binary {
@@ -99,10 +100,15 @@ App::~App()
   }
 }
 
+std::vector<const CreateFunc*> App::get_functions() const
+{
+  return this->functions;
+}
+
 const CreateFunc* App::find(std::string name) const
 {
   for (const auto& func : this->functions) {
-    if (func->get_name().compare(name)) {
+    if (func->get_name().compare(name) == 0) {
       return func;
     }
   }

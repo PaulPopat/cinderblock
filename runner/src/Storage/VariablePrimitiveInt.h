@@ -7,7 +7,7 @@ class VariablePrimitiveInt : public VariablePrimitive<int> {
   public:
   static const VariablePrimitiveInt* FromVariable(const Variable* var)
   {
-    if (var->IsType != VariablePrimitiveInt::TypeName) {
+    if (var->get_type_name() != VariablePrimitiveInt::TypeName) {
       return nullptr;
     }
 
@@ -18,6 +18,11 @@ class VariablePrimitiveInt : public VariablePrimitive<int> {
   const char IsType = 4;
   VariablePrimitiveInt(int value);
   VariablePrimitiveInt(val value);
+
+  const char get_type_name() const
+  {
+    return VariablePrimitiveInt::TypeName;
+  }
 
   const val raw() const;
   int get_value() const;
