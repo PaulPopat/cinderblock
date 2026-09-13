@@ -48,13 +48,6 @@ function extractBool(input: VariablePrimitiveBool) {
   return input.data;
 }
 
-function variabliseChar(input: number): VariablePrimitiveChar {
-  return {
-    type: 7,
-    data: input,
-  };
-}
-
 function extractChar(input: VariablePrimitiveChar) {
   return input.data;
 }
@@ -146,11 +139,7 @@ export function variablise(input: unknown): Variable {
     case "function":
       return variablisePipeable(input as PipeableFunc);
     case "number":
-      if (input % 1 !== 0) {
-        if (input < 255) {
-          return variabliseChar(input);
-        }
-
+      if (input % 1 === 0) {
         return variabliseInt(input);
       }
 

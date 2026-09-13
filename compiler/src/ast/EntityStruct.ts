@@ -52,7 +52,7 @@ export class EntityStruct extends Entity {
   }
 
   float(name: string): Entry | undefined {
-    return undefined;
+    return this.parent?.float(name);
   }
 
   get model(): CreateFunc[] {

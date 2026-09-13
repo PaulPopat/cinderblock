@@ -129,4 +129,56 @@ describe("logic", () => {
     const result = await code.binary().run("result", {});
     assert.equal(result, 4);
   });
+
+  test("struct referencing error case 1", async () => {
+    const code = new Inline(
+      `
+        namespace cinder_utils {
+          struct Location
+            file: string
+            line: int
+            character: int
+          ;
+        }
+
+        namespace cinder_utils {
+          struct Range
+            from: Location
+            to: Location
+          ;
+
+          let range_within (_s: Range, potential: Location) =
+            (potential.file != _s.from.file) || (potential.line < _s.from.line) || (potential.line > _s.to.line)
+              ? false
+              : _s.from.line == _s.to.line
+              ? (potential.character >= _s.from.character) && (potential.character <= _s.to.character)
+              : (potential.line != _s.from.line) && (potential.line != _s.to.line)
+              ? true
+              : potential.line == _s.from.line
+              ? potential.character >= _s.from.character
+              : potential.character <= _s.to.character;
+        }
+      `,
+    );
+    const result = await code.binary().run("cinder_utils_range_within", {
+      _s: {
+        from: {
+          file: "test",
+          line: 1,
+          character: 0,
+        },
+        to: {
+          file: "test",
+          line: 5,
+          character: 0,
+        },
+      },
+      potential: {
+        file: "test",
+        line: 2,
+        character: 0,
+      },
+    });
+    assert.equal(result, true);
+  });
 });

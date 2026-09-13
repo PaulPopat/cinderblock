@@ -1,0 +1,6 @@
+namespace cinder_tokeniser {
+  struct Token
+    data: string
+    range: Range
+  ;
+}

@@ -76,15 +76,16 @@ export class EntityNamespace extends Entity {
   }
 
   float(name: string): Entry | undefined {
-    const possible = [
-      name,
-      ...this.namespace
-        .split("_")
-        .reverse()
-        .reduce((current, next) => [next, ...current], [] as Array<string>)
-        .map((n) => [n, name].join("_")),
-    ];
-    return possible.reduce((result, n) => result ?? this.parent?.float(n), this.dig([this.#name, name].join("_")) as Entry | undefined);
+    const buildUp = this.#name
+      .split("_")
+      .reduce((current, next) => [...current, [current[current.length - 1], next].filter((l) => l).join("_")], [] as Array<string>);
+    const possible = [name, ...buildUp.map((n) => [n, name].join("_"))];
+    for (const p of possible) {
+      const potential = this.dig(p);
+      if (potential) return potential;
+    }
+
+    return possible.reduce((result, n) => result ?? this.parent?.float(n), undefined as Entry | undefined);
   }
 
   get model(): CreateFunc[] {

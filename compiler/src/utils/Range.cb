@@ -1,0 +1,19 @@
+namespace cinder_utils {
+  struct Range
+    from: Location
+    to: Location
+  ;
+
+  namespace range {
+    let within (_s: Range, potential: Location) =
+      (potential.file != _s.from.file) || (potential.line < _s.from.line) || (potential.line > _s.to.line)
+        ? false
+        : _s.from.line == _s.to.line
+        ? (potential.character >= _s.from.character) && (potential.character <= _s.to.character)
+        : (potential.line != _s.from.line) && (potential.line != _s.to.line)
+        ? true
+        : potential.line == _s.from.line
+        ? potential.character >= _s.from.character
+        : potential.character <= _s.to.character;
+  }
+}
