@@ -1,6 +1,11 @@
 namespace cinder_tokeniser {
+  extern std_string_matches (_s: string, pattern: string): bool;
+  extern std_string_split (_s: string, on: string): string[];
+
   let Tokenise (file: string, text: string) =
-      let allowed_literals = [
+      let line_split = { on = "\n" } -> std_string_split;
+
+      let allowedLiterals = [
         "[]",
         "[",
         "]",
@@ -26,7 +31,7 @@ namespace cinder_tokeniser {
         "->",
       ];
 
-      let allowed_pattersn = [
+      let allowedPatterns = [
         "^[a-zA-Z0-9_@$#]+$",
         "^[0-9]+\\.[0-9]*[a-z]?$",
         "^\"[^\"]*\"?$",
