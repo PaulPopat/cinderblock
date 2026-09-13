@@ -119,4 +119,14 @@ describe("logic", () => {
     const result = await code.binary().run("result_entry", {});
     assert.equal(result, "hello world");
   });
+
+  test("maths between two types", async () => {
+    const code = new Inline(
+      `
+        let result = 2 + 2.0f;
+      `,
+    );
+    const result = await code.binary().run("result", {});
+    assert.equal(result, 4);
+  });
 });

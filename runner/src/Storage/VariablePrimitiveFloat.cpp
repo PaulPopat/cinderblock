@@ -25,4 +25,29 @@ float VariablePrimitiveFloat::get_value() const
 {
   return this->value;
 }
+
+char VariablePrimitiveFloat::get_char() const
+{
+  return this->value;
+}
+
+int VariablePrimitiveFloat::get_int() const
+{
+  return this->value;
+}
+
+long VariablePrimitiveFloat::get_long() const
+{
+  return this->value;
+}
+
+float VariablePrimitiveFloat::get_float() const
+{
+  return this->value;
+}
+
+double VariablePrimitiveFloat::get_double() const
+{
+  return this->value;
+}
 }

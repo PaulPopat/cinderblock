@@ -1,6 +1,6 @@
 #include "Operator.h"
+#include "../Storage/VariableArithmetic.h"
 #include "../Storage/VariablePipeable.h"
-#include "../Storage/VariablePrimitive.h"
 #include "../Storage/VariablePrimitiveBool.h"
 #include "../Storage/VariablePrimitiveChar.h"
 #include "../Storage/VariablePrimitiveDouble.h"
@@ -47,27 +47,27 @@ const Variable* Operator::resolve(Closure* closure) const
     }
     case VariablePrimitiveChar::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveChar(
-        VariablePrimitiveChar::FromVariable(left)->get_value() + VariablePrimitive<char>::GetValue(right)
+        VariablePrimitiveChar::FromVariable(left)->get_value() + VariableArithmetic::FromVariable(right)->get_char()
       ));
     }
     case VariablePrimitiveDouble::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveDouble(
-        VariablePrimitiveDouble::FromVariable(left)->get_value() + VariablePrimitive<double>::GetValue(right)
+        VariablePrimitiveDouble::FromVariable(left)->get_value() + VariableArithmetic::FromVariable(right)->get_double()
       ));
     }
     case VariablePrimitiveFloat::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveFloat(
-        VariablePrimitiveFloat::FromVariable(left)->get_value() + VariablePrimitive<float>::GetValue(right)
+        VariablePrimitiveFloat::FromVariable(left)->get_value() + VariableArithmetic::FromVariable(right)->get_float()
       ));
     }
     case VariablePrimitiveInt::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveInt(
-        VariablePrimitiveInt::FromVariable(left)->get_value() + VariablePrimitive<int>::GetValue(right)
+        VariablePrimitiveInt::FromVariable(left)->get_value() + VariableArithmetic::FromVariable(right)->get_int()
       ));
     }
     case VariablePrimitiveLong::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveLong(
-        VariablePrimitiveLong::FromVariable(left)->get_value() + VariablePrimitive<long>::GetValue(right)
+        VariablePrimitiveLong::FromVariable(left)->get_value() + VariableArithmetic::FromVariable(right)->get_long()
       ));
     }
     default: {
@@ -97,27 +97,27 @@ const Variable* Operator::resolve(Closure* closure) const
     switch (left->get_type_name()) {
     case VariablePrimitiveChar::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveChar(
-        VariablePrimitiveChar::FromVariable(left)->get_value() / VariablePrimitive<char>::GetValue(right)
+        VariablePrimitiveChar::FromVariable(left)->get_value() / VariableArithmetic::FromVariable(right)->get_char()
       ));
     }
     case VariablePrimitiveDouble::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveDouble(
-        VariablePrimitiveDouble::FromVariable(left)->get_value() / VariablePrimitive<double>::GetValue(right)
+        VariablePrimitiveDouble::FromVariable(left)->get_value() / VariableArithmetic::FromVariable(right)->get_double()
       ));
     }
     case VariablePrimitiveFloat::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveFloat(
-        VariablePrimitiveFloat::FromVariable(left)->get_value() / VariablePrimitive<float>::GetValue(right)
+        VariablePrimitiveFloat::FromVariable(left)->get_value() / VariableArithmetic::FromVariable(right)->get_float()
       ));
     }
     case VariablePrimitiveInt::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveInt(
-        VariablePrimitiveInt::FromVariable(left)->get_value() / VariablePrimitive<int>::GetValue(right)
+        VariablePrimitiveInt::FromVariable(left)->get_value() / VariableArithmetic::FromVariable(right)->get_int()
       ));
     }
     case VariablePrimitiveLong::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveLong(
-        VariablePrimitiveLong::FromVariable(left)->get_value() / VariablePrimitive<long>::GetValue(right)
+        VariablePrimitiveLong::FromVariable(left)->get_value() / VariableArithmetic::FromVariable(right)->get_long()
       ));
     }
     default: {
@@ -145,32 +145,32 @@ const Variable* Operator::resolve(Closure* closure) const
     }
     case VariablePrimitiveBool::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveBool::FromVariable(left)->get_value() == VariablePrimitive<bool>::GetValue(right)
+        VariablePrimitiveBool::FromVariable(left)->get_value() == VariablePrimitiveBool::FromVariable(right)->get_value()
       ));
     }
     case VariablePrimitiveChar::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveChar::FromVariable(left)->get_value() == VariablePrimitive<char>::GetValue(right)
+        VariablePrimitiveChar::FromVariable(left)->get_value() == VariableArithmetic::FromVariable(right)->get_char()
       ));
     }
     case VariablePrimitiveDouble::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveDouble::FromVariable(left)->get_value() == VariablePrimitive<double>::GetValue(right)
+        VariablePrimitiveDouble::FromVariable(left)->get_value() == VariableArithmetic::FromVariable(right)->get_double()
       ));
     }
     case VariablePrimitiveFloat::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveFloat::FromVariable(left)->get_value() == VariablePrimitive<float>::GetValue(right)
+        VariablePrimitiveFloat::FromVariable(left)->get_value() == VariableArithmetic::FromVariable(right)->get_float()
       ));
     }
     case VariablePrimitiveInt::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveInt::FromVariable(left)->get_value() == VariablePrimitive<int>::GetValue(right)
+        VariablePrimitiveInt::FromVariable(left)->get_value() == VariableArithmetic::FromVariable(right)->get_int()
       ));
     }
     case VariablePrimitiveLong::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveLong::FromVariable(left)->get_value() == VariablePrimitive<long>::GetValue(right)
+        VariablePrimitiveLong::FromVariable(left)->get_value() == VariableArithmetic::FromVariable(right)->get_long()
       ));
     }
     default: {
@@ -184,27 +184,27 @@ const Variable* Operator::resolve(Closure* closure) const
     switch (left->get_type_name()) {
     case VariablePrimitiveChar::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveChar(
-        VariablePrimitiveChar::FromVariable(left)->get_value() > VariablePrimitive<char>::GetValue(right)
+        VariablePrimitiveChar::FromVariable(left)->get_value() > VariableArithmetic::FromVariable(right)->get_char()
       ));
     }
     case VariablePrimitiveDouble::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveDouble(
-        VariablePrimitiveDouble::FromVariable(left)->get_value() > VariablePrimitive<double>::GetValue(right)
+        VariablePrimitiveDouble::FromVariable(left)->get_value() > VariableArithmetic::FromVariable(right)->get_double()
       ));
     }
     case VariablePrimitiveFloat::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveFloat(
-        VariablePrimitiveFloat::FromVariable(left)->get_value() > VariablePrimitive<float>::GetValue(right)
+        VariablePrimitiveFloat::FromVariable(left)->get_value() > VariableArithmetic::FromVariable(right)->get_float()
       ));
     }
     case VariablePrimitiveInt::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveInt(
-        VariablePrimitiveInt::FromVariable(left)->get_value() > VariablePrimitive<int>::GetValue(right)
+        VariablePrimitiveInt::FromVariable(left)->get_value() > VariableArithmetic::FromVariable(right)->get_int()
       ));
     }
     case VariablePrimitiveLong::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveLong(
-        VariablePrimitiveLong::FromVariable(left)->get_value() > VariablePrimitive<long>::GetValue(right)
+        VariablePrimitiveLong::FromVariable(left)->get_value() > VariableArithmetic::FromVariable(right)->get_long()
       ));
     }
     default: {
@@ -218,27 +218,27 @@ const Variable* Operator::resolve(Closure* closure) const
     switch (left->get_type_name()) {
     case VariablePrimitiveChar::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveChar(
-        VariablePrimitiveChar::FromVariable(left)->get_value() >= VariablePrimitive<char>::GetValue(right)
+        VariablePrimitiveChar::FromVariable(left)->get_value() >= VariableArithmetic::FromVariable(right)->get_char()
       ));
     }
     case VariablePrimitiveDouble::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveDouble(
-        VariablePrimitiveDouble::FromVariable(left)->get_value() >= VariablePrimitive<double>::GetValue(right)
+        VariablePrimitiveDouble::FromVariable(left)->get_value() >= VariableArithmetic::FromVariable(right)->get_double()
       ));
     }
     case VariablePrimitiveFloat::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveFloat(
-        VariablePrimitiveFloat::FromVariable(left)->get_value() >= VariablePrimitive<float>::GetValue(right)
+        VariablePrimitiveFloat::FromVariable(left)->get_value() >= VariableArithmetic::FromVariable(right)->get_float()
       ));
     }
     case VariablePrimitiveInt::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveInt(
-        VariablePrimitiveInt::FromVariable(left)->get_value() >= VariablePrimitive<int>::GetValue(right)
+        VariablePrimitiveInt::FromVariable(left)->get_value() >= VariableArithmetic::FromVariable(right)->get_int()
       ));
     }
     case VariablePrimitiveLong::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveLong(
-        VariablePrimitiveLong::FromVariable(left)->get_value() >= VariablePrimitive<long>::GetValue(right)
+        VariablePrimitiveLong::FromVariable(left)->get_value() >= VariableArithmetic::FromVariable(right)->get_long()
       ));
     }
     default: {
@@ -270,27 +270,27 @@ const Variable* Operator::resolve(Closure* closure) const
     switch (left->get_type_name()) {
     case VariablePrimitiveChar::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveChar(
-        VariablePrimitiveChar::FromVariable(left)->get_value() < VariablePrimitive<char>::GetValue(right)
+        VariablePrimitiveChar::FromVariable(left)->get_value() < VariableArithmetic::FromVariable(right)->get_char()
       ));
     }
     case VariablePrimitiveDouble::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveDouble(
-        VariablePrimitiveDouble::FromVariable(left)->get_value() < VariablePrimitive<double>::GetValue(right)
+        VariablePrimitiveDouble::FromVariable(left)->get_value() < VariableArithmetic::FromVariable(right)->get_double()
       ));
     }
     case VariablePrimitiveFloat::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveFloat(
-        VariablePrimitiveFloat::FromVariable(left)->get_value() < VariablePrimitive<float>::GetValue(right)
+        VariablePrimitiveFloat::FromVariable(left)->get_value() < VariableArithmetic::FromVariable(right)->get_float()
       ));
     }
     case VariablePrimitiveInt::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveInt(
-        VariablePrimitiveInt::FromVariable(left)->get_value() < VariablePrimitive<int>::GetValue(right)
+        VariablePrimitiveInt::FromVariable(left)->get_value() < VariableArithmetic::FromVariable(right)->get_int()
       ));
     }
     case VariablePrimitiveLong::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveLong(
-        VariablePrimitiveLong::FromVariable(left)->get_value() < VariablePrimitive<long>::GetValue(right)
+        VariablePrimitiveLong::FromVariable(left)->get_value() < VariableArithmetic::FromVariable(right)->get_long()
       ));
     }
     default: {
@@ -304,27 +304,27 @@ const Variable* Operator::resolve(Closure* closure) const
     switch (left->get_type_name()) {
     case VariablePrimitiveChar::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveChar(
-        VariablePrimitiveChar::FromVariable(left)->get_value() <= VariablePrimitive<char>::GetValue(right)
+        VariablePrimitiveChar::FromVariable(left)->get_value() <= VariableArithmetic::FromVariable(right)->get_char()
       ));
     }
     case VariablePrimitiveDouble::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveDouble(
-        VariablePrimitiveDouble::FromVariable(left)->get_value() <= VariablePrimitive<double>::GetValue(right)
+        VariablePrimitiveDouble::FromVariable(left)->get_value() <= VariableArithmetic::FromVariable(right)->get_double()
       ));
     }
     case VariablePrimitiveFloat::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveFloat(
-        VariablePrimitiveFloat::FromVariable(left)->get_value() <= VariablePrimitive<float>::GetValue(right)
+        VariablePrimitiveFloat::FromVariable(left)->get_value() <= VariableArithmetic::FromVariable(right)->get_float()
       ));
     }
     case VariablePrimitiveInt::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveInt(
-        VariablePrimitiveInt::FromVariable(left)->get_value() <= VariablePrimitive<int>::GetValue(right)
+        VariablePrimitiveInt::FromVariable(left)->get_value() <= VariableArithmetic::FromVariable(right)->get_int()
       ));
     }
     case VariablePrimitiveLong::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveLong(
-        VariablePrimitiveLong::FromVariable(left)->get_value() <= VariablePrimitive<long>::GetValue(right)
+        VariablePrimitiveLong::FromVariable(left)->get_value() <= VariableArithmetic::FromVariable(right)->get_long()
       ));
     }
     default: {
@@ -338,27 +338,27 @@ const Variable* Operator::resolve(Closure* closure) const
     switch (left->get_type_name()) {
     case VariablePrimitiveChar::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveChar(
-        VariablePrimitiveChar::FromVariable(left)->get_value() * VariablePrimitive<char>::GetValue(right)
+        VariablePrimitiveChar::FromVariable(left)->get_value() * VariableArithmetic::FromVariable(right)->get_char()
       ));
     }
     case VariablePrimitiveDouble::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveDouble(
-        VariablePrimitiveDouble::FromVariable(left)->get_value() * VariablePrimitive<double>::GetValue(right)
+        VariablePrimitiveDouble::FromVariable(left)->get_value() * VariableArithmetic::FromVariable(right)->get_double()
       ));
     }
     case VariablePrimitiveFloat::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveFloat(
-        VariablePrimitiveFloat::FromVariable(left)->get_value() * VariablePrimitive<float>::GetValue(right)
+        VariablePrimitiveFloat::FromVariable(left)->get_value() * VariableArithmetic::FromVariable(right)->get_float()
       ));
     }
     case VariablePrimitiveInt::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveInt(
-        VariablePrimitiveInt::FromVariable(left)->get_value() * VariablePrimitive<int>::GetValue(right)
+        VariablePrimitiveInt::FromVariable(left)->get_value() * VariableArithmetic::FromVariable(right)->get_int()
       ));
     }
     case VariablePrimitiveLong::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveLong(
-        VariablePrimitiveLong::FromVariable(left)->get_value() * VariablePrimitive<long>::GetValue(right)
+        VariablePrimitiveLong::FromVariable(left)->get_value() * VariableArithmetic::FromVariable(right)->get_long()
       ));
     }
     default: {
@@ -386,32 +386,32 @@ const Variable* Operator::resolve(Closure* closure) const
     }
     case VariablePrimitiveBool::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveBool::FromVariable(left)->get_value() != VariablePrimitive<bool>::GetValue(right)
+        VariablePrimitiveBool::FromVariable(left)->get_value() != VariablePrimitiveBool::FromVariable(right)->get_value()
       ));
     }
     case VariablePrimitiveChar::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveChar::FromVariable(left)->get_value() != VariablePrimitive<char>::GetValue(right)
+        VariablePrimitiveChar::FromVariable(left)->get_value() != VariableArithmetic::FromVariable(right)->get_char()
       ));
     }
     case VariablePrimitiveDouble::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveDouble::FromVariable(left)->get_value() != VariablePrimitive<double>::GetValue(right)
+        VariablePrimitiveDouble::FromVariable(left)->get_value() != VariableArithmetic::FromVariable(right)->get_double()
       ));
     }
     case VariablePrimitiveFloat::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveFloat::FromVariable(left)->get_value() != VariablePrimitive<float>::GetValue(right)
+        VariablePrimitiveFloat::FromVariable(left)->get_value() != VariableArithmetic::FromVariable(right)->get_float()
       ));
     }
     case VariablePrimitiveInt::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveInt::FromVariable(left)->get_value() != VariablePrimitive<int>::GetValue(right)
+        VariablePrimitiveInt::FromVariable(left)->get_value() != VariableArithmetic::FromVariable(right)->get_int()
       ));
     }
     case VariablePrimitiveLong::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveLong::FromVariable(left)->get_value() != VariablePrimitive<long>::GetValue(right)
+        VariablePrimitiveLong::FromVariable(left)->get_value() != VariableArithmetic::FromVariable(right)->get_long()
       ));
     }
     default: {
@@ -484,27 +484,27 @@ const Variable* Operator::resolve(Closure* closure) const
     switch (left->get_type_name()) {
     case VariablePrimitiveChar::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveChar(
-        VariablePrimitiveChar::FromVariable(left)->get_value() - VariablePrimitive<char>::GetValue(right)
+        VariablePrimitiveChar::FromVariable(left)->get_value() - VariableArithmetic::FromVariable(right)->get_char()
       ));
     }
     case VariablePrimitiveDouble::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveDouble(
-        VariablePrimitiveDouble::FromVariable(left)->get_value() - VariablePrimitive<double>::GetValue(right)
+        VariablePrimitiveDouble::FromVariable(left)->get_value() - VariableArithmetic::FromVariable(right)->get_double()
       ));
     }
     case VariablePrimitiveFloat::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveFloat(
-        VariablePrimitiveFloat::FromVariable(left)->get_value() - VariablePrimitive<float>::GetValue(right)
+        VariablePrimitiveFloat::FromVariable(left)->get_value() - VariableArithmetic::FromVariable(right)->get_float()
       ));
     }
     case VariablePrimitiveInt::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveInt(
-        VariablePrimitiveInt::FromVariable(left)->get_value() - VariablePrimitive<int>::GetValue(right)
+        VariablePrimitiveInt::FromVariable(left)->get_value() - VariableArithmetic::FromVariable(right)->get_int()
       ));
     }
     case VariablePrimitiveLong::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveLong(
-        VariablePrimitiveLong::FromVariable(left)->get_value() - VariablePrimitive<long>::GetValue(right)
+        VariablePrimitiveLong::FromVariable(left)->get_value() - VariableArithmetic::FromVariable(right)->get_long()
       ));
     }
     default: {
@@ -518,17 +518,17 @@ const Variable* Operator::resolve(Closure* closure) const
     switch (left->get_type_name()) {
     case VariablePrimitiveChar::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveChar(
-        VariablePrimitiveChar::FromVariable(left)->get_value() % VariablePrimitive<char>::GetValue(right)
+        VariablePrimitiveChar::FromVariable(left)->get_value() % VariableArithmetic::FromVariable(right)->get_char()
       ));
     }
     case VariablePrimitiveInt::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveInt(
-        VariablePrimitiveInt::FromVariable(left)->get_value() % VariablePrimitive<int>::GetValue(right)
+        VariablePrimitiveInt::FromVariable(left)->get_value() % VariableArithmetic::FromVariable(right)->get_int()
       ));
     }
     case VariablePrimitiveLong::TypeName: {
       return closure->add_temp_variable(new VariablePrimitiveLong(
-        VariablePrimitiveLong::FromVariable(left)->get_value() % VariablePrimitive<long>::GetValue(right)
+        VariablePrimitiveLong::FromVariable(left)->get_value() % VariableArithmetic::FromVariable(right)->get_long()
       ));
     }
     default: {

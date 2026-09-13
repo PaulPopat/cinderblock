@@ -1,9 +1,9 @@
 #pragma once
 
-#include "VariablePrimitive.h"
+#include "VariableArithmetic.h"
 
 namespace Storage {
-class VariablePrimitiveFloat : public VariablePrimitive<float> {
+class VariablePrimitiveFloat : public VariableArithmetic {
   public:
   static const VariablePrimitiveFloat* FromVariable(const Variable* var)
   {
@@ -26,6 +26,12 @@ class VariablePrimitiveFloat : public VariablePrimitive<float> {
 
   const val raw() const;
   float get_value() const;
+
+  char get_char() const;
+  int get_int() const;
+  long get_long() const;
+  float get_float() const;
+  double get_double() const;
 
   private:
   float value;

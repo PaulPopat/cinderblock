@@ -25,4 +25,29 @@ double VariablePrimitiveDouble::get_value() const
 {
   return this->value;
 }
+
+char VariablePrimitiveDouble::get_char() const
+{
+  return this->value;
+}
+
+int VariablePrimitiveDouble::get_int() const
+{
+  return this->value;
+}
+
+long VariablePrimitiveDouble::get_long() const
+{
+  return this->value;
+}
+
+float VariablePrimitiveDouble::get_float() const
+{
+  return this->value;
+}
+
+double VariablePrimitiveDouble::get_double() const
+{
+  return this->value;
+}
 }

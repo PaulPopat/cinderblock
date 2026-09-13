@@ -24,4 +24,29 @@ int VariablePrimitiveInt::get_value() const
 {
   return this->value;
 }
+
+char VariablePrimitiveInt::get_char() const
+{
+  return this->value;
+}
+
+int VariablePrimitiveInt::get_int() const
+{
+  return this->value;
+}
+
+long VariablePrimitiveInt::get_long() const
+{
+  return this->value;
+}
+
+float VariablePrimitiveInt::get_float() const
+{
+  return this->value;
+}
+
+double VariablePrimitiveInt::get_double() const
+{
+  return this->value;
+}
 }

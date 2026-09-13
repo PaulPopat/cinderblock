@@ -1,9 +1,9 @@
 #pragma once
 
-#include "VariablePrimitive.h"
+#include "Variable.h"
 
 namespace Storage {
-class VariablePrimitiveBool : public VariablePrimitive<bool> {
+class VariablePrimitiveBool : public Variable {
   public:
   static const VariablePrimitiveBool* FromVariable(const Variable* var)
   {
