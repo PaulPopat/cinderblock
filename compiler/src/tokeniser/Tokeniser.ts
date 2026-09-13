@@ -11,7 +11,7 @@ export class Tokeniser {
     /^[a-zA-Z0-9_@$#]+$/gm,
     /^[0-9]+\.[0-9]*[a-z]?$/gm,
     ...allowedLiterals.map((a) => new RegExp(["^", ...[...a].map((c) => "\\" + c), "$"].join(""))),
-    /^"[^"]*"?$/gm,
+    /^"([^"]|\\")*"?$/gm,
     /^'[^']?'?$/gm,
     /^'\\.?'?$/gm,
   ];

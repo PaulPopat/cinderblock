@@ -1,4 +1,3 @@
-import type { Location } from "./Location.ts";
 import type { Range } from "./Range.ts";
 
 export abstract class CompilerError extends Error {
