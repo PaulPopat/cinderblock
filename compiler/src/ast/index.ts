@@ -10,6 +10,7 @@ export * from "./Expression.ts";
 export * from "./ExpressionAccess.ts";
 export * from "./ExpressionArrayAdd.ts";
 export * from "./ExpressionBrackets.ts";
+export * from "./ExpressionFunc.ts";
 export * from "./ExpressionLiteral.ts";
 export * from "./ExpressionLiteralArray.ts";
 export * from "./ExpressionLiteralBool.ts";

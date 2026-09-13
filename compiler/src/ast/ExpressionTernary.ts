@@ -5,7 +5,7 @@ import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypeUnion } from "./TypeUnion.ts";
 import { WriterError } from "./WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { Instruction } from "#writer";
+import type { CreateFunc, Instruction } from "#writer";
 import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 
 export class ExpressionTernary extends Expression {
@@ -61,5 +61,9 @@ export class ExpressionTernary extends Expression {
       positive: this.#positive.instruction,
       negative: this.#negative.instruction,
     };
+  }
+
+  get funcs(): CreateFunc[] {
+    return [...this.#predicate.funcs, ...this.#positive.funcs, ...this.#negative.funcs];
   }
 }

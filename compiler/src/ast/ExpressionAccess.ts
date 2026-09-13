@@ -7,7 +7,7 @@ import { TypeReference } from "./TypeReference.ts";
 import { TypeTuple } from "./TypeTuple.ts";
 import { WriterError } from "./WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { Instruction } from "#writer";
+import type { CreateFunc, Instruction } from "#writer";
 
 export class ExpressionAccess extends Expression {
   static {
@@ -66,5 +66,9 @@ export class ExpressionAccess extends Expression {
       subject: this.#subject.instruction,
       key: this.#name,
     };
+  }
+
+  get funcs(): CreateFunc[] {
+    return this.#subject.funcs;
   }
 }

@@ -2,6 +2,7 @@ import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TokenTypeName } from "#tokeniser";
+import type { CreateFunc } from "#writer";
 
 export class ExpressionBrackets extends Expression {
   static {
@@ -34,5 +35,9 @@ export class ExpressionBrackets extends Expression {
 
   get instruction() {
     return this.#subject.instruction;
+  }
+
+  get funcs(): CreateFunc[] {
+    return [...this.#subject.funcs];
   }
 }

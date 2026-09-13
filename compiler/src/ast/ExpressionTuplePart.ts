@@ -4,7 +4,7 @@ import { TypeTuple } from "./TypeTuple.ts";
 import type { Entry } from "./Entry.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { Instruction } from "#writer";
+import type { CreateFunc, Instruction } from "#writer";
 
 export class ExpressionTuplePart extends Expression {
   readonly #name: string;
@@ -37,5 +37,9 @@ export class ExpressionTuplePart extends Expression {
 
   get instruction(): Instruction {
     return this.#value.instruction;
+  }
+
+  get funcs(): CreateFunc[] {
+    return this.#value.funcs;
   }
 }

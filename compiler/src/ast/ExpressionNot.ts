@@ -4,7 +4,7 @@ import { LinkerError } from "./LinkerError.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { Instruction } from "#writer";
+import type { CreateFunc, Instruction } from "#writer";
 
 export class ExpressionNot extends Expression {
   static {
@@ -46,5 +46,9 @@ export class ExpressionNot extends Expression {
     }
 
     return { type: "not", subject: this.#subject.instruction };
+  }
+
+  get funcs(): CreateFunc[] {
+    return [...this.#subject.funcs];
   }
 }

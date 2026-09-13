@@ -4,7 +4,7 @@ import { ExpressionLiteral } from "./ExpressionLiteral.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveDouble } from "./TypePrimitiveDouble.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { Instruction } from "#writer";
+import type { CreateFunc, Instruction } from "#writer";
 
 export class ExpressionLiteralDouble extends ExpressionLiteral {
   static {
@@ -33,5 +33,9 @@ export class ExpressionLiteralDouble extends ExpressionLiteral {
 
   get instruction(): Instruction {
     return { type: "literal_double", value: this.#value };
+  }
+
+  get funcs(): CreateFunc[] {
+    return [];
   }
 }

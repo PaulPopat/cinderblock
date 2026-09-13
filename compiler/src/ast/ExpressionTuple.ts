@@ -5,7 +5,7 @@ import { ExpressionTuplePart } from "./ExpressionTuplePart.ts";
 import type { Entry } from "./Entry.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { Instruction } from "#writer";
+import type { CreateFunc, Instruction } from "#writer";
 
 export class ExpressionTuple extends Expression {
   static {
@@ -61,5 +61,9 @@ export class ExpressionTuple extends Expression {
       type: "tuple",
       parts: this.#parts.map((p) => [p.name, p.instruction]),
     };
+  }
+
+  get funcs(): CreateFunc[] {
+    return this.#parts.flatMap((p) => p.funcs);
   }
 }

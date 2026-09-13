@@ -3,7 +3,7 @@ import { Expression } from "./Expression.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { LinkerError } from "./LinkerError.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { Instruction } from "#writer";
+import type { CreateFunc, Instruction } from "#writer";
 import { EntityLet } from "./EntityLet.ts";
 import { EntityArg } from "./EntityArg.ts";
 import { EntityExternal } from "./EntityExternal.ts";
@@ -54,5 +54,9 @@ export class ExpressionReference extends Expression {
     }
 
     throw new WriterError("Unknown subject type", this.range);
+  }
+
+  get funcs(): CreateFunc[] {
+    return [];
   }
 }

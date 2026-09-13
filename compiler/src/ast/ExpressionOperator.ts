@@ -1,5 +1,6 @@
 import type { TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
+import type { CreateFunc } from "#writer";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 
@@ -19,5 +20,9 @@ export abstract class ExpressionOperator extends Expression {
 
   get right() {
     return this.#right;
+  }
+
+  get funcs(): CreateFunc[] {
+    return [...this.#left.funcs, ...this.#right.funcs];
   }
 }

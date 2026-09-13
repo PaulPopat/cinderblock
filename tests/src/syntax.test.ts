@@ -30,6 +30,14 @@ describe("syntax", () => {
     assert.equal(result, "hello");
   });
 
+  test("inline let", async () => {
+    const code = new Inline(`
+      let test_let = "hello " + ("world" -> (let (_s: string) = _s;));
+    `);
+    const result = await code.binary().run("test_let", {});
+    assert.equal(result, "hello world");
+  });
+
   test("returns an array", async () => {
     const code = new Inline(`
       let test_let = ["hello", "world"];

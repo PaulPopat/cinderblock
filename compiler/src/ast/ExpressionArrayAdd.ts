@@ -3,7 +3,7 @@ import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { Instruction } from "#writer";
+import type { CreateFunc, Instruction } from "#writer";
 import { TypeArray } from "./TypeArray.ts";
 import { WriterError } from "./WriterError.ts";
 
@@ -52,5 +52,9 @@ export class ExpressionArrayAdd extends Expression {
       left: this.#subject.instruction,
       right: this.#addition.instruction,
     };
+  }
+
+  get funcs(): CreateFunc[] {
+    return [...this.#subject.funcs, ...this.#addition.funcs];
   }
 }

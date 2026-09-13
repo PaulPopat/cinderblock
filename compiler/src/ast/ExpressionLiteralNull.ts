@@ -3,7 +3,7 @@ import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { Instruction } from "#writer";
+import type { CreateFunc, Instruction } from "#writer";
 import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
 
 export class ExpressionLiteralNull extends ExpressionLiteral {
@@ -26,5 +26,9 @@ export class ExpressionLiteralNull extends ExpressionLiteral {
 
   get instruction(): Instruction {
     return { type: "literal_null" };
+  }
+
+  get funcs(): CreateFunc[] {
+    return [];
   }
 }

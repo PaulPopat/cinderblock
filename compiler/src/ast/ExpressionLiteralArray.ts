@@ -5,7 +5,7 @@ import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypeArray } from "./TypeArray.ts";
 import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { Instruction } from "#writer";
+import type { CreateFunc, Instruction } from "#writer";
 
 export class ExpressionLiteralArray extends ExpressionLiteral {
   static {
@@ -68,5 +68,9 @@ export class ExpressionLiteralArray extends ExpressionLiteral {
       type: "literal_array",
       subject: this.#value.map((v) => v.instruction),
     };
+  }
+
+  get funcs(): CreateFunc[] {
+    return this.#value.flatMap((v) => v.funcs);
   }
 }

@@ -129,7 +129,7 @@ export class EntityLet extends EntityNamespace {
     return [
       {
         name: this.#internalName,
-        vars: this.topLevelEntities.flatMap((e) => e.model),
+        vars: [...this.topLevelEntities.flatMap((e) => e.model), ...this.#contents.funcs],
         returns: this.#contents.instruction,
         no_args: this.#args.length === 0,
         tags: Object.fromEntries(this.#tags.map((t) => [t.key, t.value?.toString() ?? ""])),
