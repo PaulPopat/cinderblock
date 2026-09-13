@@ -1,5 +1,5 @@
 {
-  "name": "@cinderblock-lang/legacy-compiler",
+  "name": "@cinderblock-lang/compiler",
   "scripts": {
     "typecheck": "tsc --noEmit"
   },

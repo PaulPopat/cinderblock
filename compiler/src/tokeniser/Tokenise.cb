@@ -39,5 +39,7 @@ namespace cinder_tokeniser {
         "^'\\.?'?$",
       ];
 
+      let lines = text -> line_split;
+
     "hello";
 }

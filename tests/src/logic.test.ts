@@ -1,5 +1,5 @@
 import test, { describe } from "node:test";
-import { Inline } from "@cinderblock-lang/compiler";
+import { Inline } from "@cinderblock-lang/legacy-compiler";
 import assert from "node:assert";
 
 describe("logic", () => {

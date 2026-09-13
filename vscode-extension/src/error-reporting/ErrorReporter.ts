@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { Project, CompilerError } from "@cinderblock-lang/compiler";
+import { Project, CompilerError } from "@cinderblock-lang/legacy-compiler";
 import path from "node:path";
 
 export class ErrorReporter implements vscode.Disposable {

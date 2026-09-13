@@ -1,4 +1,4 @@
-import { ExpressionReference, Project, TypeReference } from "@cinderblock-lang/compiler";
+import { ExpressionReference, Project, TypeReference } from "@cinderblock-lang/legacy-compiler";
 import * as vscode from "vscode";
 
 export class DefinitionProvider implements vscode.DefinitionProvider, vscode.HoverProvider, vscode.Disposable {
