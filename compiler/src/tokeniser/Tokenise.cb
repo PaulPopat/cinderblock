@@ -1,6 +1,8 @@
 namespace cinder_tokeniser {
   extern std_string_matches (_s: string, pattern: string): bool;
   extern std_string_split (_s: string, on: string): string[];
+  extern std_string_trim (_s: string): string;
+  extern std_array_some (_s: string[], predicate: (item: string, index: int): bool ): bool;
 
   let Tokenise (file: string, text: string) =
       let line_split = { on = "\n" } -> std_string_split;
@@ -39,7 +41,63 @@ namespace cinder_tokeniser {
         "^'\\.?'?$",
       ];
 
-      let lines = text -> line_split;
+      let isValid (_s: string) =
+        (
+          {
+            predicate = let (item: string) =
+              {
+                _s = _s,
+                pattern = item,
+              } -> std_string_matches;,
+            _s = allowedPatterns,
+          } -> std_array_some
+        ) ||
+        (
+          {
+            predicate = let (item: string) = item == _s;,
+            _s = allowedLiterals,
+          } -> std_array_some
+        );
+
+      struct TokenisationContext
+        result: Token[]
+        location: Location
+        current: string
+      ;
+
+      let process (
+        ctx: TokenisationContext,
+        character: string,
+        lineNumber: int,
+        characterNumber: int
+      ) =
+        (ctx.current + character) -> isValid
+          ? {
+            result = ctx.result,
+            location = ctx.location,
+            current = ctx.current + character,
+          }
+          : {
+            result = (ctx.current + character) -> std_string_trim != ""
+              ? ctx.result ++ {
+                data = (ctx.current + character),
+                range = {
+                  from = ctx.location,
+                  to = {
+                    file = file,
+                    line = lineNumber + 1,
+                    character = characterNumber + 1,
+                  },
+                }
+              }
+              : ctx.result,
+            location = {
+              file = file,
+              line = lineNumber + 1,
+              character = characterNumber + 1,
+            },
+            current = "",
+          };
 
     "hello";
 }

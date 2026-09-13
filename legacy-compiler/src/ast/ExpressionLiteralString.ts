@@ -10,7 +10,7 @@ export class ExpressionLiteralString extends ExpressionLiteral {
   static {
     Expression.RegisterExpression({
       priority: 150,
-      match: /^"([^"]|\\.)+"$/gm,
+      match: /^("([^"]|\\.)+"|"")$/gm,
       factory: this,
     });
   }

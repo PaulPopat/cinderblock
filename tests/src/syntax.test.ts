@@ -183,6 +183,14 @@ describe("syntax", () => {
     assert.equal(result, '^"[^"]*"?$');
   });
 
+  test("empty string", async () => {
+    const code = new Inline(`
+      let test_let = "";
+    `);
+    const result = await code.binary().run("test_let", {});
+    assert.equal(result, "");
+  });
+
   test("performs an addition", async () => {
     const code = new Inline(`
       let test_let = 1 + 2;
