@@ -5,6 +5,7 @@ import { TypeArg } from "./TypeArg.ts";
 import { TokenTypeName } from "#tokeniser";
 import { Entity } from "./Entity.ts";
 import type { CreateFunc } from "#writer";
+import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
 
 export class EntityArg extends Entity {
   readonly #type: Type;
@@ -13,11 +14,13 @@ export class EntityArg extends Entity {
   constructor(walker: TokenWalker, parent: () => Entry | undefined) {
     const [{ type, name }, done] = walker
       .text("name", TokenTypeName.ParameterName)
-      .expect(":", TokenTypeName.Punctuation)
-      .extract("type", (w) => Type.Parse(w, () => this))
+      .if(
+        (s) => s.data === ":",
+        (w) => w.expect(":", TokenTypeName.Punctuation).extract("type", (w) => Type.Parse(w, () => this)),
+      )
       .finish();
     super(walker.location, done, parent);
-    this.#type = type;
+    this.#type = type ?? new TypePrimitiveUnknown(walker.location, done, () => this);
     this.#name = name.startsWith('"') ? JSON.parse(name) : name;
   }
 

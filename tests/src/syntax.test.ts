@@ -333,6 +333,16 @@ describe("syntax", () => {
     assert.equal(result, 4);
   });
 
+  test("unknown arg", async () => {
+    const code = new Inline(`
+      struct data value: string ;
+      let pipeable (test) = (test as data).value + 2;
+      let test_let = {test = {value = 2}} -> pipeable;
+    `);
+    const result = await code.binary().run("test_let", {});
+    assert.equal(result, 4);
+  });
+
   test("tuple arg", async () => {
     const code = new Inline(`
       let pipeable (test: {value: int}) = test.value + 2;

@@ -2,16 +2,25 @@ import { TokenTypeName, type TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
 import type { Entry } from "./Entry.ts";
 import { Type } from "./Type.ts";
+import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
 
 export class TypeArg extends Type {
   static Parse(walker: TokenWalker, parent: () => Entry | undefined) {
     const [{ name, type }, done] = walker
       .text("name", TokenTypeName.PropertyName)
-      .expect(":", TokenTypeName.Punctuation)
-      .extract("type", (w) => Type.Parse(w, parent))
+      .if(
+        (s) => s.data === ":",
+        (w) => w.expect(":", TokenTypeName.Punctuation).extract("type", (w) => Type.Parse(w, parent)),
+      )
       .finish();
 
-    return new TypeArg(walker.location, done, parent, type, name.startsWith('"') ? JSON.parse(name) : name);
+    return new TypeArg(
+      walker.location,
+      done,
+      parent,
+      type ?? new TypePrimitiveUnknown(walker.location, done, parent),
+      name.startsWith('"') ? JSON.parse(name) : name,
+    );
   }
 
   readonly #type: Type;
