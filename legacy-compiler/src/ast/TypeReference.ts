@@ -42,7 +42,7 @@ export class TypeReference extends Type {
     return this.struct.args;
   }
 
-  representation(): string {
-    return `{ ${this.args.map((a) => a.representation()).join(", ")} }`;
+  representation(depth: number): string {
+    return depth > 1 ? this.#name : `{ ${this.args.map((a) => a.representation(depth + 1)).join(", ")} }`;
   }
 }

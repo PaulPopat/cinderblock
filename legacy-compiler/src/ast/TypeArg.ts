@@ -40,7 +40,7 @@ export class TypeArg extends Type {
     return this.#name;
   }
 
-  representation(): string {
-    return `${this.#name}: ${this.#type.representation()}`;
+  representation(depth: number): string {
+    return `${this.#name}: ${this.#type.representation(depth + 1)}`;
   }
 }

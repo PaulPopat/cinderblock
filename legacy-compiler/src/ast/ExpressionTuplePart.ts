@@ -12,7 +12,7 @@ export class ExpressionTuplePart extends Expression {
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     const [{ name, value }, done] = walker
-      .text("name", TokenTypeName.PropertyName)
+      .text("name", TokenTypeName.PropertyName, () => this)
       .expect("=", TokenTypeName.Operator)
       .extract("value", (s) => Expression.Parse(s, () => this, lookFor))
       .finish();

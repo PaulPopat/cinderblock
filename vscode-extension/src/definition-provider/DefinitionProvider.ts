@@ -1,4 +1,15 @@
-import { ExpressionReference, Project, TypeReference } from "@cinderblock-lang/legacy-compiler";
+import {
+  EntityLet,
+  EntityStruct,
+  ExpressionAccess,
+  ExpressionReference,
+  ExpressionTuplePart,
+  Project,
+  Range,
+  Type,
+  TypeReference,
+  TypeTuple,
+} from "@cinderblock-lang/legacy-compiler";
 import * as vscode from "vscode";
 
 export class DefinitionProvider implements vscode.DefinitionProvider, vscode.HoverProvider, vscode.Disposable {
@@ -35,42 +46,25 @@ export class DefinitionProvider implements vscode.DefinitionProvider, vscode.Hov
     const found = this.#resolve(document, position);
     if (!found) return;
 
-    if (found instanceof ExpressionReference) {
-      const definition = found.subject;
-      const range = definition.range;
-      return {
-        uri: vscode.Uri.joinPath(this.#workspacePath.uri, definition.location.file),
-        range: new vscode.Range(
-          new vscode.Position(range.from.line - 1, range.from.character - 1),
-          new vscode.Position(range.from.line - 1, range.to.character - 1),
-        ),
-      };
-    }
+    const goTo = (range: Range) => ({
+      uri: vscode.Uri.joinPath(this.#workspacePath.uri, range.from.file),
+      range: new vscode.Range(
+        new vscode.Position(range.from.line - 1, range.from.character - 1),
+        new vscode.Position(range.from.line - 1, range.to.character - 1),
+      ),
+    });
 
-    // Not sure why the compiler is doing this.
-    if (found instanceof TypeReference) {
-      const definition = found.struct;
-      const range = definition.range;
-      return {
-        uri: vscode.Uri.joinPath(this.#workspacePath.uri, definition.location.file),
-        range: new vscode.Range(
-          new vscode.Position(range.from.line - 1, range.from.character - 1),
-          new vscode.Position(range.from.line - 1, range.to.character - 1),
-        ),
-      };
-    }
+    if (found instanceof ExpressionReference) return goTo(found.subject.range);
+    if (found instanceof TypeReference) return goTo(found.struct.range);
   }
 
   provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Hover> {
     const found = this.#resolve(document, position);
     if (!found) return;
 
-    if (found instanceof ExpressionReference) {
-      const definition = found.subject;
-      const range = found.range;
-      const type = definition.type;
+    const display = (type: Type, range: Range) => {
       const contents = new vscode.MarkdownString(undefined, true);
-      contents.appendCodeblock(type.representation(), "cinderblock");
+      contents.appendCodeblock(type.representation(0), "cinderblock");
       return new vscode.Hover(
         contents,
         new vscode.Range(
@@ -78,20 +72,13 @@ export class DefinitionProvider implements vscode.DefinitionProvider, vscode.Hov
           new vscode.Position(range.from.line - 1, range.to.character - 1),
         ),
       );
-    }
+    };
 
-    // Not sure why the compiler is doing this.
-    if (found instanceof TypeReference) {
-      const range = found.range;
-      const contents = new vscode.MarkdownString(undefined, true);
-      contents.appendCodeblock(found.representation(), "cinderblock");
-      return new vscode.Hover(
-        contents,
-        new vscode.Range(
-          new vscode.Position(range.from.line - 1, range.from.character - 1),
-          new vscode.Position(range.from.line - 1, range.to.character - 1),
-        ),
-      );
-    }
+    if (found instanceof ExpressionReference) return display(found.subject.type, found.range);
+    if (found instanceof TypeReference) return display(found, found.range);
+    if (found instanceof EntityLet) return display(found.type, found.range);
+    if (found instanceof EntityStruct) return display(new TypeTuple(found.location, found.done, () => found, found.args), found.range);
+    if (found instanceof ExpressionTuplePart) return display(found.value.resolution, found.range);
+    if (found instanceof ExpressionAccess) return display(found.resolution, found.range);
   }
 }

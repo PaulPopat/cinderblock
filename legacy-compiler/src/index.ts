@@ -3,4 +3,4 @@ export * from "./Inline.ts";
 
 export * from "#ast";
 
-export { CompilerError } from "#utils";
+export { CompilerError, Range, Location } from "#utils";

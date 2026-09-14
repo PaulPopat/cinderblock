@@ -28,7 +28,7 @@ export class TypeArray extends Type {
     return this.#contains;
   }
 
-  representation(): string {
-    return `${this.#contains.representation()}[]`;
+  representation(depth: number): string {
+    return `${this.#contains.representation(depth + 1)}[]`;
   }
 }

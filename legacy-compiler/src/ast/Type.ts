@@ -43,5 +43,5 @@ export abstract class Type extends Entry {
     return undefined;
   }
 
-  abstract representation(): string;
+  abstract representation(depth: number): string;
 }

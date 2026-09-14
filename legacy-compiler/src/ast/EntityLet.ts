@@ -28,7 +28,7 @@ export class EntityLet extends EntityNamespace {
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined) {
     const [{ name, args, returns, contents, tags, entities }, done] = walker
-      .expect("let", TokenTypeName.KeyWord)
+      .expect("let", TokenTypeName.KeyWord, () => this)
       .if(
         (s) => s.data === "[",
         (s) =>
@@ -40,7 +40,7 @@ export class EntityLet extends EntityNamespace {
             )
             .expect("]", TokenTypeName.Punctuation),
       )
-      .text("name", TokenTypeName.FunctionName)
+      .text("name", TokenTypeName.FunctionName, () => this)
       .if(
         (s) => s.data === "(",
         (walker) =>
@@ -56,7 +56,7 @@ export class EntityLet extends EntityNamespace {
         (s) => s.data === ":",
         (walker) => walker.expect(":", TokenTypeName.Punctuation).extract("returns", (s) => Type.Parse(s, () => this)),
       )
-      .expect("=", TokenTypeName.Operator)
+      .expect("=", TokenTypeName.Operator, () => this)
       .while(
         "entities",
         (s) => Entity.HasParser(s),

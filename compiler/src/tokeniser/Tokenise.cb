@@ -2,10 +2,11 @@ namespace cinder_tokeniser {
   extern std_string_matches (_s: string, pattern: string): bool;
   extern std_string_split (_s: string, on: string): string[];
   extern std_string_trim (_s: string): string;
-  extern std_array_some (_s: string[], predicate: (item: string, index: int): bool ): bool;
+  extern std_array_some (_s: unknown[], predicate: (item: unknown, index: int): bool ): bool;
+  extern std_array_reduce (_s: unknown[], initial: unknown, predicate: (item: unknown, current: unknown, index: int): unknown ): unknown;
 
   let Tokenise (file: string, text: string) =
-      let line_split = { on = "\n" } -> std_string_split;
+      let character_split = { on = "" } -> std_string_split;
 
       let allowedLiterals = [
         "[]",
@@ -63,41 +64,52 @@ namespace cinder_tokeniser {
         result: Token[]
         location: Location
         current: string
+        line: int
+        character: int
       ;
 
       let process (
         ctx: TokenisationContext,
-        character: string,
-        lineNumber: int,
-        characterNumber: int
-      ) =
-        (ctx.current + character) -> isValid
-          ? {
-            result = ctx.result,
-            location = ctx.location,
-            current = ctx.current + character,
-          }
-          : {
-            result = (ctx.current + character) -> std_string_trim != ""
-              ? ctx.result ++ {
-                data = (ctx.current + character),
-                range = {
-                  from = ctx.location,
-                  to = {
-                    file = file,
-                    line = lineNumber + 1,
-                    character = characterNumber + 1,
-                  },
-                }
+        character: string
+      ) = {
+        result =
+          ((ctx.current + character) -> isValid) &&
+          ((ctx.current + character) -> std_string_trim != "")
+            ? ctx.result ++ {
+              data = (ctx.current + character),
+              range = {
+                from = ctx.location,
+                to = {
+                  file = file,
+                  line = ctx.line + 1,
+                  character = ctx.character + 1,
+                },
               }
-              : ctx.result,
-            location = {
-              file = file,
-              line = lineNumber + 1,
-              character = characterNumber + 1,
-            },
-            current = "",
-          };
+            }
+            : ctx.result,
+        location = {
+          file = file,
+          line = ctx.line + 1,
+          character = ctx.character + 1,
+        },
+        current = "",
+        line = character == "\n" ? ctx.line + 1 : ctx.line,
+        character = character == "\n" ? 0 : ctx.character + 1,
+      };
 
-    "hello";
+    (
+      {
+        initial = {
+          result = [] as Token[],
+          location = { file = file, line = 0, character = 0 },
+          current = "",
+          line = 0,
+          character = 0,
+        },
+        _s = text -> character_split,
+        reducer = let (item: string, current: TokenisationContext) =
+          { ctx = current, character = item } -> process;
+      } -> std_array_reduce
+      as TokenisationContext
+    ).result;
 }

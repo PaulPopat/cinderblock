@@ -19,8 +19,8 @@ export class EntityStruct extends Entity {
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined) {
     const [{ name, args }, done] = walker
-      .expect("struct", TokenTypeName.KeyWord)
-      .text("name", TokenTypeName.StructName)
+      .expect("struct", TokenTypeName.KeyWord, () => this)
+      .text("name", TokenTypeName.StructName, () => this)
       .while(
         "args",
         (s) => s.data !== ";",

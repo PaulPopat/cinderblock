@@ -36,7 +36,7 @@ export class TypeTuple extends Type {
     return this.#args;
   }
 
-  representation(): string {
-    return `{ ${this.#args.map((a) => a.representation()).join(", ")} }`;
+  representation(depth: number): string {
+    return `{ ${this.#args.map((a) => a.representation(depth + 1)).join(", ")} }`;
   }
 }

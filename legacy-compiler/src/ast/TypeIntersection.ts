@@ -36,7 +36,10 @@ export class TypeIntersection extends Type {
     return this.#parts;
   }
 
-  representation(): string {
-    return this.#parts.map((p) => p.representation()).join(" & ");
+  representation(depth: number): string {
+    return this.#parts
+      .map((p) => p.representation(depth + 1))
+      .filter((value, index, total) => total.indexOf(value) === index)
+      .join(" & ");
   }
 }

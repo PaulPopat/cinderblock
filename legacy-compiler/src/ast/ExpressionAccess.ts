@@ -25,7 +25,10 @@ export class ExpressionAccess extends Expression {
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     if (!existing) throw new ParserError("Unexpected .", walker);
 
-    const [{ name }, done] = walker.expect(".", TokenTypeName.Operator).text("name", TokenTypeName.PropertyReference).finish();
+    const [{ name }, done] = walker
+      .expect(".", TokenTypeName.Operator)
+      .text("name", TokenTypeName.PropertyReference, () => this)
+      .finish();
     super(walker.location, done, parent);
     this.#subject = existing;
     this.#name = name;

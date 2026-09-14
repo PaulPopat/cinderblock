@@ -48,7 +48,7 @@ export class TypePipeable extends Type {
     return this.#returns;
   }
 
-  representation(): string {
-    return `(${this.#args.map((a) => a.representation()).join(", ")}): ${this.#returns.representation()}`;
+  representation(depth: number): string {
+    return `(${this.#args.map((a) => a.representation(depth + 1)).join(", ")}): ${this.#returns.representation(depth + 1)}`;
   }
 }
