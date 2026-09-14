@@ -49,7 +49,8 @@ namespace cinder_tokeniser {
               {
                 _s = _s,
                 pattern = item,
-              } -> std_string_matches;,
+              } -> std_string_matches
+            ;,
             _s = allowedPatterns,
           } -> std_array_some
         ) ||
@@ -58,7 +59,8 @@ namespace cinder_tokeniser {
             predicate = let (item: string) = item == _s;,
             _s = allowedLiterals,
           } -> std_array_some
-        );
+        )
+      ;
 
       struct TokenisationContext
         result: Token[]
@@ -76,16 +78,16 @@ namespace cinder_tokeniser {
           ((ctx.current + character) -> isValid) &&
           ((ctx.current + character) -> std_string_trim != "")
             ? ctx.result ++ {
-              data = (ctx.current + character),
-              range = {
-                from = ctx.location,
-                to = {
-                  file = file,
-                  line = ctx.line + 1,
-                  character = ctx.character + 1,
-                },
+                data = (ctx.current + character),
+                range = {
+                  from = ctx.location,
+                  to = {
+                    file = file,
+                    line = ctx.line + 1,
+                    character = ctx.character + 1,
+                  },
+                }
               }
-            }
             : ctx.result,
         location = {
           file = file,
@@ -95,7 +97,8 @@ namespace cinder_tokeniser {
         current = "",
         line = character == "\n" ? ctx.line + 1 : ctx.line,
         character = character == "\n" ? 0 : ctx.character + 1,
-      };
+      }
+    ;
 
     (
       {
@@ -108,8 +111,10 @@ namespace cinder_tokeniser {
         },
         _s = text -> character_split,
         reducer = let (item: string, current: TokenisationContext) =
-          { ctx = current, character = item } -> process;
+          { ctx = current, character = item } -> process
+        ;
       } -> std_array_reduce
       as TokenisationContext
-    ).result;
+    ).result
+  ;
 }
