@@ -46,7 +46,11 @@ export class ExpressionFunc extends Expression {
     this.#contents = contents;
   }
 
-  resolution(invocationType: TypeTuple): Type {
+  get args() {
+    return this.#args;
+  }
+
+  resolution(invocationType: TypeTuple): TypePipeable {
     return new TypePipeable(
       this.location,
       this.done,

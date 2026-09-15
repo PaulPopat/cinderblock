@@ -1,5 +1,6 @@
 import { TokenTypeName, type TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
+import type { Shape } from "#writer";
 import type { Entry } from "./Entry.ts";
 import { Type } from "./Type.ts";
 import { TypePrimitive } from "./TypePrimitive.ts";
@@ -22,5 +23,9 @@ export class TypePrimitiveInt extends TypePrimitive {
 
   get name() {
     return "int";
+  }
+
+  shape(): Shape {
+    return { type: "int" };
   }
 }

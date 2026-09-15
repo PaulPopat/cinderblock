@@ -3,6 +3,7 @@ import { Type } from "./Type.ts";
 import type { Entry } from "./Entry.ts";
 import { Location } from "#utils";
 import { TokenTypeName, TokenWalker } from "#tokeniser";
+import type { Shape } from "#writer";
 
 export class TypeTuple extends Type {
   static {
@@ -42,5 +43,12 @@ export class TypeTuple extends Type {
 
   representation(depth: number): string {
     return `{ ${this.#args.map((a) => a.representation(depth + 1)).join(", ")} }`;
+  }
+
+  shape(): Shape {
+    return {
+      type: "tuple",
+      args: this.args.map((a) => ({ key: a.name, value: a.type.shape() })),
+    };
   }
 }

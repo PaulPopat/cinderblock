@@ -1,5 +1,6 @@
 import { TokenTypeName, type TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
+import type { Shape } from "#writer";
 import { EntityStruct } from "./EntityStruct.ts";
 import type { Entry } from "./Entry.ts";
 import { LinkerError } from "./LinkerError.ts";
@@ -46,5 +47,12 @@ export class TypeReference extends Type {
 
   representation(depth: number): string {
     return depth > 1 ? this.#name : `{ ${this.args.map((a) => a.representation(depth + 1)).join(", ")} }`;
+  }
+
+  shape(): Shape {
+    return {
+      type: "tuple",
+      args: this.struct.args.map((a) => ({ key: a.name, value: a.type.shape() })),
+    };
   }
 }

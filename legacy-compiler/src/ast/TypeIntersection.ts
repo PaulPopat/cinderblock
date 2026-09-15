@@ -1,6 +1,8 @@
 import { TokenTypeName, type TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
+import type { Shape } from "#writer";
 import type { Entry } from "./Entry.ts";
+import { LinkerError } from "./LinkerError.ts";
 import { ParserError } from "./ParserError.ts";
 import { Type } from "./Type.ts";
 
@@ -41,5 +43,19 @@ export class TypeIntersection extends Type {
       .map((p) => p.representation(depth + 1))
       .filter((value, index, total) => total.indexOf(value) === index)
       .join(" & ");
+  }
+
+  shape(): Shape {
+    return {
+      type: "tuple",
+      args: this.#parts.flatMap((p) => {
+        const pShape = p.shape();
+        if (pShape.type !== "tuple") {
+          throw new LinkerError("May only intersect on tuples", p.range);
+        }
+
+        return pShape.args;
+      }),
+    };
   }
 }

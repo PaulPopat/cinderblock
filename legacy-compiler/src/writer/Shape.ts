@@ -9,6 +9,7 @@ import type { ShapeNull } from "./ShapeNull.ts";
 import type { ShapePipeable } from "./ShapePipeable.ts";
 import type { ShapeString } from "./ShapeString.ts";
 import type { ShapeTuple } from "./ShapeTuple.ts";
+import type { ShapeUnion } from "./ShapeUnion.ts";
 import type { ShapeUnknown } from "./ShapeUnknown.ts";
 
 export type Shape =
@@ -23,4 +24,5 @@ export type Shape =
   | ShapeNull
   | ShapeString
   | ShapeTuple
-  | ShapeUnknown;
+  | ShapeUnknown
+  | ShapeUnion;

@@ -3,6 +3,7 @@ import { Type } from "./Type.ts";
 import type { Entry } from "./Entry.ts";
 import { TokenTypeName, type TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
+import type { Shape } from "#writer";
 
 export class TypePipeable extends Type {
   static {
@@ -50,5 +51,9 @@ export class TypePipeable extends Type {
 
   representation(depth: number): string {
     return `(${this.#args.map((a) => a.representation(depth + 1)).join(", ")}): ${this.#returns.representation(depth + 1)}`;
+  }
+
+  shape(): Shape {
+    return { type: "pipeable" };
   }
 }

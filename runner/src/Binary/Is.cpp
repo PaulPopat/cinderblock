@@ -22,8 +22,9 @@ const int Is::get_end() const
 
 const Variable* Is::resolve(Closure* closure) const
 {
+  auto matches = this->right->matches(this->left->resolve(closure));
   return closure->add_temp_variable(
-    new VariablePrimitiveBool(this->right->matches(this->left->resolve(closure)))
+    new VariablePrimitiveBool(matches)
   );
 }
 }

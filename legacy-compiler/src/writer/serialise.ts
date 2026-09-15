@@ -114,7 +114,7 @@ const operators = Object.freeze({
 });
 
 function serialiseOperator(data: InstructionOperator): Buffer {
-  return Buffer.concat([new Uint8Array([14]), new Uint8Array([operators[data.operator]]), serialise(data.left), serialise(data.right)]);
+  return Buffer.concat([new Uint8Array([14, operators[data.operator]]), serialise(data.left), serialise(data.right)]);
 }
 
 function serialiseReference(data: InstructionReference): Buffer {
@@ -155,6 +155,8 @@ function serialiseShape(data: Shape): Buffer {
       return Buffer.concat([new Uint8Array([10]), makeArray(data.args, ({ key, value }) => Buffer.concat([makeString(key), serialiseShape(value)]))]);
     case "unknown":
       return Buffer.from(new Uint8Array([11]));
+    case "union":
+      return Buffer.concat([new Uint8Array([12]), makeArray(data.args, (value) => serialiseShape(value))]);
   }
 }
 

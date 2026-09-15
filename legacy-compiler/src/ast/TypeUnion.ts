@@ -1,5 +1,6 @@
 import { TokenTypeName, type TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
+import type { Shape } from "#writer";
 import type { Entry } from "./Entry.ts";
 import { ParserError } from "./ParserError.ts";
 import { Type } from "./Type.ts";
@@ -41,5 +42,9 @@ export class TypeUnion extends Type {
       .map((p) => p.representation(depth + 1))
       .filter((value, index, total) => total.indexOf(value) === index)
       .join(" | ");
+  }
+
+  shape(): Shape {
+    return { type: "union", args: this.#parts.map((p) => p.shape()) };
   }
 }

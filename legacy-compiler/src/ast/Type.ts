@@ -1,6 +1,7 @@
 import { Entry } from "./Entry.ts";
 import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
+import type { Shape } from "#writer";
 
 type TypeParseable = {
   priority: number;
@@ -44,4 +45,5 @@ export abstract class Type extends Entry {
   }
 
   abstract representation(depth: number): string;
+  abstract shape(): Shape;
 }

@@ -1,5 +1,6 @@
 import { TokenTypeName, type TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
+import type { Shape } from "#writer";
 import type { Entry } from "./Entry.ts";
 import { ParserError } from "./ParserError.ts";
 import { Type } from "./Type.ts";
@@ -30,5 +31,9 @@ export class TypeArray extends Type {
 
   representation(depth: number): string {
     return `${this.#contains.representation(depth + 1)}[]`;
+  }
+
+  shape(): Shape {
+    return { type: "array", value: this.#contains.shape() };
   }
 }

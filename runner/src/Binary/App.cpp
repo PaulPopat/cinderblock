@@ -33,6 +33,7 @@
 #include "ShapeString.h"
 #include "ShapeTuple.h"
 #include "ShapeUnknown.h"
+#include "ShapeUnion.h"
 #include "../Storage/VariablePipeable.h"
 #include <string>
 
@@ -132,6 +133,9 @@ App::App(const char* binary)
   });
   Shape::Register(ShapeUnknown::TypeName, [](const char* binary, int offset) {
     return new ShapeUnknown(binary, offset);
+  });
+  Shape::Register(ShapeUnion::TypeName, [](const char* binary, int offset) {
+    return new ShapeUnion(binary, offset);
   });
 
   auto functions = extract_array<const CreateFunc*>(binary, 0, [](const char* binary, int offset) {

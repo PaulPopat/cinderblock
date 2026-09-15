@@ -1,5 +1,6 @@
 import { TokenTypeName, type TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
+import type { Shape } from "#writer";
 import type { Entry } from "./Entry.ts";
 import { Type } from "./Type.ts";
 import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
@@ -42,5 +43,9 @@ export class TypeArg extends Type {
 
   representation(depth: number): string {
     return `${this.#name}: ${this.#type.representation(depth + 1)}`;
+  }
+
+  shape(): Shape {
+    return { type: "null" };
   }
 }

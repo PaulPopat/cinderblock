@@ -414,4 +414,19 @@ describe("syntax", () => {
     const result = await code.binary().run("test_let", {});
     assert.equal(result, 4);
   });
+
+  test("pattern match", async () => {
+    const code = new Inline(`
+      struct test
+        value: string
+      ;
+
+      let test_let (arg: unknown) = arg |
+        let (_s: int) = _s;
+        let (_s: test) = _s.value;
+      ;
+    `);
+    const result = await code.binary().run("test_let", { arg: { value: "hello world" } });
+    assert.equal(result, "hello world");
+  });
 });
