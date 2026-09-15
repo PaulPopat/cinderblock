@@ -6,6 +6,7 @@ import { TokenTypeName } from "#tokeniser";
 import { Entity } from "./Entity.ts";
 import type { CreateFunc } from "#writer";
 import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
+import type { TypeTuple } from "./TypeTuple.ts";
 
 export class EntityArg extends Entity {
   readonly #type: Type;
@@ -24,7 +25,11 @@ export class EntityArg extends Entity {
     this.#name = name.startsWith('"') ? JSON.parse(name) : name;
   }
 
-  type() {
+  type(invocationType: TypeTuple) {
+    if (this.#type instanceof TypePrimitiveUnknown) {
+      return invocationType.args.find((a) => a.name === this.#name)?.type ?? this.#type;
+    }
+
     return this.#type;
   }
 

@@ -181,4 +181,15 @@ describe("logic", () => {
     });
     assert.equal(result, true);
   });
+
+  test("unknown argument inference", async () => {
+    const code = new Inline(
+      `
+        let internal (_s: unknown) = _s;
+        let result = ({ test = "data" } --> internal).test;
+      `,
+    );
+    const result = await code.binary().run("result", {});
+    assert.equal(result, "data");
+  });
 });

@@ -58,7 +58,7 @@ export class ExpressionAccess extends Expression {
   instruction(invocationType: TypeTuple): Instruction {
     let subjectType = this.#subject.resolution(invocationType);
     if (!(subjectType instanceof TypeTuple) && !(subjectType instanceof TypeReference)) {
-      throw new WriterError("Left must be array", this.range);
+      throw new WriterError("Left must be a tuple", this.range);
     }
 
     if (!subjectType.args.some((a) => a.name === this.#name)) {
