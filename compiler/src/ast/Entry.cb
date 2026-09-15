@@ -1,0 +1,9 @@
+namespace cinder_ast {
+  use cinder_utils;
+  use cinder_tokeniser;
+
+  struct Entry
+    location: Location
+    done: TokenWalker
+  ;
+}

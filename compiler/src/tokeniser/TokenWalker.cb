@@ -1,0 +1,124 @@
+namespace cinder_tokeniser {
+  use cinder_utils;
+
+  struct TokenWalker
+    tokens: Token[]
+    index: int
+    current: Token | null
+    ctx: Dictionary
+    text: string
+    done: bool
+    types: TokenType[]
+    range: Range
+    errors: CompilerError[]
+  ;
+
+  let TokenWalker_Create (
+    _s: Token[],
+    index: int,
+    ctx: unknown,
+    types: TokenType[],
+    errors: CompilerError[]
+  ): TokenWalker =
+      let done = _s -> std_array_length <= index;
+      let current: Token = !done ?
+        { _s = _s, i = index } -> std_array_get
+        : { data = "", range = Range_Empty };
+      let range: Range = current.range;
+
+    {
+      tokens = _s,
+      index = index,
+      current = current,
+      ctx = ctx,
+      text = current.data,
+      types = types,
+      range = range,
+      location = range.from,
+      errors = errors,
+    }
+  ;
+
+  let TokenWalker_Previous (_s: TokenWalker): TokenWalker =
+    {
+      _s = _s.tokens,
+      index = _s.index - 1,
+      ctx = _s.ctx,
+      types = _s.types,
+      errors = _s.errors,
+    } -> TokenWalker_Create
+  ;
+
+  let TokenWalker_Expect (
+    _s: TokenWalker,
+    expected: string[],
+    typeName: string,
+    self: (): unknown
+  ): TokenWalker =
+    {
+      _s = expected,
+      predicate = let (item: string) =
+        _s.text == item
+      ;
+    } -> std_array_some
+      ? {
+        _s = _s.tokens,
+        ctx = _s.ctx,
+        types = _s.types,
+        index = _s.index + 1,
+        errors = _s.errors ++ {
+          range = _s.range,
+          message =
+            "Expected " +
+            ({ _s = expected, separator = ", " } -> std_array_join) +
+            " but found " +
+            _s.text,
+        },
+      } -> TokenWalker_Create
+      : {
+        _s = _s.tokens,
+        index = _s.index + 1,
+        ctx = _s.ctx,
+        types = _s.types,
+        errors = _s.errors,
+      } -> TokenWalker_Create
+  ;
+
+  struct ExtractResult
+    done: TokenWalker
+  ;
+
+  let TokenWalker_Extract (
+    walker: TokenWalker,
+    name: string,
+    extractor: (_s: TokenWalker, so_far: Dictionary): ExtractResult
+  ) =
+      let result = { _s = walker, so_far = walker.ctx } -> extractor;
+    {
+      ...result.done,
+      ctx = { _s = walker.ctx, key = name, value = result } -> Dictionary_Set
+    }
+  ;
+
+  let TokenWalker_If (
+    walker: TokenWalker,
+    predicate: (_s: TokenWalker): bool,
+    extractor: (_s: TokenWalker): TokenWalker
+  ) = 
+    walker --> predicate
+      ? walker --> extractor
+      : walker
+  ;
+
+  let TokenWalker_While (
+    _s: TokenWalker,
+    name: string,
+    extractor: (_s: TokenWalker, so_far: Dictionary): ExtractResult
+  ) =
+      let result = { _s = _s, so_far = _s.ctx } -> extractor;
+    {
+      ...result.done,
+      ctx = { _s = _s.ctx, key = name, value = result } -> Dictionary_Set
+    }
+  ;
+}

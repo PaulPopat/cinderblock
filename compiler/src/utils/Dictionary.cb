@@ -1,0 +1,43 @@
+namespace cinder_utils {
+  struct DictionaryEntry
+    key: string
+    value: unknown
+  ;
+
+  struct Dictionary
+    data: DictionaryEntry[]
+  ;
+
+  let Dictionary_Create: Dictionary =
+    {
+      data = [] as DictionaryEntry[],
+    }
+  ;
+
+  let Dictionary_Set (_s: Dictionary, key: string, value: unknown): Dictionary =
+    {
+      data =
+        (
+          {
+            _s = _s.data,
+            predicate = let (item: { key: string }) = item.key != key;,
+          }
+          -> std_array_filter
+        )
+        ++ { key = key, value = value }
+        as DictionaryEntry[],
+    }
+  ;
+
+  let Dictionary_Get (_s: Dictionary, key: string) =
+    (
+      {
+        _s = _s.data,
+        predicate = let (item: { key: string }) = item.key != key;,
+      }
+      -> std_array_find
+      as DictionaryEntry
+    )
+    .value
+  ;
+}

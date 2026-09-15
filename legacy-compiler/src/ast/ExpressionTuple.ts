@@ -6,6 +6,9 @@ import type { Entry } from "./Entry.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { CreateFunc, Instruction } from "#writer";
+import { ExpressionTupleSpread } from "./ExpressionTupleSpread.ts";
+import { LinkerError } from "./LinkerError.ts";
+import { TypeReference } from "./TypeReference.ts";
 
 export class ExpressionTuple extends Expression {
   static {
@@ -16,14 +19,21 @@ export class ExpressionTuple extends Expression {
     });
   }
 
-  readonly #parts: Array<ExpressionTuplePart>;
+  readonly #parts: Array<ExpressionTuplePart | ExpressionTupleSpread>;
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     const [{ value }, done] = walker
       .while(
         "value",
         (w) => (w.data === "{" || w.data === ",") && w.expect(["{", ","], TokenTypeName.Punctuation).data !== "}",
-        (s) => new ExpressionTuplePart(s.expect(["{", ","], TokenTypeName.Punctuation), () => this, [...lookFor, ",", "}"], undefined),
+        (s) => {
+          const next = s.expect(["{", ","], TokenTypeName.Punctuation);
+          if (next.data === "...") {
+            return new ExpressionTupleSpread(next, () => this, [...lookFor, ",", "}"], undefined);
+          }
+
+          return new ExpressionTuplePart(next, () => this, [...lookFor, ",", "}"], undefined);
+        },
       )
       .if(
         (w) => w.data === "{",
@@ -43,23 +53,41 @@ export class ExpressionTuple extends Expression {
     return this.#parts;
   }
 
-  partOf(name: string) {
-    return this.#parts.find((p) => p.name === name);
-  }
-
   get resolution() {
     return new TypeTuple(
       this.location,
       this.done,
       () => this,
-      this.#parts.map((part) => new TypeArg(this.location, this.done, () => this, part.value.resolution, part.name)),
+      this.#parts.flatMap((part) => {
+        if (part instanceof ExpressionTupleSpread) {
+          const resolution = part.resolution;
+          if (resolution instanceof TypeTuple || resolution instanceof TypeReference) {
+            return resolution.args;
+          }
+
+          throw new LinkerError("Expected a tuple", this.range);
+        }
+
+        return [new TypeArg(this.location, this.done, () => this, part.value.resolution, part.name)];
+      }),
     );
   }
 
   get instruction(): Instruction {
     return {
       type: "tuple",
-      parts: this.#parts.map((p) => [p.name, p.instruction]),
+      parts: this.#parts.flatMap((part) => {
+        if (part instanceof ExpressionTupleSpread) {
+          const resolution = part.resolution;
+          if (resolution instanceof TypeTuple || resolution instanceof TypeReference) {
+            return resolution.args.map((a): [string, Instruction] => [a.name, { type: "access", subject: part.instruction, key: a.name }]);
+          }
+
+          throw new LinkerError("Expected a tuple", this.range);
+        }
+
+        return [[part.name, part.instruction]];
+      }),
     };
   }
 

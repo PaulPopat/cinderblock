@@ -26,6 +26,7 @@ export * from "./ExpressionOperator.ts";
 export * from "./ExpressionOperatorAdd.ts";
 export * from "./ExpressionOperatorAnd.ts";
 export * from "./ExpressionOperatorAs.ts";
+export * from "./ExpressionOperatorDirectPipe.ts";
 export * from "./ExpressionOperatorDivide.ts";
 export * from "./ExpressionOperatorEquals.ts";
 export * from "./ExpressionOperatorGreaterThan.ts";

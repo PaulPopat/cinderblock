@@ -4,4 +4,10 @@ namespace cinder_utils {
     line: int
     character: int
   ;
+
+  let Location_Empty: Location = {
+    file = "",
+    line = 1,
+    character = 1,
+  };
 }

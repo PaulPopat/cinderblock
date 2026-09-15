@@ -1,0 +1,6 @@
+namespace cinder_utils {
+  struct CompilerError
+    range: Range
+    message: string
+  ;
+}

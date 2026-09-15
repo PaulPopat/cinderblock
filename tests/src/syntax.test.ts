@@ -78,6 +78,29 @@ describe("syntax", () => {
     assert.deepStrictEqual(result, { test: "hello", world: 123 });
   });
 
+  test("tuple spread", async () => {
+    const code = new Inline(`
+      let part_one = {test="hello"};
+      let part_two = {world=123};
+      let test_let = {...part_one, ...part_two};
+    `);
+    const result = await code.binary().run("test_let", {});
+    assert.deepStrictEqual(result, { test: "hello", world: 123 });
+  });
+
+  test("tuple spread on struct", async () => {
+    const code = new Inline(`
+      struct part_two_data
+        world: int
+      ;
+      let part_one = {test="hello"};
+      let part_two: part_two_data = {world=123};
+      let test_let = {...part_one, ...part_two};
+    `);
+    const result = await code.binary().run("test_let", {});
+    assert.deepStrictEqual(result, { test: "hello", world: 123 });
+  });
+
   test("returns a tuple with a trailing comma", async () => {
     const code = new Inline(`
       let test_let = {test="hello", world=123,};
@@ -333,6 +356,17 @@ describe("syntax", () => {
     assert.equal(result, 4);
   });
 
+  test("struct extension", async () => {
+    const code = new Inline(`
+      struct otherstruct  value: int;
+      struct mystruct : otherstruct;
+      let pipeable (test: mystruct) = test.value + 2;
+      let test_let = {test = {value = 2}} -> pipeable;
+    `);
+    const result = await code.binary().run("test_let", {});
+    assert.equal(result, 4);
+  });
+
   test("unknown arg", async () => {
     const code = new Inline(`
       struct data value: string ;
@@ -347,6 +381,15 @@ describe("syntax", () => {
     const code = new Inline(`
       let pipeable (test: {value: int}) = test.value + 2;
       let test_let = {test = {value = 2}} -> pipeable;
+    `);
+    const result = await code.binary().run("test_let", {});
+    assert.equal(result, 4);
+  });
+
+  test("tuple direct pipe", async () => {
+    const code = new Inline(`
+      let pipeable (_s: {value: int}) = _s.value + 2;
+      let test_let = {value = 2} --> pipeable;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, 4);

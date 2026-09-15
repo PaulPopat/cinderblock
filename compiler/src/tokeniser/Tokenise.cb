@@ -1,10 +1,4 @@
 namespace cinder_tokeniser {
-  extern std_string_matches (_s: string, pattern: string): bool;
-  extern std_string_split (_s: string, on: string): string[];
-  extern std_string_trim (_s: string): string;
-  extern std_array_some (_s: unknown[], predicate: (item: unknown, index: int): bool ): bool;
-  extern std_array_reduce (_s: unknown[], initial: unknown, predicate: (item: unknown, current: unknown, index: int): unknown ): unknown;
-
   let Tokenise (file: string, text: string) =
       let character_split = { on = "" } -> std_string_split;
 
@@ -31,6 +25,10 @@ namespace cinder_tokeniser {
         ">",
         ">=",
         ".",
+        "..",
+        "...",
+        "--",
+        "-->",
         "->",
       ];
 
@@ -113,8 +111,8 @@ namespace cinder_tokeniser {
         reducer = let (item: string, current: TokenisationContext) =
           { ctx = current, character = item } -> process
         ;
-      } -> std_array_reduce
-      as TokenisationContext
+      } -> std_array_reduce as
+      TokenisationContext
     ).result
   ;
 }

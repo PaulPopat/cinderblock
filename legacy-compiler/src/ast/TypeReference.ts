@@ -6,17 +6,19 @@ import { LinkerError } from "./LinkerError.ts";
 import { Type } from "./Type.ts";
 
 export class TypeReference extends Type {
+  static ParseReference(walker: TokenWalker, parent: () => Entry | undefined, left?: Type) {
+    const [{ value }, done] = walker.text("value", TokenTypeName.StructReference, (): TypeReference => result).finish();
+
+    const result = new TypeReference(walker.location, done, parent, value);
+    return result;
+  }
+
   static {
     Type.RegisterType({
       priority: 1,
       match: /^[a-zA-Z][a-zA-Z0-9_@$#:]*$/gm,
       chainable: false,
-      factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
-        const [{ value }, done] = walker.text("value", TokenTypeName.StructReference, (): TypeReference => result).finish();
-
-        const result = new TypeReference(walker.location, done, parent, value);
-        return result;
-      },
+      factory: TypeReference.ParseReference,
     });
   }
 

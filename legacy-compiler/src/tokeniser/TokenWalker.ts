@@ -10,6 +10,10 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
     return new TokenWalker({}, tokens, [], 0);
   }
 
+  static get empty() {
+    return this.start([]);
+  }
+
   readonly #data: TContext;
   readonly #tokens: Array<Token>;
   readonly #types: Array<TokenType>;

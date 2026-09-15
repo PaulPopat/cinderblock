@@ -6,36 +6,41 @@ import type { Variable } from "#variable";
 import type { AppMetadata } from "./AppMetadata.ts";
 import * as std from "#std";
 
+export type GlobalFunction = ((this: CinderBlockBinary, args: Record<string, unknown>) => unknown) | unknown;
+
 export class CinderBlockBinary {
-  static async FromBinary(dir: string, globals: Record<string, unknown>) {
+  static async FromBinary(dir: string, globals: Record<string, GlobalFunction>) {
     const data = await fs.readFile(path.resolve(dir, ".cinder", "app.block"));
     const names = JSON.parse(await fs.readFile(path.resolve(dir, ".cinder", "metadata.json"), "utf8"));
     return this.FromMemory(data, names, globals);
   }
 
-  static FromMemory(data: Buffer, metadata: AppMetadata, globals: Record<string, unknown>) {
+  static FromMemory(data: Buffer, metadata: AppMetadata, globals: Record<string, GlobalFunction>) {
     const module = CinderBlockRunner().then((m) => {
       m.LoadApp(data);
-      m.LoadGlobals([
-        ...Object.entries(globals)
-          .filter(([key]) => typeof key === "string")
-          .map(([key, value]) => ({ name: key as string, value: variablise(value) })),
-        ...Object.entries(std)
-          .filter(([key]) => typeof key === "string")
-          .map(([key, value]) => ({ name: key as string, value: variablise(value) })),
-      ]);
 
       return m;
     });
 
-    return new CinderBlockBinary(module, metadata);
+    return new CinderBlockBinary(module, metadata, globals);
   }
 
-  readonly #module: MainModule | Promise<MainModule>;
+  readonly #module: Promise<MainModule>;
   readonly #metadata: AppMetadata;
 
-  constructor(module: MainModule | Promise<MainModule>, metadata: AppMetadata) {
-    this.#module = module;
+  constructor(module: MainModule | Promise<MainModule>, metadata: AppMetadata, globals: Record<string, GlobalFunction>) {
+    this.#module = Promise.resolve(module).then((m) => {
+      m.LoadGlobals([
+        ...Object.entries(globals)
+          .filter(([key]) => typeof key === "string")
+          .map(([key, value]) => ({ name: key as string, value: variablise(typeof value === "function" ? value.bind(this) : value) })),
+        ...Object.entries(std)
+          .filter(([key]) => typeof key === "string")
+          .map(([key, value]) => ({ name: key as string, value: variablise(value.bind(this)) })),
+      ]);
+
+      return m;
+    });
     this.#metadata = metadata;
   }
 
