@@ -4,6 +4,7 @@ import type { InstructionAccess } from "./InstructionAccess.ts";
 import type { InstructionArg } from "./InstructionArg.ts";
 import type { InstructionArrayAdd } from "./InstructionArrayAdd.ts";
 import type { InstructionExternal } from "./InstructionExternal.ts";
+import type { InstructionIs } from "./InstructionIs.ts";
 import type { InstructionLiteralArray } from "./InstructionLiteralArray.ts";
 import type { InstructionLiteralBool } from "./InstructionLiteralBool.ts";
 import type { InstructionLiteralChar } from "./InstructionLiteralChar.ts";
@@ -17,6 +18,7 @@ import type { InstructionOperator } from "./InstructionOperator.ts";
 import type { InstructionReference } from "./InstructionReference.ts";
 import type { InstructionTernary } from "./InstructionTernary.ts";
 import type { InstructionTuple } from "./InstructionTuple.ts";
+import type { Shape } from "./Shape.ts";
 
 function makeArray<T>(input: Array<T>, mapper: (item: T) => Buffer) {
   const length = Buffer.from(new Uint8Array(4));
@@ -127,6 +129,39 @@ function serialiseTuple(data: InstructionTuple): Buffer {
   return Buffer.concat([new Uint8Array([17]), makeArray(data.parts, ([name, inst]) => Buffer.concat([makeString(name), serialise(inst)]))]);
 }
 
+function serialiseShape(data: Shape): Buffer {
+  switch (data.type) {
+    case "array":
+      return Buffer.concat([new Uint8Array([0]), serialiseShape(data.value)]);
+    case "bool":
+      return Buffer.from(new Uint8Array([1]));
+    case "char":
+      return Buffer.from(new Uint8Array([2]));
+    case "double":
+      return Buffer.from(new Uint8Array([3]));
+    case "float":
+      return Buffer.from(new Uint8Array([4]));
+    case "int":
+      return Buffer.from(new Uint8Array([5]));
+    case "long":
+      return Buffer.from(new Uint8Array([6]));
+    case "null":
+      return Buffer.from(new Uint8Array([7]));
+    case "pipeable":
+      return Buffer.from(new Uint8Array([8]));
+    case "string":
+      return Buffer.from(new Uint8Array([9]));
+    case "tuple":
+      return Buffer.concat([new Uint8Array([10]), makeArray(data.args, ({ key, value }) => Buffer.concat([makeString(key), serialiseShape(value)]))]);
+    case "unknown":
+      return Buffer.from(new Uint8Array([11]));
+  }
+}
+
+function serialiseIs(data: InstructionIs): Buffer {
+  return Buffer.concat([new Uint8Array([18]), serialise(data.left), serialiseShape(data.right)]);
+}
+
 const serialisers = Object.freeze({
   access: serialiseAccess,
   arg: serialiseArg,
@@ -146,6 +181,7 @@ const serialisers = Object.freeze({
   reference: serialiseReference,
   ternary: serialiseTernary,
   tuple: serialiseTuple,
+  is: serialiseIs,
 });
 
 function serialise(data: Instruction): Buffer {

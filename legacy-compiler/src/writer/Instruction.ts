@@ -2,6 +2,7 @@ import type { InstructionAccess } from "./InstructionAccess.ts";
 import type { InstructionArg } from "./InstructionArg.ts";
 import type { InstructionArrayAdd } from "./InstructionArrayAdd.ts";
 import type { InstructionExternal } from "./InstructionExternal.ts";
+import type { InstructionIs } from "./InstructionIs.ts";
 import type { InstructionLiteralArray } from "./InstructionLiteralArray.ts";
 import type { InstructionLiteralBool } from "./InstructionLiteralBool.ts";
 import type { InstructionLiteralChar } from "./InstructionLiteralChar.ts";
@@ -35,4 +36,5 @@ export type Instruction =
   | InstructionOperator
   | InstructionReference
   | InstructionTernary
-  | InstructionTuple;
+  | InstructionTuple
+  | InstructionIs;
