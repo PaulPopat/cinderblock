@@ -19,6 +19,19 @@
 #include "Ternary.h"
 #include "Tuple.h"
 #include "extract.h"
+#include "Shape.h"
+#include "ShapeArray.h"
+#include "ShapeBool.h"
+#include "ShapeChar.h"
+#include "ShapeDouble.h"
+#include "ShapeFloat.h"
+#include "ShapeInt.h"
+#include "ShapeLong.h"
+#include "ShapeNull.h"
+#include "ShapePipeable.h"
+#include "ShapeString.h"
+#include "ShapeTuple.h"
+#include "ShapeUnknown.h"
 #include "../Storage/VariablePipeable.h"
 #include <string>
 
@@ -78,6 +91,43 @@ App::App(const char* binary)
   });
   Instruction::Register(Tuple::TypeName, [](const char* binary, int offset) {
     return new Tuple(binary, offset);
+  });
+
+  Shape::Register(ShapeArray::TypeName, [](const char* binary, int offset) {
+    return new ShapeArray(binary, offset);
+  });
+  Shape::Register(ShapeBool::TypeName, [](const char* binary, int offset) {
+    return new ShapeBool(binary, offset);
+  });
+  Shape::Register(ShapeChar::TypeName, [](const char* binary, int offset) {
+    return new ShapeChar(binary, offset);
+  });
+  Shape::Register(ShapeDouble::TypeName, [](const char* binary, int offset) {
+    return new ShapeDouble(binary, offset);
+  });
+  Shape::Register(ShapeFloat::TypeName, [](const char* binary, int offset) {
+    return new ShapeFloat(binary, offset);
+  });
+  Shape::Register(ShapeInt::TypeName, [](const char* binary, int offset) {
+    return new ShapeInt(binary, offset);
+  });
+  Shape::Register(ShapeLong::TypeName, [](const char* binary, int offset) {
+    return new ShapeLong(binary, offset);
+  });
+  Shape::Register(ShapeNull::TypeName, [](const char* binary, int offset) {
+    return new ShapeNull(binary, offset);
+  });
+  Shape::Register(ShapePipeable::TypeName, [](const char* binary, int offset) {
+    return new ShapePipeable(binary, offset);
+  });
+  Shape::Register(ShapeString::TypeName, [](const char* binary, int offset) {
+    return new ShapeString(binary, offset);
+  });
+  Shape::Register(ShapeTuple::TypeName, [](const char* binary, int offset) {
+    return new ShapeTuple(binary, offset);
+  });
+  Shape::Register(ShapeUnknown::TypeName, [](const char* binary, int offset) {
+    return new ShapeUnknown(binary, offset);
   });
 
   auto functions = extract_array<const CreateFunc*>(binary, 0, [](const char* binary, int offset) {
