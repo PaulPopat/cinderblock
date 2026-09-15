@@ -30,6 +30,7 @@ namespace cinder_tokeniser {
         "--",
         "-->",
         "->",
+        "@",
       ];
 
       let allowedPatterns = [

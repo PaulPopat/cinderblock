@@ -14,6 +14,7 @@
 #include "LiteralLong.h"
 #include "LiteralNull.h"
 #include "LiteralString.h"
+#include "Index.h"
 #include "Not.h"
 #include "Operator.h"
 #include "Reference.h"
@@ -96,6 +97,9 @@ App::App(const char* binary)
   });
   Instruction::Register(Is::TypeName, [](const char* binary, int offset) {
     return new Is(binary, offset);
+  });
+  Instruction::Register(Index::TypeName, [](const char* binary, int offset) {
+    return new Index(binary, offset);
   });
 
   Shape::Register(ShapeArray::TypeName, [](const char* binary, int offset) {

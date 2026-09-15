@@ -23,7 +23,7 @@ export class ExpressionOperatorAdd extends ExpressionOperator {
     if (!existing) throw new ParserError("Unexpected +", walker);
     const [{ right }, done] = walker
       .expect("+", TokenTypeName.Operator)
-      .extract("right", (w) => Expression.ParseOne(w, parent))
+      .extract("right", (w) => Expression.ParseOne(w, () => this))
       .finish();
     super(walker.location, done, parent, existing, right);
   }

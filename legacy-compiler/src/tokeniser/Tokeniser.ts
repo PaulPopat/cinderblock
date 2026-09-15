@@ -29,6 +29,7 @@ const allowedLiterals = [
   "--",
   "-->",
   "->",
+  "@",
 ];
 
 export class Tokeniser {
@@ -36,7 +37,7 @@ export class Tokeniser {
   readonly #text: string;
 
   readonly #patterns = [
-    /^[a-zA-Z0-9_@$#]+$/gm,
+    /^[a-zA-Z0-9_$#]+$/gm,
     /^[0-9]+\.[0-9]*[a-z]?$/gm,
     ...allowedLiterals.map((a) => new RegExp(["^", ...[...a].map((c) => "\\" + c), "$"].join(""))),
     /^"([^"]|\\")*"?$/gm,

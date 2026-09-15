@@ -429,4 +429,20 @@ describe("syntax", () => {
     const result = await code.binary().run("test_let", { arg: { value: "hello world" } });
     assert.equal(result, "hello world");
   });
+
+  test("array index", async () => {
+    const code = new Inline(`
+      let test_let (arg: unknown[]) = arg@2;
+    `);
+    const result = await code.binary().run("test_let", { arg: [0, 1, 2, 3, 4] });
+    assert.equal(result, 2);
+  });
+
+  test("array index out of range", async () => {
+    const code = new Inline(`
+      let test_let (arg: unknown[]) = arg@2;
+    `);
+    const result = await code.binary().run("test_let", { arg: [] });
+    assert.equal(result, null);
+  });
 });

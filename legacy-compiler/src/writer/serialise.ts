@@ -4,6 +4,7 @@ import type { InstructionAccess } from "./InstructionAccess.ts";
 import type { InstructionArg } from "./InstructionArg.ts";
 import type { InstructionArrayAdd } from "./InstructionArrayAdd.ts";
 import type { InstructionExternal } from "./InstructionExternal.ts";
+import type { InstructionIndex } from "./InstructionIndex.ts";
 import type { InstructionIs } from "./InstructionIs.ts";
 import type { InstructionLiteralArray } from "./InstructionLiteralArray.ts";
 import type { InstructionLiteralBool } from "./InstructionLiteralBool.ts";
@@ -164,6 +165,10 @@ function serialiseIs(data: InstructionIs): Buffer {
   return Buffer.concat([new Uint8Array([18]), serialise(data.left), serialiseShape(data.right)]);
 }
 
+function serialiseIndex(data: InstructionIndex): Buffer {
+  return Buffer.concat([new Uint8Array([19]), serialise(data.index), serialise(data.subject)]);
+}
+
 const serialisers = Object.freeze({
   access: serialiseAccess,
   arg: serialiseArg,
@@ -184,6 +189,7 @@ const serialisers = Object.freeze({
   ternary: serialiseTernary,
   tuple: serialiseTuple,
   is: serialiseIs,
+  index: serialiseIndex,
 });
 
 function serialise(data: Instruction): Buffer {
