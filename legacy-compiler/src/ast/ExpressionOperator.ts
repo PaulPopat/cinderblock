@@ -3,6 +3,7 @@ import type { Location } from "#utils";
 import type { CreateFunc } from "#writer";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
+import type { TypeTuple } from "./TypeTuple.ts";
 
 export abstract class ExpressionOperator extends Expression {
   readonly #left: Expression;
@@ -22,7 +23,7 @@ export abstract class ExpressionOperator extends Expression {
     return this.#right;
   }
 
-  get funcs(): CreateFunc[] {
-    return [...this.#left.funcs, ...this.#right.funcs];
+  funcs(invocationType: TypeTuple): Array<CreateFunc> {
+    return [...this.#left.funcs(invocationType), ...this.#right.funcs(invocationType)];
   }
 }

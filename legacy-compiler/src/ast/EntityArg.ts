@@ -24,7 +24,7 @@ export class EntityArg extends Entity {
     this.#name = name.startsWith('"') ? JSON.parse(name) : name;
   }
 
-  get type() {
+  type() {
     return this.#type;
   }
 
@@ -46,7 +46,7 @@ export class EntityArg extends Entity {
     return this.parent?.float(name);
   }
 
-  get model(): CreateFunc[] {
+  model(): CreateFunc[] {
     return [];
   }
 }

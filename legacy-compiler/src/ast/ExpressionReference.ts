@@ -8,6 +8,8 @@ import { EntityLet } from "./EntityLet.ts";
 import { EntityArg } from "./EntityArg.ts";
 import { EntityExternal } from "./EntityExternal.ts";
 import { WriterError } from "./WriterError.ts";
+import type { Type } from "./Type.ts";
+import type { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionReference extends Expression {
   static {
@@ -39,11 +41,11 @@ export class ExpressionReference extends Expression {
     return result;
   }
 
-  get resolution() {
-    return this.subject.type;
+  resolution(invocationType: TypeTuple): Type {
+    return this.subject.type(invocationType);
   }
 
-  get instruction(): Instruction {
+  instruction(invocationType: TypeTuple): Instruction {
     const subject = this.float(this.#name);
     if (subject instanceof EntityLet) {
       return { type: "reference", name: subject.internalName };
@@ -56,7 +58,7 @@ export class ExpressionReference extends Expression {
     throw new WriterError("Unknown subject type", this.range);
   }
 
-  get funcs(): CreateFunc[] {
+  funcs(invocationType: TypeTuple): Array<CreateFunc> {
     return [];
   }
 }

@@ -5,6 +5,8 @@ import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { CreateFunc, Instruction } from "#writer";
+import type { Type } from "./Type.ts";
+import type { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionNot extends Expression {
   static {
@@ -31,8 +33,8 @@ export class ExpressionNot extends Expression {
     return this.#subject;
   }
 
-  get resolution() {
-    let subjectType = this.#subject.resolution;
+  resolution(invocationType: TypeTuple): Type {
+    let subjectType = this.#subject.resolution(invocationType);
     if (!(subjectType instanceof TypePrimitiveBool)) {
       throw new LinkerError("Boolean required", this.range);
     }
@@ -40,15 +42,15 @@ export class ExpressionNot extends Expression {
     return new TypePrimitiveBool(this.location, this.done, () => this);
   }
 
-  get instruction(): Instruction {
-    if (!(this.#subject.resolution instanceof TypePrimitiveBool)) {
+  instruction(invocationType: TypeTuple): Instruction {
+    if (!(this.#subject.resolution(invocationType) instanceof TypePrimitiveBool)) {
       throw new LinkerError("Boolean required", this.range);
     }
 
-    return { type: "not", subject: this.#subject.instruction };
+    return { type: "not", subject: this.#subject.instruction(invocationType) };
   }
 
-  get funcs(): CreateFunc[] {
-    return [...this.#subject.funcs];
+  funcs(invocationType: TypeTuple): Array<CreateFunc> {
+    return [...this.#subject.funcs(invocationType)];
   }
 }

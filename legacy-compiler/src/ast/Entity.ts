@@ -2,6 +2,7 @@ import type { TokenWalker } from "#tokeniser";
 import type { CreateFunc } from "#writer";
 import { Entry } from "./Entry.ts";
 import { ParserError } from "./ParserError.ts";
+import type { TypeTuple } from "./TypeTuple.ts";
 
 type EntityParseable = {
   priority: number;
@@ -28,7 +29,7 @@ export abstract class Entity extends Entry {
   }
 
   abstract get name(): string;
-  abstract get model(): Array<CreateFunc>;
+  abstract model(invocationType: TypeTuple): Array<CreateFunc>;
 
   get fullName() {
     return [super.namespace, this.name].join("_");

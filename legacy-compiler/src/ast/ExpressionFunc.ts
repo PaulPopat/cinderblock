@@ -6,6 +6,7 @@ import { Expression } from "./Expression.ts";
 import { Namer } from "./Namer.ts";
 import { Type } from "./Type.ts";
 import { TypePipeable } from "./TypePipeable.ts";
+import type { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionFunc extends Expression {
   static {
@@ -45,17 +46,17 @@ export class ExpressionFunc extends Expression {
     this.#contents = contents;
   }
 
-  get resolution(): Type {
+  resolution(invocationType: TypeTuple): Type {
     return new TypePipeable(
       this.location,
       this.done,
       () => this,
       this.#args.map((a) => a.typeArg),
-      this.#returns ?? this.#contents.resolution,
+      this.#returns ?? this.#contents.resolution(invocationType),
     );
   }
 
-  get instruction(): Instruction {
+  instruction(invocationType: TypeTuple): Instruction {
     return { type: "reference", name: this.#internalName };
   }
 
@@ -63,12 +64,12 @@ export class ExpressionFunc extends Expression {
     return this.#args.reduce((result, arg) => result ?? arg.dig(name), undefined as Entry | undefined) ?? super.float(name);
   }
 
-  get funcs(): CreateFunc[] {
+  funcs(invocationType: TypeTuple): Array<CreateFunc> {
     return [
       {
         name: this.#internalName,
         vars: [],
-        returns: this.#contents.instruction,
+        returns: this.#contents.instruction(invocationType),
         no_args: false,
         tags: {},
       },

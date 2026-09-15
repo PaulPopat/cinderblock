@@ -11,6 +11,7 @@ import {
   TypePrimitiveLong,
   TypePrimitiveString,
   TypePrimitiveUnknown,
+  TypeTuple,
 } from "#ast";
 import { TokenWalker } from "#tokeniser";
 import { Location } from "#utils";
@@ -224,7 +225,7 @@ export abstract class App extends EntityNamespace {
 
   get binaryData(): BinaryData {
     return {
-      data: serialiseApp(this.topLevelEntities.flatMap((e) => e.model)),
+      data: serialiseApp(this.topLevelEntities.flatMap((e) => e.model(TypeTuple.empty))),
       metadata: {
         funcs: Object.fromEntries(
           this.entities

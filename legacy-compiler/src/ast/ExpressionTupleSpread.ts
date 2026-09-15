@@ -3,6 +3,8 @@ import type { Entry } from "./Entry.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { CreateFunc, Instruction } from "#writer";
+import type { Type } from "./Type.ts";
+import type { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionTupleSpread extends Expression {
   readonly #value: Expression;
@@ -20,15 +22,15 @@ export class ExpressionTupleSpread extends Expression {
     return this.#value;
   }
 
-  get resolution() {
-    return this.#value.resolution;
+  resolution(invocationType: TypeTuple): Type {
+    return this.#value.resolution(invocationType);
   }
 
-  get instruction(): Instruction {
-    return this.#value.instruction;
+  instruction(invocationType: TypeTuple): Instruction {
+    return this.#value.instruction(invocationType);
   }
 
-  get funcs(): CreateFunc[] {
-    return this.#value.funcs;
+  funcs(invocationType: TypeTuple): Array<CreateFunc> {
+    return this.#value.funcs(invocationType);
   }
 }

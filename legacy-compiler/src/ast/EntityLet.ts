@@ -10,6 +10,7 @@ import { TokenTypeName } from "#tokeniser";
 import { EntityNamespace } from "./EntityNamespace.ts";
 import type { CreateFunc } from "#writer";
 import { Namer } from "./Namer.ts";
+import type { TypeTuple } from "./TypeTuple.ts";
 
 export class EntityLet extends EntityNamespace {
   static {
@@ -101,8 +102,8 @@ export class EntityLet extends EntityNamespace {
     return [this.parent?.namespace, this.name].filter((r) => r).join("_");
   }
 
-  get type() {
-    const result = this.#returns ?? this.#contents.resolution;
+  type(invocationType: TypeTuple) {
+    const result = this.#returns ?? this.#contents.resolution(invocationType);
     if (this.#args.length)
       return new TypePipeable(
         this.location,
@@ -125,12 +126,12 @@ export class EntityLet extends EntityNamespace {
     return this.#args.reduce((result, arg) => result ?? arg.dig(name), undefined as Entry | undefined) ?? super.float(name);
   }
 
-  get model(): Array<CreateFunc> {
+  model(invocationType: TypeTuple): Array<CreateFunc> {
     return [
       {
         name: this.#internalName,
-        vars: [...this.topLevelEntities.flatMap((e) => e.model), ...this.#contents.funcs],
-        returns: this.#contents.instruction,
+        vars: [...this.topLevelEntities.flatMap((e) => e.model(invocationType)), ...this.#contents.funcs(invocationType)],
+        returns: this.#contents.instruction(invocationType),
         no_args: this.#args.length === 0,
         tags: Object.fromEntries(this.#tags.map((t) => [t.key, t.value?.toString() ?? ""])),
       },

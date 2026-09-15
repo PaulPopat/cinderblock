@@ -5,6 +5,7 @@ import type { Entry } from "./Entry.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { CreateFunc, Instruction } from "#writer";
+import type { Type } from "./Type.ts";
 
 export class ExpressionTuplePart extends Expression {
   readonly #name: string;
@@ -29,17 +30,17 @@ export class ExpressionTuplePart extends Expression {
     return this.#value;
   }
 
-  get resolution() {
+  resolution(invocationType: TypeTuple): Type {
     return new TypeTuple(this.location, this.done, () => this, [
-      new TypeArg(this.location, this.done, () => this, this.#value.resolution, this.#name),
+      new TypeArg(this.location, this.done, () => this, this.#value.resolution(invocationType), this.#name),
     ]);
   }
 
-  get instruction(): Instruction {
-    return this.#value.instruction;
+  instruction(invocationType: TypeTuple): Instruction {
+    return this.#value.instruction(invocationType);
   }
 
-  get funcs(): CreateFunc[] {
-    return this.#value.funcs;
+  funcs(invocationType: TypeTuple): Array<CreateFunc> {
+    return this.#value.funcs(invocationType);
   }
 }

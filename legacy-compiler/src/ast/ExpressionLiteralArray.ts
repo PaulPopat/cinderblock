@@ -6,6 +6,8 @@ import { TypeArray } from "./TypeArray.ts";
 import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { CreateFunc, Instruction } from "#writer";
+import type { Type } from "./Type.ts";
+import type { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionLiteralArray extends ExpressionLiteral {
   static {
@@ -54,23 +56,23 @@ export class ExpressionLiteralArray extends ExpressionLiteral {
     return this.#value;
   }
 
-  get resolution() {
+  resolution(invocationType: TypeTuple): Type {
     return new TypeArray(
       this.location,
       this.done,
       () => this,
-      this.#value[0]?.resolution ?? new TypePrimitiveUnknown(this.location, this.done, () => this),
+      this.#value[0]?.resolution(invocationType) ?? new TypePrimitiveUnknown(this.location, this.done, () => this),
     );
   }
 
-  get instruction(): Instruction {
+  instruction(invocationType: TypeTuple): Instruction {
     return {
       type: "literal_array",
-      subject: this.#value.map((v) => v.instruction),
+      subject: this.#value.map((v) => v.instruction(invocationType)),
     };
   }
 
-  get funcs(): CreateFunc[] {
-    return this.#value.flatMap((v) => v.funcs);
+  funcs(invocationType: TypeTuple): Array<CreateFunc> {
+    return this.#value.flatMap((v) => v.funcs(invocationType));
   }
 }

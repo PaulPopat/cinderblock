@@ -1,8 +1,8 @@
 import { TypeArg } from "./TypeArg.ts";
 import { Type } from "./Type.ts";
 import type { Entry } from "./Entry.ts";
-import type { Location } from "#utils";
-import { TokenTypeName, type TokenWalker } from "#tokeniser";
+import { Location } from "#utils";
+import { TokenTypeName, TokenWalker } from "#tokeniser";
 
 export class TypeTuple extends Type {
   static {
@@ -23,6 +23,10 @@ export class TypeTuple extends Type {
         return new TypeTuple(walker.location, done, parent, parts);
       },
     });
+  }
+
+  static get empty() {
+    return new TypeTuple(Location.empty, TokenWalker.empty, () => undefined, []);
   }
 
   readonly #args: Array<TypeArg>;

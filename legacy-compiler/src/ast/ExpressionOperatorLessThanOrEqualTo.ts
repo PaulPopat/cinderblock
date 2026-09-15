@@ -8,6 +8,8 @@ import { WriterError } from "./WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { Instruction } from "#writer";
 import { TypePrimitive } from "./TypePrimitive.ts";
+import type { Type } from "./Type.ts";
+import type { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionOperatorLessThanOrEqualTo extends ExpressionOperator {
   static {
@@ -27,24 +29,24 @@ export class ExpressionOperatorLessThanOrEqualTo extends ExpressionOperator {
     super(walker.location, done, parent, existing, right);
   }
 
-  get resolution() {
+  resolution(invocationType: TypeTuple): Type {
     return new TypePrimitiveBool(this.location, this.done, () => this);
   }
 
-  get instruction(): Instruction {
-    if (!(this.left.resolution instanceof TypePrimitive)) {
+  instruction(invocationType: TypeTuple): Instruction {
+    if (!(this.left.resolution(invocationType) instanceof TypePrimitive)) {
       throw new WriterError("Primitive required", this.range);
     }
 
-    if (!(this.right.resolution instanceof TypePrimitive)) {
+    if (!(this.right.resolution(invocationType) instanceof TypePrimitive)) {
       throw new WriterError("Primitive required", this.range);
     }
 
     return {
       type: "operator",
       operator: "less_than_or_equal_to",
-      left: this.left.instruction,
-      right: this.right.instruction,
+      left: this.left.instruction(invocationType),
+      right: this.right.instruction(invocationType),
     };
   }
 }

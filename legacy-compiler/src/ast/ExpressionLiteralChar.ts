@@ -5,6 +5,8 @@ import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveChar } from "./TypePrimitiveChar.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { CreateFunc, Instruction } from "#writer";
+import type { Type } from "./Type.ts";
+import type { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionLiteralChar extends ExpressionLiteral {
   static {
@@ -27,17 +29,17 @@ export class ExpressionLiteralChar extends ExpressionLiteral {
     return this.#value;
   }
 
-  get resolution() {
+  resolution(invocationType: TypeTuple): Type {
     return new TypePrimitiveChar(this.location, this.done, () => this);
   }
 
-  get instruction(): Instruction {
+  instruction(invocationType: TypeTuple): Instruction {
     const value: string = JSON.parse(`"${this.#value.slice(1, this.#value.length - 1)}"`);
 
     return { type: "literal_char", value: value.charCodeAt(0) };
   }
 
-  get funcs(): CreateFunc[] {
+  funcs(invocationType: TypeTuple): Array<CreateFunc> {
     return [];
   }
 }

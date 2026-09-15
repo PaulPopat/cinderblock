@@ -5,6 +5,8 @@ import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { CreateFunc, Instruction } from "#writer";
 import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
+import type { Type } from "./Type.ts";
+import type { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionLiteralNull extends ExpressionLiteral {
   static {
@@ -20,15 +22,15 @@ export class ExpressionLiteralNull extends ExpressionLiteral {
     super(walker.location, done, parent);
   }
 
-  get resolution() {
+  resolution(invocationType: TypeTuple): Type {
     return new TypePrimitiveUnknown(this.location, this.done, () => this);
   }
 
-  get instruction(): Instruction {
+  instruction(invocationType: TypeTuple): Instruction {
     return { type: "literal_null" };
   }
 
-  get funcs(): CreateFunc[] {
+  funcs(invocationType: TypeTuple): Array<CreateFunc> {
     return [];
   }
 }

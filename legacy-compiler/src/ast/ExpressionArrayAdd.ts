@@ -6,6 +6,8 @@ import { TokenTypeName } from "#tokeniser";
 import type { CreateFunc, Instruction } from "#writer";
 import { TypeArray } from "./TypeArray.ts";
 import { WriterError } from "./WriterError.ts";
+import type { Type } from "./Type.ts";
+import type { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionArrayAdd extends Expression {
   static {
@@ -38,23 +40,23 @@ export class ExpressionArrayAdd extends Expression {
     return this.#addition;
   }
 
-  get resolution() {
-    return this.#subject.resolution;
+  resolution(invocationType: TypeTuple): Type {
+    return this.#subject.resolution(invocationType);
   }
 
-  get instruction(): Instruction {
-    if (!(this.#subject.resolution instanceof TypeArray)) {
+  instruction(invocationType: TypeTuple): Instruction {
+    if (!(this.#subject.resolution(invocationType) instanceof TypeArray)) {
       throw new WriterError("Left must be array", this.range);
     }
 
     return {
       type: "array_add",
-      left: this.#subject.instruction,
-      right: this.#addition.instruction,
+      left: this.#subject.instruction(invocationType),
+      right: this.#addition.instruction(invocationType),
     };
   }
 
-  get funcs(): CreateFunc[] {
-    return [...this.#subject.funcs, ...this.#addition.funcs];
+  funcs(invocationType: TypeTuple): Array<CreateFunc> {
+    return [...this.#subject.funcs(invocationType), ...this.#addition.funcs(invocationType)];
   }
 }

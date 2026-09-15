@@ -67,7 +67,7 @@ export class EntityStruct extends Entity {
     return this.parent?.float(name);
   }
 
-  get model(): CreateFunc[] {
+  model(): CreateFunc[] {
     return [];
   }
 }

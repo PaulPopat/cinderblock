@@ -3,6 +3,8 @@ import { Expression } from "./Expression.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { CreateFunc } from "#writer";
+import type { Type } from "./Type.ts";
+import type { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionBrackets extends Expression {
   static {
@@ -29,15 +31,15 @@ export class ExpressionBrackets extends Expression {
     return this.#subject;
   }
 
-  get resolution() {
-    return this.#subject.resolution;
+  resolution(invocationType: TypeTuple): Type {
+    return this.#subject.resolution(invocationType);
   }
 
-  get instruction() {
-    return this.#subject.instruction;
+  instruction(invocationType: TypeTuple) {
+    return this.#subject.instruction(invocationType);
   }
 
-  get funcs(): CreateFunc[] {
-    return [...this.#subject.funcs];
+  funcs(invocationType: TypeTuple): Array<CreateFunc> {
+    return [...this.#subject.funcs(invocationType)];
   }
 }

@@ -4,6 +4,7 @@ import type { Entry } from "./Entry.ts";
 import { TokenTypeName } from "#tokeniser";
 import { type Location } from "#utils";
 import type { CreateFunc } from "#writer";
+import type { TypeTuple } from "./TypeTuple.ts";
 
 export class EntityNamespace extends Entity {
   static {
@@ -88,7 +89,7 @@ export class EntityNamespace extends Entity {
     return possible.reduce((result, n) => result ?? this.parent?.float(n), undefined as Entry | undefined);
   }
 
-  get model(): CreateFunc[] {
-    return this.#entities.flatMap((e) => e.model);
+  model(invocationType: TypeTuple): CreateFunc[] {
+    return this.#entities.flatMap((e) => e.model(invocationType));
   }
 }

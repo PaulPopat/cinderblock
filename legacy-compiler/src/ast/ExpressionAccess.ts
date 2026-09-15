@@ -8,6 +8,7 @@ import { TypeTuple } from "./TypeTuple.ts";
 import { WriterError } from "./WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { CreateFunc, Instruction } from "#writer";
+import type { Type } from "./Type.ts";
 
 export class ExpressionAccess extends Expression {
   static {
@@ -42,8 +43,8 @@ export class ExpressionAccess extends Expression {
     return this.#name;
   }
 
-  get resolution() {
-    let subjectType = this.#subject.resolution;
+  resolution(invocationType: TypeTuple): Type {
+    let subjectType = this.#subject.resolution(invocationType);
     if (!(subjectType instanceof TypeTuple) && !(subjectType instanceof TypeReference))
       throw new LinkerError("Subject is not accessible", this.range);
 
@@ -54,8 +55,8 @@ export class ExpressionAccess extends Expression {
     return property.type;
   }
 
-  get instruction(): Instruction {
-    let subjectType = this.#subject.resolution;
+  instruction(invocationType: TypeTuple): Instruction {
+    let subjectType = this.#subject.resolution(invocationType);
     if (!(subjectType instanceof TypeTuple) && !(subjectType instanceof TypeReference)) {
       throw new WriterError("Left must be array", this.range);
     }
@@ -66,12 +67,12 @@ export class ExpressionAccess extends Expression {
 
     return {
       type: "access",
-      subject: this.#subject.instruction,
+      subject: this.#subject.instruction(invocationType),
       key: this.#name,
     };
   }
 
-  get funcs(): CreateFunc[] {
-    return this.#subject.funcs;
+  funcs(invocationType: TypeTuple): Array<CreateFunc> {
+    return this.#subject.funcs(invocationType);
   }
 }

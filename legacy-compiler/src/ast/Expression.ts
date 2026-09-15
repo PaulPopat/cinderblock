@@ -3,6 +3,7 @@ import { ParserError } from "./ParserError.ts";
 import { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import type { Type } from "./Type.ts";
 import type { CreateFunc, Instruction } from "#writer";
+import type { TypeTuple } from "./TypeTuple.ts";
 
 type ExpressionParseable = {
   priority: number;
@@ -64,7 +65,9 @@ export abstract class Expression extends Entry {
     return expression;
   }
 
-  abstract get resolution(): Type;
+  abstract resolution(invocationType: TypeTuple): Type;
+  abstract instruction(invocationType: TypeTuple): Instruction;
+  abstract funcs(invocationType: TypeTuple): Array<CreateFunc>;
 
   float(name: string): Entry | undefined {
     return this.parent?.float(name);
@@ -73,7 +76,4 @@ export abstract class Expression extends Entry {
   dig(name: string): Entry | undefined {
     return undefined;
   }
-
-  abstract get instruction(): Instruction;
-  abstract get funcs(): Array<CreateFunc>;
 }

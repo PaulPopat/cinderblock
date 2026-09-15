@@ -7,6 +7,8 @@ import { WriterError } from "./WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { CreateFunc, Instruction } from "#writer";
 import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
+import type { Type } from "./Type.ts";
+import type { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionTernary extends Expression {
   static {
@@ -46,24 +48,27 @@ export class ExpressionTernary extends Expression {
     return this.#negative;
   }
 
-  get resolution() {
-    return new TypeUnion(this.location, this.done, () => this, [this.#positive.resolution, this.#negative.resolution]);
+  resolution(invocationType: TypeTuple): Type {
+    return new TypeUnion(this.location, this.done, () => this, [
+      this.#positive.resolution(invocationType),
+      this.#negative.resolution(invocationType),
+    ]);
   }
 
-  get instruction(): Instruction {
-    if (!(this.#predicate.resolution instanceof TypePrimitiveBool)) {
+  instruction(invocationType: TypeTuple): Instruction {
+    if (!(this.#predicate.resolution(invocationType) instanceof TypePrimitiveBool)) {
       throw new WriterError("Boolean required", this.range);
     }
 
     return {
       type: "ternary",
-      predicate: this.#predicate.instruction,
-      positive: this.#positive.instruction,
-      negative: this.#negative.instruction,
+      predicate: this.#predicate.instruction(invocationType),
+      positive: this.#positive.instruction(invocationType),
+      negative: this.#negative.instruction(invocationType),
     };
   }
 
-  get funcs(): CreateFunc[] {
-    return [...this.#predicate.funcs, ...this.#positive.funcs, ...this.#negative.funcs];
+  funcs(invocationType: TypeTuple): Array<CreateFunc> {
+    return [...this.#predicate.funcs(invocationType), ...this.#positive.funcs(invocationType), ...this.#negative.funcs(invocationType)];
   }
 }

@@ -9,6 +9,7 @@ import { TypePipeable } from "./TypePipeable.ts";
 import { TypeTuple } from "./TypeTuple.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { Instruction } from "#writer";
+import type { Type } from "./Type.ts";
 
 export class ExpressionOperatorPipe extends ExpressionOperator {
   static {
@@ -28,13 +29,13 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
     super(walker.location, done, parent, existing, right);
   }
 
-  get resolution() {
-    const right = this.right.resolution;
+  resolution(invocationType: TypeTuple): Type {
+    const right = this.right.resolution(invocationType);
     if (!(right instanceof TypePipeable)) {
       throw new LinkerError("Target not pipeable", this.range);
     }
 
-    let input = this.left.resolution;
+    let input = this.left.resolution(invocationType);
     if (!(input instanceof TypeTuple)) {
       input = new TypeTuple(this.location, this.done, () => this, [new TypeArg(this.location, this.done, () => this, input, "_s")]);
     }
@@ -46,13 +47,13 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
     return new TypePipeable(this.location, this.done, () => this, remaining, right.returns);
   }
 
-  get instruction(): Instruction {
-    const right = this.right.resolution;
+  instruction(invocationType: TypeTuple): Instruction {
+    const right = this.right.resolution(invocationType);
     if (!(right instanceof TypePipeable)) {
       throw new LinkerError("Target not pipeable", this.range);
     }
 
-    let input = this.left.resolution;
+    let input = this.left.resolution(invocationType);
     if (!(input instanceof TypeTuple)) {
       input = new TypeTuple(this.location, this.done, () => this, [new TypeArg(this.location, this.done, () => this, input, "_s")]);
     }
@@ -63,16 +64,16 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
       return {
         type: "operator",
         operator: "pipe",
-        left: this.left.instruction,
-        right: this.right.instruction,
+        left: this.left.instruction(invocationType),
+        right: this.right.instruction(invocationType),
       };
     }
 
     return {
       type: "operator",
       operator: "partial_pipe",
-      left: this.left.instruction,
-      right: this.right.instruction,
+      left: this.left.instruction(invocationType),
+      right: this.right.instruction(invocationType),
     };
   }
 }
