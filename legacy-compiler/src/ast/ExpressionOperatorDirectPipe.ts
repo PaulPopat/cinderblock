@@ -30,14 +30,14 @@ export class ExpressionOperatorDirectPipe extends ExpressionOperator {
   }
 
   resolution(invocationType: TypeTuple): Type {
-    const right = this.right.resolution(invocationType);
-    if (!(right instanceof TypePipeable)) {
-      throw new LinkerError("Target not pipeable", this.range);
-    }
-
     const input = new TypeTuple(this.location, this.done, () => this, [
       new TypeArg(this.location, this.done, () => this, this.left.resolution(invocationType), "_s"),
     ]);
+
+    const right = this.right.resolution(input);
+    if (!(right instanceof TypePipeable)) {
+      throw new LinkerError("Target not pipeable", this.range);
+    }
 
     const remaining = right.args.filter((r) => !(input as TypeTuple).args.find((a) => a.name === r.name));
 
