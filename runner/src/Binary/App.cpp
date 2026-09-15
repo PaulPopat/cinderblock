@@ -4,6 +4,7 @@
 #include "ArrayAdd.h"
 #include "CreateFunc.h"
 #include "External.h"
+#include "Is.h"
 #include "LiteralArray.h"
 #include "LiteralBool.h"
 #include "LiteralChar.h"
@@ -91,6 +92,9 @@ App::App(const char* binary)
   });
   Instruction::Register(Tuple::TypeName, [](const char* binary, int offset) {
     return new Tuple(binary, offset);
+  });
+  Instruction::Register(Is::TypeName, [](const char* binary, int offset) {
+    return new Is(binary, offset);
   });
 
   Shape::Register(ShapeArray::TypeName, [](const char* binary, int offset) {
