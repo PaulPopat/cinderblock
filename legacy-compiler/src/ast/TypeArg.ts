@@ -11,17 +11,19 @@ export class TypeArg extends Type {
       .text("name", TokenTypeName.PropertyName)
       .if(
         (s) => s.data === ":",
-        (w) => w.expect(":", TokenTypeName.Punctuation).extract("type", (w) => Type.Parse(w, parent)),
+        (w) => w.expect(":", TokenTypeName.Punctuation).extract("type", (w) => Type.Parse(w, (): Entry => result)),
       )
       .finish();
 
-    return new TypeArg(
+    const result = new TypeArg(
       walker.location,
       done,
       parent,
-      type ?? new TypePrimitiveUnknown(walker.location, done, parent),
+      type ?? new TypePrimitiveUnknown(walker.location, done, (): Entry => result),
       name.startsWith('"') ? JSON.parse(name) : name,
     );
+
+    return result;
   }
 
   readonly #type: Type;

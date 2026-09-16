@@ -17,13 +17,15 @@ export class TypeIntersection extends Type {
         if (!left) throw new ParserError("Unexpected &", walker);
         const [{ right }, done] = walker
           .expect("&", TokenTypeName.Operator)
-          .extract("right", (w) => Type.Parse(w, parent))
+          .extract("right", (w) => Type.Parse(w, (): Entry => result))
           .finish();
 
-        return new TypeIntersection(walker.location, done, parent, [
+        const result = new TypeIntersection(walker.location, done, parent, [
           ...(left instanceof TypeIntersection ? left.parts : [left]),
           ...(right instanceof TypeIntersection ? right.parts : [right]),
         ]);
+
+        return result;
       },
     });
   }

@@ -20,18 +20,19 @@ export class TypeTuple extends Type {
               w.while(
                 "extending",
                 (s) => s.data === ":" || s.data === ",",
-                (s) => TypeReference.ParseReference(s.expect([":", ","], TokenTypeName.Operator), parent),
+                (s) => TypeReference.ParseReference(s.expect([":", ","], TokenTypeName.Operator), (): Entry => result),
               ),
           )
           .while(
             "parts",
             (s) => s.data !== ";",
-            (s) => TypeArg.Parse(s, parent),
+            (s) => TypeArg.Parse(s, (): Entry => result),
           )
           .expect(";", TokenTypeName.Punctuation)
           .finish();
 
-        return new TypeTuple(walker.location, done, parent, parts, extending ?? []);
+        const result = new TypeTuple(walker.location, done, parent, parts, extending ?? []);
+        return result;
       },
     });
   }

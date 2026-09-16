@@ -16,7 +16,7 @@ export class TypePipeable extends Type {
           .while(
             "args",
             (s) => (s.data === "," || s.data === "(") && s.expect([",", "("], TokenTypeName.Punctuation).data !== ")",
-            (s) => TypeArg.Parse(s.expect([",", "("], TokenTypeName.Punctuation), parent),
+            (s) => TypeArg.Parse(s.expect([",", "("], TokenTypeName.Punctuation), (): Entry => result),
           )
           .if(
             (s) => s.data === "(",
@@ -24,10 +24,11 @@ export class TypePipeable extends Type {
           )
           .expect(")", TokenTypeName.Punctuation)
           .expect(":", TokenTypeName.Punctuation)
-          .extract("returns", (w) => Type.Parse(w, parent))
+          .extract("returns", (w) => Type.Parse(w, (): Entry => result))
           .finish();
 
-        return new TypePipeable(walker.location, done, parent, args, returns);
+        const result = new TypePipeable(walker.location, done, parent, args, returns);
+        return result;
       },
     });
   }

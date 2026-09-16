@@ -16,13 +16,15 @@ export class TypeUnion extends Type {
         if (!left) throw new ParserError("Unexpected |", walker);
         const [{ right }, done] = walker
           .expect("|", TokenTypeName.Operator)
-          .extract("right", (w) => Type.Parse(w, parent))
+          .extract("right", (w) => Type.Parse(w, (): Entry => result))
           .finish();
 
-        return new TypeUnion(walker.location, done, parent, [
+        const result = new TypeUnion(walker.location, done, parent, [
           ...(left instanceof TypeUnion ? left.parts : [left]),
           ...(right instanceof TypeUnion ? right.parts : [right]),
         ]);
+
+        return result;
       },
     });
   }
