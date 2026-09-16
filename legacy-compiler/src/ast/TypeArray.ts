@@ -29,12 +29,12 @@ export class TypeArray extends Type {
     return this.#contains;
   }
 
-  get flattened(): Type {
-    return new TypeArray(this.location, this.done, () => this.parent, this.#contains.flattened);
+  flattened(generics: Record<string, Type>): Type {
+    return new TypeArray(this.location, this.done, () => this.parent, this.#contains.flattened(generics));
   }
 
   matches(input: Type): boolean {
-    return input instanceof TypeArray && input.contains.flattened.matches(this.#contains.flattened);
+    return input instanceof TypeArray && input.contains.matches(this.#contains);
   }
 
   representation(depth: number): string {

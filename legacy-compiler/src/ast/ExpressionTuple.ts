@@ -71,7 +71,7 @@ export class ExpressionTuple extends Expression {
 
         return [new TypeArg(this.location, this.done, () => this, part.value.resolution, part.name)];
       }),
-    ).flattened;
+    ).flattened({});
   }
 
   get instruction(): Instruction {

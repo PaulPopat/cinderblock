@@ -51,7 +51,7 @@ export class ExpressionAccess extends Expression {
 
     if (!property) throw new LinkerError("Could not find property", this.range);
 
-    return property.type.flattened;
+    return property.type.flattened({});
   }
 
   get instruction(): Instruction {

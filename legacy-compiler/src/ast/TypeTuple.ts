@@ -54,12 +54,12 @@ export class TypeTuple extends Type {
     return [...this.#args, ...this.#extending.flatMap((e) => e.struct.args)];
   }
 
-  get flattened() {
+  flattened(generics: Record<string, Type>): Type {
     return new TypeTuple(
       this.location,
       this.done,
       () => this.parent,
-      this.args.map((a) => a.flattened),
+      this.args.map((a) => a.flattened(generics)),
     );
   }
 

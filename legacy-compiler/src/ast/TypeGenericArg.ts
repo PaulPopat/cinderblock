@@ -5,7 +5,7 @@ import type { Entry } from "./Entry.ts";
 import { Type } from "./Type.ts";
 import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
 
-export class TypeArg extends Type {
+export class TypeGenericArg extends Type {
   static Parse(walker: TokenWalker, parent: () => Entry | undefined) {
     const [{ name, type }, done] = walker
       .text("name", TokenTypeName.PropertyName)
@@ -15,7 +15,7 @@ export class TypeArg extends Type {
       )
       .finish();
 
-    const result = new TypeArg(
+    const result = new TypeGenericArg(
       walker.location,
       done,
       parent,
@@ -43,12 +43,12 @@ export class TypeArg extends Type {
     return this.#name;
   }
 
-  flattened(generics: Record<string, Type>): TypeArg {
-    return new TypeArg(this.location, this.done, () => this.parent, this.#type.flattened(generics), this.#name);
+  flattened(generics: Record<string, Type>): Type {
+    return new TypeGenericArg(this.location, this.done, () => this.parent, this.#type.flattened(generics), this.#name);
   }
 
   matches(input: Type): boolean {
-    return input instanceof TypeArg && input.name === this.#name && input.type.matches(this.#type);
+    return input instanceof TypeGenericArg && input.name === this.#name && input.type.matches(this.#type);
   }
 
   representation(depth: number): string {

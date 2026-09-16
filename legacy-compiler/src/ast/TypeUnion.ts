@@ -40,8 +40,8 @@ export class TypeUnion extends Type {
     return this.#parts;
   }
 
-  get flattened(): Type {
-    const result = this.#parts.map((p) => p.flattened).filter((p, i, a) => a.findIndex((b) => b.matches(p)) === i);
+  flattened(generics: Record<string, Type>): Type {
+    const result = this.#parts.map((p) => p.flattened(generics)).filter((p, i, a) => a.findIndex((b) => b.matches(p)) === i);
     if (result.length === 1) {
       return result[0]!;
     }
@@ -54,7 +54,7 @@ export class TypeUnion extends Type {
   }
 
   matches(input: Type): boolean {
-    return input instanceof TypeUnion && !input.parts.map((p) => p.flattened).some((a) => !this.parts.some((b) => a.matches(b.flattened)));
+    return input instanceof TypeUnion && !input.parts.map((p) => p).some((a) => !this.parts.some((b) => a.matches(b)));
   }
 
   representation(depth: number): string {

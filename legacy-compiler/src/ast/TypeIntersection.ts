@@ -41,13 +41,13 @@ export class TypeIntersection extends Type {
     return this.#parts;
   }
 
-  get flattened() {
+  flattened(generics: Record<string, Type>): Type {
     return new TypeTuple(
       this.location,
       this.done,
       () => this.parent,
       this.#parts
-        .map((p) => p.flattened)
+        .map((p) => p.flattened(generics))
         .flatMap((p) => {
           if (!(p instanceof TypeTuple)) {
             throw new LinkerError("Tuple required for intersection", this.range);
@@ -60,7 +60,7 @@ export class TypeIntersection extends Type {
   }
 
   matches(input: Type): boolean {
-    return this.flattened.matches(input.flattened);
+    throw new Error("Not implemented");
   }
 
   representation(depth: number): string {

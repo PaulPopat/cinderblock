@@ -50,13 +50,13 @@ export class TypePipeable extends Type {
     return this.#returns;
   }
 
-  get flattened() {
+  flattened(generics: Record<string, Type>): TypePipeable {
     return new TypePipeable(
       this.location,
       this.done,
       () => this.parent,
-      this.#args.map((a) => a.flattened),
-      this.#returns.flattened,
+      this.#args.map((a) => a.flattened(generics)),
+      this.#returns.flattened(generics),
     );
   }
 
@@ -65,7 +65,7 @@ export class TypePipeable extends Type {
       input instanceof TypePipeable &&
       input.args.length === this.args.length &&
       !input.#args.some((a) => !this.#args.some((b) => a.matches(b))) &&
-      input.returns.flattened.matches(this.#returns.flattened)
+      input.returns.matches(this.#returns)
     );
   }
 

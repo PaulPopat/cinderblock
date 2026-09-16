@@ -45,14 +45,14 @@ export class TypeReference extends Type {
     return this.struct.args;
   }
 
-  get flattened() {
+  flattened(generics: Record<string, Type>): Type {
     const result = this.float(this.#name);
     if (!(result instanceof EntityStruct)) throw new LinkerError("Reference not found", this.range);
-    return result.type.flattened;
+    return result.type.flattened(generics);
   }
 
   matches(input: Type): boolean {
-    return this.flattened.matches(input.flattened);
+    throw new Error("Not implemented");
   }
 
   representation(depth: number): string {
