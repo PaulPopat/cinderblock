@@ -41,6 +41,10 @@ export class TypeArg extends Type {
     return this.#name;
   }
 
+  get flattened() {
+    return new TypeArg(this.location, this.done, () => this.parent, this.#type.flattened, this.#name);
+  }
+
   representation(depth: number): string {
     return `${this.#name}: ${this.#type.representation(depth + 1)}`;
   }

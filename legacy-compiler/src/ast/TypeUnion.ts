@@ -37,6 +37,15 @@ export class TypeUnion extends Type {
     return this.#parts;
   }
 
+  get flattened(): Type {
+    return new TypeUnion(
+      this.location,
+      this.done,
+      () => this.parent,
+      this.#parts.map((p) => p.flattened),
+    );
+  }
+
   representation(depth: number): string {
     return this.#parts
       .map((p) => p.representation(depth + 1))

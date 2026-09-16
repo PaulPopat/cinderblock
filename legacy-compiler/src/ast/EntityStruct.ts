@@ -5,6 +5,7 @@ import type { Entry } from "./Entry.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { CreateFunc } from "#writer";
 import { TypeReference } from "./TypeReference.ts";
+import { TypeTuple } from "./TypeTuple.ts";
 
 export class EntityStruct extends Entity {
   static {
@@ -55,6 +56,10 @@ export class EntityStruct extends Entity {
 
   get fullName() {
     return this.#name;
+  }
+
+  get type() {
+    return new TypeTuple(this.location, this.done, () => this.parent, this.#args, this.#extending);
   }
 
   dig(name: string): Entry | undefined {

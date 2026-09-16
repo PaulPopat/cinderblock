@@ -5,6 +5,7 @@ import type { Entry } from "./Entry.ts";
 import { LinkerError } from "./LinkerError.ts";
 import { ParserError } from "./ParserError.ts";
 import { Type } from "./Type.ts";
+import { TypeTuple } from "./TypeTuple.ts";
 
 export class TypeIntersection extends Type {
   static {
@@ -36,6 +37,24 @@ export class TypeIntersection extends Type {
 
   get parts() {
     return this.#parts;
+  }
+
+  get flattened() {
+    return new TypeTuple(
+      this.location,
+      this.done,
+      () => this.parent,
+      this.#parts
+        .map((p) => p.flattened)
+        .flatMap((p) => {
+          if (!(p instanceof TypeTuple)) {
+            throw new LinkerError("Tuple required for intersection", this.range);
+          }
+
+          return p.args;
+        }),
+      [],
+    );
   }
 
   representation(depth: number): string {

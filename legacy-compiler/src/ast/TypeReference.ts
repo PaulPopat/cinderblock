@@ -45,6 +45,12 @@ export class TypeReference extends Type {
     return this.struct.args;
   }
 
+  get flattened() {
+    const result = this.float(this.#name);
+    if (!(result instanceof EntityStruct)) throw new LinkerError("Reference not found", this.range);
+    return result.type.flattened;
+  }
+
   representation(depth: number): string {
     return depth > 1 ? this.#name : `{ ${this.args.map((a) => a.representation(depth + 1)).join(", ")} }`;
   }

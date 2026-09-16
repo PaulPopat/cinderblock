@@ -49,6 +49,16 @@ export class TypePipeable extends Type {
     return this.#returns;
   }
 
+  get flattened() {
+    return new TypePipeable(
+      this.location,
+      this.done,
+      () => this.parent,
+      this.#args.map((a) => a.flattened),
+      this.#returns.flattened,
+    );
+  }
+
   representation(depth: number): string {
     return `(${this.#args.map((a) => a.representation(depth + 1)).join(", ")}): ${this.#returns.representation(depth + 1)}`;
   }

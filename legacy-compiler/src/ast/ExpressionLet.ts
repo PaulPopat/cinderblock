@@ -84,7 +84,7 @@ export class ExpressionLet extends Expression {
       () => this,
       this.#args.map((a) => a.typeArg),
       this.#returns ?? this.#contents.resolution,
-    );
+    ).flattened;
   }
 
   get instruction(): Instruction {

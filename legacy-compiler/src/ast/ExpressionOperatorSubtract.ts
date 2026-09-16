@@ -8,7 +8,6 @@ import { TokenTypeName } from "#tokeniser";
 import type { Instruction } from "#writer";
 import { TypePrimitive } from "./TypePrimitive.ts";
 import type { Type } from "./Type.ts";
-import type { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionOperatorSubtract extends ExpressionOperator {
   static {

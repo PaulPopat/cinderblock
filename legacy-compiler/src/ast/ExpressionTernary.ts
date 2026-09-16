@@ -48,7 +48,7 @@ export class ExpressionTernary extends Expression {
   }
 
   get resolution(): Type {
-    return new TypeUnion(this.location, this.done, () => this, [this.#positive.resolution, this.#negative.resolution]);
+    return new TypeUnion(this.location, this.done, () => this, [this.#positive.resolution, this.#negative.resolution]).flattened;
   }
 
   get instruction(): Instruction {

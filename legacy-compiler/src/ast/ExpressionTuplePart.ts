@@ -33,7 +33,7 @@ export class ExpressionTuplePart extends Expression {
   get resolution(): Type {
     return new TypeTuple(this.location, this.done, () => this, [
       new TypeArg(this.location, this.done, () => this, this.#value.resolution, this.#name),
-    ]);
+    ]).flattened;
   }
 
   get instruction(): Instruction {

@@ -45,7 +45,7 @@ export class ExpressionMatch extends Expression {
       this.done,
       () => this,
       this.#matchers.map((m) => m.resolution.returns),
-    );
+    ).flattened;
   }
 
   get instruction(): Instruction {

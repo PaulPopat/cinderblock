@@ -41,7 +41,7 @@ export class ExpressionReference extends Expression {
   }
 
   get resolution(): Type {
-    return this.subject.type;
+    return this.subject.type.flattened;
   }
 
   get instruction(): Instruction {

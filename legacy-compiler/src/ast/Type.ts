@@ -44,6 +44,7 @@ export abstract class Type extends Entry {
     return undefined;
   }
 
+  abstract get flattened(): Type;
   abstract representation(depth: number): string;
   abstract shape(): Shape;
 }
