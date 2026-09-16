@@ -11,17 +11,27 @@ export class EntityArg extends Entity {
   readonly #type: Type;
   readonly #name: string;
 
-  constructor(walker: TokenWalker, parent: () => Entry | undefined) {
-    const [{ type, name }, done] = walker
-      .text("name", TokenTypeName.ParameterName)
-      .if(
-        (s) => s.data === ":",
-        (w) => w.expect(":", TokenTypeName.Punctuation).extract("type", (w) => Type.Parse(w, () => this)),
-      )
-      .finish();
-    super(walker.location, done, parent);
-    this.#type = type ?? new TypePrimitiveUnknown(walker.location, done, () => this);
-    this.#name = name.startsWith('"') ? JSON.parse(name) : name;
+  constructor(walker: TokenWalker, parent: () => Entry | undefined);
+  constructor(fromType: TypeArg);
+  constructor(...args: [walker: TokenWalker, parent: () => Entry | undefined] | [fromType: TypeArg]) {
+    if (args.length === 2) {
+      const [walker, parent] = args;
+      const [{ type, name }, done] = walker
+        .text("name", TokenTypeName.ParameterName)
+        .if(
+          (s) => s.data === ":",
+          (w) => w.expect(":", TokenTypeName.Punctuation).extract("type", (w) => Type.Parse(w, () => this)),
+        )
+        .finish();
+      super(walker.location, done, parent);
+      this.#type = type ?? new TypePrimitiveUnknown(walker.location, done, () => this);
+      this.#name = name.startsWith('"') ? JSON.parse(name) : name;
+    } else {
+      const [fromType] = args;
+      super(fromType.location, fromType.done, () => fromType.parent);
+      this.#type = fromType.type;
+      this.#name = fromType.name;
+    }
   }
 
   get type() {

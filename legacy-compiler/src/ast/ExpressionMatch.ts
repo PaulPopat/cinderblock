@@ -6,7 +6,7 @@ import type { CreateFunc, Instruction } from "#writer";
 import { LinkerError } from "./LinkerError.ts";
 import type { Type } from "./Type.ts";
 import { ParserError } from "./ParserError.ts";
-import { ExpressionFunc } from "./ExpressionFunc.ts";
+import { ExpressionLet } from "./ExpressionLet.ts";
 import { TypeUnion } from "./TypeUnion.ts";
 
 export class ExpressionMatch extends Expression {
@@ -19,7 +19,7 @@ export class ExpressionMatch extends Expression {
   }
 
   readonly #subject: Expression;
-  readonly #matchers: Array<ExpressionFunc>;
+  readonly #matchers: Array<ExpressionLet>;
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
     if (!existing) {
@@ -31,7 +31,7 @@ export class ExpressionMatch extends Expression {
       .while(
         "matchers",
         (w) => w.data === "let",
-        (s) => new ExpressionFunc(s, () => this, lookFor, undefined),
+        (s) => new ExpressionLet(s, () => this, lookFor, undefined),
       )
       .finish();
     super(walker.location, done, parent);
