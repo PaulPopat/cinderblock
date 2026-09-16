@@ -6,7 +6,6 @@ import { TypePrimitiveFloat } from "./TypePrimitiveFloat.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { CreateFunc, Instruction } from "#writer";
 import type { Type } from "./Type.ts";
-import type { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionLiteralFloat extends ExpressionLiteral {
   static {
@@ -29,15 +28,15 @@ export class ExpressionLiteralFloat extends ExpressionLiteral {
     return this.#value;
   }
 
-  resolution(invocationType: TypeTuple): Type {
+  get resolution(): Type {
     return new TypePrimitiveFloat(this.location, this.done, () => this);
   }
 
-  instruction(invocationType: TypeTuple): Instruction {
+  get instruction(): Instruction {
     return { type: "literal_float", value: Number.parseFloat(this.#value) };
   }
 
-  funcs(invocationType: TypeTuple): Array<CreateFunc> {
+  get funcs(): Array<CreateFunc> {
     return [];
   }
 }

@@ -65,9 +65,9 @@ export abstract class Expression extends Entry {
     return expression;
   }
 
-  abstract resolution(invocationType: TypeTuple): Type;
-  abstract instruction(invocationType: TypeTuple): Instruction;
-  abstract funcs(invocationType: TypeTuple): Array<CreateFunc>;
+  abstract get resolution(): Type;
+  abstract get instruction(): Instruction;
+  abstract get funcs(): Array<CreateFunc>;
 
   float(name: string): Entry | undefined {
     return this.parent?.float(name);

@@ -6,7 +6,6 @@ import { TypePrimitiveDouble } from "./TypePrimitiveDouble.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { CreateFunc, Instruction } from "#writer";
 import type { Type } from "./Type.ts";
-import type { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionLiteralDouble extends ExpressionLiteral {
   static {
@@ -29,15 +28,15 @@ export class ExpressionLiteralDouble extends ExpressionLiteral {
     return this.#value;
   }
 
-  resolution(invocationType: TypeTuple): Type {
+  get resolution(): Type {
     return new TypePrimitiveDouble(this.location, this.done, () => this);
   }
 
-  instruction(invocationType: TypeTuple): Instruction {
+  get instruction(): Instruction {
     return { type: "literal_double", value: this.#value };
   }
 
-  funcs(invocationType: TypeTuple): Array<CreateFunc> {
+  get funcs(): Array<CreateFunc> {
     return [];
   }
 }

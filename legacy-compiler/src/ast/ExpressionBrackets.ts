@@ -31,15 +31,15 @@ export class ExpressionBrackets extends Expression {
     return this.#subject;
   }
 
-  resolution(invocationType: TypeTuple): Type {
-    return this.#subject.resolution(invocationType);
+  get resolution(): Type {
+    return this.#subject.resolution;
   }
 
-  instruction(invocationType: TypeTuple) {
-    return this.#subject.instruction(invocationType);
+  get instruction() {
+    return this.#subject.instruction;
   }
 
-  funcs(invocationType: TypeTuple): Array<CreateFunc> {
-    return [...this.#subject.funcs(invocationType)];
+  get funcs(): Array<CreateFunc> {
+    return [...this.#subject.funcs];
   }
 }

@@ -30,17 +30,17 @@ export class ExpressionTuplePart extends Expression {
     return this.#value;
   }
 
-  resolution(invocationType: TypeTuple): Type {
+  get resolution(): Type {
     return new TypeTuple(this.location, this.done, () => this, [
-      new TypeArg(this.location, this.done, () => this, this.#value.resolution(invocationType), this.#name),
+      new TypeArg(this.location, this.done, () => this, this.#value.resolution, this.#name),
     ]);
   }
 
-  instruction(invocationType: TypeTuple): Instruction {
-    return this.#value.instruction(invocationType);
+  get instruction(): Instruction {
+    return this.#value.instruction;
   }
 
-  funcs(invocationType: TypeTuple): Array<CreateFunc> {
-    return this.#value.funcs(invocationType);
+  get funcs(): Array<CreateFunc> {
+    return this.#value.funcs;
   }
 }

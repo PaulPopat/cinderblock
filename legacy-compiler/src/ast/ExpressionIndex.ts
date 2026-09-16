@@ -34,8 +34,8 @@ export class ExpressionIndex extends Expression {
     this.#key = key;
   }
 
-  resolution(invocationType: TypeTuple): Type {
-    let subjectType = this.#subject.resolution(invocationType);
+  get resolution(): Type {
+    let subjectType = this.#subject.resolution;
     if (!(subjectType instanceof TypeArray)) {
       throw new LinkerError("Subject is not indexable", this.range);
     }
@@ -43,20 +43,20 @@ export class ExpressionIndex extends Expression {
     return subjectType.contains;
   }
 
-  instruction(invocationType: TypeTuple): Instruction {
-    let subjectType = this.#subject.resolution(invocationType);
+  get instruction(): Instruction {
+    let subjectType = this.#subject.resolution;
     if (!(subjectType instanceof TypeArray)) {
       throw new LinkerError("Subject is not indexable", this.range);
     }
 
     return {
       type: "index",
-      subject: this.#subject.instruction(invocationType),
-      index: this.#key.instruction(invocationType),
+      subject: this.#subject.instruction,
+      index: this.#key.instruction,
     };
   }
 
-  funcs(invocationType: TypeTuple): Array<CreateFunc> {
-    return this.#subject.funcs(invocationType);
+  get funcs(): Array<CreateFunc> {
+    return this.#subject.funcs;
   }
 }

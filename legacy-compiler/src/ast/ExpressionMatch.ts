@@ -1,14 +1,9 @@
-import { TypeArg } from "./TypeArg.ts";
 import { Expression } from "./Expression.ts";
-import { TypeTuple } from "./TypeTuple.ts";
-import { ExpressionTuplePart } from "./ExpressionTuplePart.ts";
 import type { Entry } from "./Entry.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { CreateFunc, Instruction } from "#writer";
-import { ExpressionTupleSpread } from "./ExpressionTupleSpread.ts";
 import { LinkerError } from "./LinkerError.ts";
-import { TypeReference } from "./TypeReference.ts";
 import type { Type } from "./Type.ts";
 import { ParserError } from "./ParserError.ts";
 import { ExpressionFunc } from "./ExpressionFunc.ts";
@@ -44,19 +39,19 @@ export class ExpressionMatch extends Expression {
     this.#matchers = matchers;
   }
 
-  resolution(invocationType: TypeTuple): Type {
+  get resolution(): Type {
     return new TypeUnion(
       this.location,
       this.done,
       () => this,
-      this.#matchers.map((m) => m.resolution(invocationType).returns),
+      this.#matchers.map((m) => m.resolution.returns),
     );
   }
 
-  instruction(invocationType: TypeTuple): Instruction {
+  get instruction(): Instruction {
     return this.#matchers.reduce(
       (instruction, matcher): Instruction => {
-        const type = matcher.args.find((a) => a.name === "_s")?.type(TypeTuple.empty);
+        const type = matcher.args.find((a) => a.name === "_s")?.type;
         if (!type) {
           throw new LinkerError("Subject required", matcher.range);
         }
@@ -65,7 +60,7 @@ export class ExpressionMatch extends Expression {
           type: "ternary",
           predicate: {
             type: "is",
-            left: this.#subject.instruction(invocationType),
+            left: this.#subject.instruction,
             right: type.shape(),
           },
           positive: {
@@ -73,9 +68,9 @@ export class ExpressionMatch extends Expression {
             operator: "pipe",
             left: {
               type: "tuple",
-              parts: [["_s", this.#subject.instruction(invocationType)]],
+              parts: [["_s", this.#subject.instruction]],
             },
-            right: matcher.instruction(TypeTuple.empty),
+            right: matcher.instruction,
           },
           negative: instruction,
         };
@@ -86,7 +81,7 @@ export class ExpressionMatch extends Expression {
     );
   }
 
-  funcs(invocationType: TypeTuple): Array<CreateFunc> {
-    return this.#matchers.flatMap((p) => p.funcs(invocationType));
+  get funcs(): Array<CreateFunc> {
+    return this.#matchers.flatMap((p) => p.funcs);
   }
 }

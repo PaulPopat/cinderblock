@@ -50,17 +50,17 @@ export class ExpressionFunc extends Expression {
     return this.#args;
   }
 
-  resolution(invocationType: TypeTuple): TypePipeable {
+  get resolution(): TypePipeable {
     return new TypePipeable(
       this.location,
       this.done,
       () => this,
       this.#args.map((a) => a.typeArg),
-      this.#returns ?? this.#contents.resolution(invocationType),
+      this.#returns ?? this.#contents.resolution,
     );
   }
 
-  instruction(invocationType: TypeTuple): Instruction {
+  get instruction(): Instruction {
     return { type: "reference", name: this.#internalName };
   }
 
@@ -68,12 +68,12 @@ export class ExpressionFunc extends Expression {
     return this.#args.reduce((result, arg) => result ?? arg.dig(name), undefined as Entry | undefined) ?? super.float(name);
   }
 
-  funcs(invocationType: TypeTuple): Array<CreateFunc> {
+  get funcs(): Array<CreateFunc> {
     return [
       {
         name: this.#internalName,
         vars: [],
-        returns: this.#contents.instruction(invocationType),
+        returns: this.#contents.instruction,
         no_args: false,
         tags: {},
       },

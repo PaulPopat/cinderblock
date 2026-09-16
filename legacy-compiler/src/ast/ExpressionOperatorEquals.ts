@@ -9,7 +9,6 @@ import { TokenTypeName } from "#tokeniser";
 import type { Instruction } from "#writer";
 import { TypePrimitive } from "./TypePrimitive.ts";
 import type { Type } from "./Type.ts";
-import type { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionOperatorEquals extends ExpressionOperator {
   static {
@@ -29,24 +28,24 @@ export class ExpressionOperatorEquals extends ExpressionOperator {
     super(walker.location, done, parent, existing, right);
   }
 
-  resolution(invocationType: TypeTuple): Type {
+  get resolution(): Type {
     return new TypePrimitiveBool(this.location, this.done, () => this);
   }
 
-  instruction(invocationType: TypeTuple): Instruction {
-    if (!(this.left.resolution(invocationType) instanceof TypePrimitive)) {
+  get instruction(): Instruction {
+    if (!(this.left.resolution instanceof TypePrimitive)) {
       throw new WriterError("Boolean required", this.range);
     }
 
-    if (!(this.right.resolution(invocationType) instanceof TypePrimitive)) {
+    if (!(this.right.resolution instanceof TypePrimitive)) {
       throw new WriterError("Boolean required", this.range);
     }
 
     return {
       type: "operator",
       operator: "equals",
-      left: this.left.instruction(invocationType),
-      right: this.right.instruction(invocationType),
+      left: this.left.instruction,
+      right: this.right.instruction,
     };
   }
 }

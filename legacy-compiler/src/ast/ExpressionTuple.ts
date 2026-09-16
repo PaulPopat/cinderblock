@@ -54,7 +54,7 @@ export class ExpressionTuple extends Expression {
     return this.#parts;
   }
 
-  resolution(invocationType: TypeTuple): Type {
+  get resolution(): Type {
     return new TypeTuple(
       this.location,
       this.done,
@@ -69,33 +69,30 @@ export class ExpressionTuple extends Expression {
           throw new LinkerError("Expected a tuple", this.range);
         }
 
-        return [new TypeArg(this.location, this.done, () => this, part.value.resolution(invocationType), part.name)];
+        return [new TypeArg(this.location, this.done, () => this, part.value.resolution, part.name)];
       }),
     );
   }
 
-  instruction(invocationType: TypeTuple): Instruction {
+  get instruction(): Instruction {
     return {
       type: "tuple",
       parts: this.#parts.flatMap((part) => {
         if (part instanceof ExpressionTupleSpread) {
-          const resolution = part.resolution(invocationType);
+          const resolution = part.resolution;
           if (resolution instanceof TypeTuple || resolution instanceof TypeReference) {
-            return resolution.args.map((a): [string, Instruction] => [
-              a.name,
-              { type: "access", subject: part.instruction(invocationType), key: a.name },
-            ]);
+            return resolution.args.map((a): [string, Instruction] => [a.name, { type: "access", subject: part.instruction, key: a.name }]);
           }
 
           throw new LinkerError("Expected a tuple", this.range);
         }
 
-        return [[part.name, part.instruction(invocationType)]];
+        return [[part.name, part.instruction]];
       }),
     };
   }
 
-  funcs(invocationType: TypeTuple): Array<CreateFunc> {
-    return this.#parts.flatMap((p) => p.funcs(invocationType));
+  get funcs(): Array<CreateFunc> {
+    return this.#parts.flatMap((p) => p.funcs);
   }
 }

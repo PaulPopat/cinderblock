@@ -32,20 +32,20 @@ export class ExpressionOperatorIn extends ExpressionOperator {
     super(walker.location, done, parent, existing, right);
   }
 
-  resolution(invocationType: TypeTuple): Type {
+  get resolution(): Type {
     return new TypePrimitiveBool(this.location, this.done, () => this);
   }
 
-  instruction(invocationType: TypeTuple): Instruction {
-    if (!(this.left.resolution(invocationType) instanceof TypePrimitiveString)) {
+  get instruction(): Instruction {
+    if (!(this.left.resolution instanceof TypePrimitiveString)) {
       throw new WriterError("String required", this.range);
     }
 
     if (
-      !(this.right.resolution(invocationType) instanceof TypeTuple) &&
-      !(this.right.resolution(invocationType) instanceof TypeReference) &&
-      !(this.right.resolution(invocationType) instanceof TypeUnion) &&
-      !(this.right.resolution(invocationType) instanceof TypeIntersection)
+      !(this.right.resolution instanceof TypeTuple) &&
+      !(this.right.resolution instanceof TypeReference) &&
+      !(this.right.resolution instanceof TypeUnion) &&
+      !(this.right.resolution instanceof TypeIntersection)
     ) {
       throw new WriterError("Tuple required", this.range);
     }
@@ -53,8 +53,8 @@ export class ExpressionOperatorIn extends ExpressionOperator {
     return {
       type: "operator",
       operator: "in",
-      left: this.left.instruction(invocationType),
-      right: this.right.instruction(invocationType),
+      left: this.left.instruction,
+      right: this.right.instruction,
     };
   }
 }

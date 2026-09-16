@@ -5,7 +5,6 @@ import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { Type } from "./Type.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { CreateFunc, Instruction } from "#writer";
-import type { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionOperatorAs extends Expression {
   static {
@@ -31,15 +30,15 @@ export class ExpressionOperatorAs extends Expression {
     this.#right = right;
   }
 
-  resolution(invocationType: TypeTuple): Type {
+  get resolution(): Type {
     return this.#right;
   }
 
-  instruction(invocationType: TypeTuple): Instruction {
-    return this.#left.instruction(invocationType);
+  get instruction(): Instruction {
+    return this.#left.instruction;
   }
 
-  funcs(invocationType: TypeTuple): Array<CreateFunc> {
-    return this.#left.funcs(invocationType);
+  get funcs(): Array<CreateFunc> {
+    return this.#left.funcs;
   }
 }

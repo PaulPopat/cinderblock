@@ -89,7 +89,7 @@ export class EntityNamespace extends Entity {
     return possible.reduce((result, n) => result ?? this.parent?.float(n), undefined as Entry | undefined);
   }
 
-  model(invocationType: TypeTuple): CreateFunc[] {
-    return this.#entities.flatMap((e) => e.model(invocationType));
+  get model(): CreateFunc[] {
+    return this.#entities.flatMap((e) => e.model);
   }
 }

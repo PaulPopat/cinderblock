@@ -43,8 +43,8 @@ export class ExpressionAccess extends Expression {
     return this.#name;
   }
 
-  resolution(invocationType: TypeTuple): Type {
-    let subjectType = this.#subject.resolution(invocationType);
+  get resolution(): Type {
+    let subjectType = this.#subject.resolution;
     if (!(subjectType instanceof TypeTuple) && !(subjectType instanceof TypeReference))
       throw new LinkerError("Subject is not accessible", this.range);
 
@@ -55,8 +55,8 @@ export class ExpressionAccess extends Expression {
     return property.type;
   }
 
-  instruction(invocationType: TypeTuple): Instruction {
-    let subjectType = this.#subject.resolution(invocationType);
+  get instruction(): Instruction {
+    let subjectType = this.#subject.resolution;
     if (!(subjectType instanceof TypeTuple) && !(subjectType instanceof TypeReference)) {
       throw new WriterError("Left must be a tuple", this.range);
     }
@@ -67,12 +67,12 @@ export class ExpressionAccess extends Expression {
 
     return {
       type: "access",
-      subject: this.#subject.instruction(invocationType),
+      subject: this.#subject.instruction,
       key: this.#name,
     };
   }
 
-  funcs(invocationType: TypeTuple): Array<CreateFunc> {
-    return this.#subject.funcs(invocationType);
+  get funcs(): Array<CreateFunc> {
+    return this.#subject.funcs;
   }
 }

@@ -6,7 +6,6 @@ import { TypePrimitiveChar } from "./TypePrimitiveChar.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { CreateFunc, Instruction } from "#writer";
 import type { Type } from "./Type.ts";
-import type { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionLiteralChar extends ExpressionLiteral {
   static {
@@ -29,17 +28,17 @@ export class ExpressionLiteralChar extends ExpressionLiteral {
     return this.#value;
   }
 
-  resolution(invocationType: TypeTuple): Type {
+  get resolution(): Type {
     return new TypePrimitiveChar(this.location, this.done, () => this);
   }
 
-  instruction(invocationType: TypeTuple): Instruction {
+  get instruction(): Instruction {
     const value: string = JSON.parse(`"${this.#value.slice(1, this.#value.length - 1)}"`);
 
     return { type: "literal_char", value: value.charCodeAt(0) };
   }
 
-  funcs(invocationType: TypeTuple): Array<CreateFunc> {
+  get funcs(): Array<CreateFunc> {
     return [];
   }
 }

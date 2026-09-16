@@ -29,12 +29,12 @@ export class ExpressionOperatorDirectPipe extends ExpressionOperator {
     super(walker.location, done, parent, existing, right);
   }
 
-  resolution(invocationType: TypeTuple): Type {
+  get resolution(): Type {
     const input = new TypeTuple(this.location, this.done, () => this, [
-      new TypeArg(this.location, this.done, () => this, this.left.resolution(invocationType), "_s"),
+      new TypeArg(this.location, this.done, () => this, this.left.resolution, "_s"),
     ]);
 
-    const right = this.right.resolution(input);
+    const right = this.right.resolution;
     if (!(right instanceof TypePipeable)) {
       throw new LinkerError("Target not pipeable", this.range);
     }
@@ -46,14 +46,14 @@ export class ExpressionOperatorDirectPipe extends ExpressionOperator {
     return new TypePipeable(this.location, this.done, () => this, remaining, right.returns);
   }
 
-  instruction(invocationType: TypeTuple): Instruction {
-    const right = this.right.resolution(invocationType);
+  get instruction(): Instruction {
+    const right = this.right.resolution;
     if (!(right instanceof TypePipeable)) {
       throw new LinkerError("Target not pipeable", this.range);
     }
 
     const input = new TypeTuple(this.location, this.done, () => this, [
-      new TypeArg(this.location, this.done, () => this, this.left.resolution(invocationType), "_s"),
+      new TypeArg(this.location, this.done, () => this, this.left.resolution, "_s"),
     ]);
 
     const remaining = right.args.filter((r) => !(input as TypeTuple).args.find((a) => a.name === r.name));
@@ -64,9 +64,9 @@ export class ExpressionOperatorDirectPipe extends ExpressionOperator {
         operator: "pipe",
         left: {
           type: "tuple",
-          parts: [["_s", this.left.instruction(invocationType)]],
+          parts: [["_s", this.left.instruction]],
         },
-        right: this.right.instruction(invocationType),
+        right: this.right.instruction,
       };
     }
 
@@ -75,9 +75,9 @@ export class ExpressionOperatorDirectPipe extends ExpressionOperator {
       operator: "partial_pipe",
       left: {
         type: "tuple",
-        parts: [["_s", this.left.instruction(invocationType)]],
+        parts: [["_s", this.left.instruction]],
       },
-      right: this.right.instruction(invocationType),
+      right: this.right.instruction,
     };
   }
 }

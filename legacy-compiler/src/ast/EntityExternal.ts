@@ -44,7 +44,7 @@ export class EntityExternal extends Entity {
     return this.#name;
   }
 
-  type() {
+  get type() {
     return this.#type;
   }
 
@@ -58,7 +58,7 @@ export class EntityExternal extends Entity {
     return this.parent?.float(name);
   }
 
-  model(): CreateFunc[] {
+  get model(): CreateFunc[] {
     return [];
   }
 }

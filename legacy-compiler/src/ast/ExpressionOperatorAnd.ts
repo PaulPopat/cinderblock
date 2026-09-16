@@ -8,7 +8,6 @@ import { WriterError } from "./WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { Instruction } from "#writer";
 import type { Type } from "./Type.ts";
-import type { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionOperatorAnd extends ExpressionOperator {
   static {
@@ -28,24 +27,24 @@ export class ExpressionOperatorAnd extends ExpressionOperator {
     super(walker.location, done, parent, existing, right);
   }
 
-  resolution(invocationType: TypeTuple): Type {
+  get resolution(): Type {
     return new TypePrimitiveBool(this.location, this.done, () => this);
   }
 
-  instruction(invocationType: TypeTuple): Instruction {
-    if (!(this.left.resolution(invocationType) instanceof TypePrimitiveBool)) {
+  get instruction(): Instruction {
+    if (!(this.left.resolution instanceof TypePrimitiveBool)) {
       throw new WriterError("Boolean required", this.range);
     }
 
-    if (!(this.right.resolution(invocationType) instanceof TypePrimitiveBool)) {
+    if (!(this.right.resolution instanceof TypePrimitiveBool)) {
       throw new WriterError("Boolean required", this.range);
     }
 
     return {
       type: "operator",
       operator: "and",
-      left: this.left.instruction(invocationType),
-      right: this.right.instruction(invocationType),
+      left: this.left.instruction,
+      right: this.right.instruction,
     };
   }
 }

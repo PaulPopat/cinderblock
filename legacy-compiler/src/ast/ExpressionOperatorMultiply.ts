@@ -8,7 +8,6 @@ import { TokenTypeName } from "#tokeniser";
 import type { Instruction } from "#writer";
 import { TypePrimitive } from "./TypePrimitive.ts";
 import type { Type } from "./Type.ts";
-import type { TypeTuple } from "./TypeTuple.ts";
 
 export class ExpressionOperatorMultiply extends ExpressionOperator {
   static {
@@ -28,24 +27,24 @@ export class ExpressionOperatorMultiply extends ExpressionOperator {
     super(walker.location, done, parent, existing, right);
   }
 
-  resolution(invocationType: TypeTuple): Type {
-    return this.left.resolution(invocationType);
+  get resolution(): Type {
+    return this.left.resolution;
   }
 
-  instruction(invocationType: TypeTuple): Instruction {
-    if (!(this.left.resolution(invocationType) instanceof TypePrimitive)) {
+  get instruction(): Instruction {
+    if (!(this.left.resolution instanceof TypePrimitive)) {
       throw new WriterError("Primitive required", this.range);
     }
 
-    if (!(this.right.resolution(invocationType) instanceof TypePrimitive)) {
+    if (!(this.right.resolution instanceof TypePrimitive)) {
       throw new WriterError("Primitive required", this.range);
     }
 
     return {
       type: "operator",
       operator: "multiply",
-      left: this.left.instruction(invocationType),
-      right: this.right.instruction(invocationType),
+      left: this.left.instruction,
+      right: this.right.instruction,
     };
   }
 }

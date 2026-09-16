@@ -28,24 +28,24 @@ export class ExpressionOperatorSubtract extends ExpressionOperator {
     super(walker.location, done, parent, existing, right);
   }
 
-  resolution(invocationType: TypeTuple): Type {
-    return this.left.resolution(invocationType);
+  get resolution(): Type {
+    return this.left.resolution;
   }
 
-  instruction(invocationType: TypeTuple): Instruction {
-    if (!(this.left.resolution(invocationType) instanceof TypePrimitive)) {
+  get instruction(): Instruction {
+    if (!(this.left.resolution instanceof TypePrimitive)) {
       throw new WriterError("Primitive required", this.range);
     }
 
-    if (!(this.right.resolution(invocationType) instanceof TypePrimitive)) {
+    if (!(this.right.resolution instanceof TypePrimitive)) {
       throw new WriterError("Primitive required", this.range);
     }
 
     return {
       type: "operator",
       operator: "subtract",
-      left: this.left.instruction(invocationType),
-      right: this.right.instruction(invocationType),
+      left: this.left.instruction,
+      right: this.right.instruction,
     };
   }
 }

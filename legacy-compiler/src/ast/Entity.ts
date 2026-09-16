@@ -29,7 +29,7 @@ export abstract class Entity extends Entry {
   }
 
   abstract get name(): string;
-  abstract model(invocationType: TypeTuple): Array<CreateFunc>;
+  abstract get model(): Array<CreateFunc>;
 
   get fullName() {
     return [super.namespace, this.name].join("_");

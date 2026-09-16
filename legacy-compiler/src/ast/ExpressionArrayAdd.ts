@@ -40,23 +40,23 @@ export class ExpressionArrayAdd extends Expression {
     return this.#addition;
   }
 
-  resolution(invocationType: TypeTuple): Type {
-    return this.#subject.resolution(invocationType);
+  get resolution(): Type {
+    return this.#subject.resolution;
   }
 
-  instruction(invocationType: TypeTuple): Instruction {
-    if (!(this.#subject.resolution(invocationType) instanceof TypeArray)) {
+  get instruction(): Instruction {
+    if (!(this.#subject.resolution instanceof TypeArray)) {
       throw new WriterError("Left must be array", this.range);
     }
 
     return {
       type: "array_add",
-      left: this.#subject.instruction(invocationType),
-      right: this.#addition.instruction(invocationType),
+      left: this.#subject.instruction,
+      right: this.#addition.instruction,
     };
   }
 
-  funcs(invocationType: TypeTuple): Array<CreateFunc> {
-    return [...this.#subject.funcs(invocationType), ...this.#addition.funcs(invocationType)];
+  get funcs(): Array<CreateFunc> {
+    return [...this.#subject.funcs, ...this.#addition.funcs];
   }
 }

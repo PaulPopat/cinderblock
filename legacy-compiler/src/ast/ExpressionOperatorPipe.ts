@@ -29,13 +29,13 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
     super(walker.location, done, parent, existing, right);
   }
 
-  resolution(invocationType: TypeTuple): Type {
-    let input = this.left.resolution(invocationType);
+  get resolution(): Type {
+    let input = this.left.resolution;
     if (!(input instanceof TypeTuple)) {
       input = new TypeTuple(this.location, this.done, () => this, [new TypeArg(this.location, this.done, () => this, input, "_s")]);
     }
 
-    const right = this.right.resolution(input as TypeTuple);
+    const right = this.right.resolution;
     if (!(right instanceof TypePipeable)) {
       throw new LinkerError("Target not pipeable", this.range);
     }
@@ -47,13 +47,13 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
     return new TypePipeable(this.location, this.done, () => this, remaining, right.returns);
   }
 
-  instruction(invocationType: TypeTuple): Instruction {
-    const right = this.right.resolution(invocationType);
+  get instruction(): Instruction {
+    const right = this.right.resolution;
     if (!(right instanceof TypePipeable)) {
       throw new LinkerError("Target not pipeable", this.range);
     }
 
-    let input = this.left.resolution(invocationType);
+    let input = this.left.resolution;
     if (!(input instanceof TypeTuple)) {
       input = new TypeTuple(this.location, this.done, () => this, [new TypeArg(this.location, this.done, () => this, input, "_s")]);
     }
@@ -64,16 +64,16 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
       return {
         type: "operator",
         operator: "pipe",
-        left: this.left.instruction(invocationType),
-        right: this.right.instruction(invocationType),
+        left: this.left.instruction,
+        right: this.right.instruction,
       };
     }
 
     return {
       type: "operator",
       operator: "partial_pipe",
-      left: this.left.instruction(invocationType),
-      right: this.right.instruction(invocationType),
+      left: this.left.instruction,
+      right: this.right.instruction,
     };
   }
 }
