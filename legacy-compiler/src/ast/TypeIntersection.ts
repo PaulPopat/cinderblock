@@ -57,6 +57,10 @@ export class TypeIntersection extends Type {
     );
   }
 
+  matches(input: Type): boolean {
+    return this.flattened.matches(input.flattened);
+  }
+
   representation(depth: number): string {
     return this.#parts
       .map((p) => p.representation(depth + 1))

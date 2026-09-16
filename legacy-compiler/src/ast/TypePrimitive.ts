@@ -7,6 +7,10 @@ export abstract class TypePrimitive extends Type {
     return this;
   }
 
+  matches(input: Type): boolean {
+    return input instanceof this.constructor;
+  }
+
   representation(): string {
     return this.name;
   }

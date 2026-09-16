@@ -45,6 +45,10 @@ export class TypeArg extends Type {
     return new TypeArg(this.location, this.done, () => this.parent, this.#type.flattened, this.#name);
   }
 
+  matches(input: Type): boolean {
+    return input instanceof TypeArg && input.name === this.#name && input.type.flattened.matches(this.#type.flattened);
+  }
+
   representation(depth: number): string {
     return `${this.#name}: ${this.#type.representation(depth + 1)}`;
   }

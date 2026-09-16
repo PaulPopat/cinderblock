@@ -45,6 +45,7 @@ export abstract class Type extends Entry {
   }
 
   abstract get flattened(): Type;
+  abstract matches(input: Type): boolean;
   abstract representation(depth: number): string;
   abstract shape(): Shape;
 }

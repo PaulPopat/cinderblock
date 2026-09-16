@@ -62,6 +62,10 @@ export class TypeTuple extends Type {
     );
   }
 
+  matches(input: Type): boolean {
+    return input instanceof TypeTuple && !input.args.some((a) => !this.args.some((b) => a.matches(b)));
+  }
+
   representation(depth: number): string {
     return `{ ${this.#args.map((a) => a.representation(depth + 1)).join(", ")} }`;
   }

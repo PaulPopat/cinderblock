@@ -33,6 +33,10 @@ export class TypeArray extends Type {
     return new TypeArray(this.location, this.done, () => this.parent, this.#contains.flattened);
   }
 
+  matches(input: Type): boolean {
+    return input instanceof TypeArray && input.contains.flattened.matches(this.#contains.flattened);
+  }
+
   representation(depth: number): string {
     return `${this.#contains.representation(depth + 1)}[]`;
   }

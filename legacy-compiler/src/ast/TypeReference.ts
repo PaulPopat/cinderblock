@@ -51,6 +51,10 @@ export class TypeReference extends Type {
     return result.type.flattened;
   }
 
+  matches(input: Type): boolean {
+    return this.flattened.matches(input.flattened);
+  }
+
   representation(depth: number): string {
     return depth > 1 ? this.#name : `{ ${this.args.map((a) => a.representation(depth + 1)).join(", ")} }`;
   }

@@ -2,6 +2,7 @@ import { TokenTypeName, type TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
 import type { Shape } from "#writer";
 import type { Entry } from "./Entry.ts";
+import { LinkerError } from "./LinkerError.ts";
 import { ParserError } from "./ParserError.ts";
 import { Type } from "./Type.ts";
 
@@ -38,12 +39,20 @@ export class TypeUnion extends Type {
   }
 
   get flattened(): Type {
-    return new TypeUnion(
-      this.location,
-      this.done,
-      () => this.parent,
-      this.#parts.map((p) => p.flattened),
-    );
+    const result = this.#parts.map((p) => p.flattened).filter((p, i, a) => a.findIndex((b) => b.matches(p)) === i);
+    if (result.length === 1) {
+      return result[0]!;
+    }
+
+    if (result.length === 0) {
+      throw new LinkerError("Union bottomed out", this.range);
+    }
+
+    return new TypeUnion(this.location, this.done, () => this.parent, result);
+  }
+
+  matches(input: Type): boolean {
+    return input instanceof TypeUnion && !input.parts.map((p) => p.flattened).some((a) => !this.parts.some((b) => a.matches(b.flattened)));
   }
 
   representation(depth: number): string {

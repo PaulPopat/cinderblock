@@ -59,6 +59,15 @@ export class TypePipeable extends Type {
     );
   }
 
+  matches(input: Type): boolean {
+    return (
+      input instanceof TypePipeable &&
+      input.args.length === this.args.length &&
+      !input.#args.some((a) => !this.#args.some((b) => a.matches(b))) &&
+      input.returns.flattened.matches(this.#returns.flattened)
+    );
+  }
+
   representation(depth: number): string {
     return `(${this.#args.map((a) => a.representation(depth + 1)).join(", ")}): ${this.#returns.representation(depth + 1)}`;
   }
