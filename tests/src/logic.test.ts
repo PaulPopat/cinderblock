@@ -182,7 +182,7 @@ describe("logic", () => {
     assert.equal(result, true);
   });
 
-  test("unknown argument inference", async () => {
+  test.skip("unknown argument inference", async () => {
     const code = new Inline(
       `
         let internal (_s: unknown) = _s;

@@ -379,7 +379,7 @@ describe("syntax", () => {
 
   test("tuple arg", async () => {
     const code = new Inline(`
-      let pipeable (test: {value: int}) = test.value + 2;
+      let pipeable (test: struct value: int ;) = test.value + 2;
       let test_let = {test = {value = 2}} -> pipeable;
     `);
     const result = await code.binary().run("test_let", {});
@@ -388,7 +388,7 @@ describe("syntax", () => {
 
   test("tuple direct pipe", async () => {
     const code = new Inline(`
-      let pipeable (_s: {value: int}) = _s.value + 2;
+      let pipeable (_s: struct value: int ;) = _s.value + 2;
       let test_let = {value = 2} --> pipeable;
     `);
     const result = await code.binary().run("test_let", {});
@@ -397,8 +397,8 @@ describe("syntax", () => {
 
   test("type union", async () => {
     const code = new Inline(`
-      let final (test: {value: int}) = test.value + 2;
-      let pipeable (test: {value: int} | {value: float}) = {test = test} -> final;
+      let final (test: struct value: int ;) = test.value + 2;
+      let pipeable (test: struct value: int ; | struct value: float ;) = {test = test} -> final;
       let test_let = {test = {value = 2}} -> pipeable;
     `);
     const result = await code.binary().run("test_let", {});
@@ -407,8 +407,8 @@ describe("syntax", () => {
 
   test("type intersection", async () => {
     const code = new Inline(`
-      let final (test: {value: int}) = test.value + 2;
-      let pipeable (test: {value: int} & {another: float}) = {test = test} -> final;
+      let final (test: struct value: int ;) = test.value + 2;
+      let pipeable (test: struct value: int ; & struct another: float ;) = {test = test} -> final;
       let test_let = {test = {value = 2}} -> pipeable;
     `);
     const result = await code.binary().run("test_let", {});
