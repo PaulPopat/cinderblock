@@ -20,7 +20,7 @@ namespace cinder_utils {
         (
           {
             _s = _s.data,
-            predicate = let (item: { key: string }) = item.key != key;,
+            predicate = let (item: struct key: string ;) = item.key != key;,
           }
           -> std_array_filter
         )
@@ -33,7 +33,7 @@ namespace cinder_utils {
     (
       {
         _s = _s.data,
-        predicate = let (item: { key: string }) = item.key != key;,
+        predicate = let (item: struct key: string ;) = item.key != key;,
       }
       -> std_array_find
       as DictionaryEntry

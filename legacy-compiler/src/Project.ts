@@ -5,16 +5,18 @@ import { App } from "./App.ts";
 import fs from "node:fs";
 
 export class Project extends App {
-  readonly #root: string;
+  readonly #roots: Array<string>;
   readonly #types: Array<TokenType>;
 
-  constructor(root: string) {
+  constructor(...roots: Array<string>) {
     const [{ entities }, done] = TokenWalker.start(
-      fs
-        .readdirSync(root, { recursive: true, encoding: "utf-8" })
-        .filter((f) => f.endsWith(".cb"))
-        .map((f) => [f, fs.readFileSync(path.resolve(root, f), "utf8")] as const)
-        .flatMap(([key, value]) => new Tokeniser(key, value).tokens),
+      roots.flatMap((root) =>
+        fs
+          .readdirSync(root, { recursive: true, encoding: "utf-8" })
+          .filter((f) => f.endsWith(".cb"))
+          .map((f) => [f, fs.readFileSync(path.resolve(root, f), "utf8")] as const)
+          .flatMap(([key, value]) => new Tokeniser(key, value).tokens),
+      ),
     )
       .while(
         "entities",
@@ -24,22 +26,22 @@ export class Project extends App {
       .finish();
 
     super(entities);
-    this.#root = root;
+    this.#roots = roots;
     this.#types = done.types;
   }
 
   compile() {
     try {
-      fs.mkdirSync(path.resolve(this.#root, ".cinder"), { recursive: true });
+      fs.mkdirSync(path.resolve(this.root, ".cinder"), { recursive: true });
     } catch {}
 
     const { data, metadata } = this.binaryData;
-    fs.writeFileSync(path.resolve(this.#root, ".cinder/app.block"), data);
-    fs.writeFileSync(path.resolve(this.#root, ".cinder/metadata.json"), JSON.stringify(metadata));
+    fs.writeFileSync(path.resolve(this.root, ".cinder/app.block"), data);
+    fs.writeFileSync(path.resolve(this.root, ".cinder/metadata.json"), JSON.stringify(metadata));
   }
 
   get root() {
-    return this.#root;
+    return this.#roots[0]!;
   }
 
   get types() {

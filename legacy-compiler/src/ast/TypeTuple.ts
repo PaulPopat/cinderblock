@@ -15,6 +15,7 @@ export class TypeTuple extends Type {
       chainable: false,
       factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
         const [{ parts, extending }, done] = walker
+          .expect("struct", TokenTypeName.KeyWord)
           .if(
             (s) => s.data === ":",
             (w) =>
