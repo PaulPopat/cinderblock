@@ -17,8 +17,6 @@
     "legacy-compiler",
     "compiler",
     "tests",
-    "server",
-    "budget-tracker",
     "vscode-extension"
   ],
   "prettier": {

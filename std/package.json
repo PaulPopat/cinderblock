@@ -2,10 +2,7 @@
   "name": "@cinderblock-lang/std",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "emsdk": "docker run --rm -v $(pwd):$(pwd) -u $(id -u):$(id -g) -w $(pwd) emscripten/emsdk",
-    "compile:start": "npm run emsdk emcmake cmake . -B build",
-    "compile:finish": "npm run emsdk emmake make",
-    "compile": "npm run compile:start && npm run compile:finish"
+    "compile": "cinderblock compile"
   },
   "repository": "https://github.com/PaulPopat/cinderblock",
   "version": "0.0.2",

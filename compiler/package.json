@@ -1,7 +1,8 @@
 {
   "name": "@cinderblock-lang/compiler",
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "compile": "node ./src/cinderblock.ts"
   },
   "repository": "https://github.com/PaulPopat/cinderblock",
   "version": "0.0.2",
@@ -31,5 +32,10 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "cinderblock": {
+    "lib_dirs": [
+      "../std"
+    ]
   }
 }

@@ -48,7 +48,17 @@ export class CinderBlockBinary {
     return extract(response as Variable);
   }
 
-  withTag(key: string, value: string) {
+  withTag(key: string) {
+    return Object.entries(this.#metadata.funcs)
+      .filter(([, funcMetadata]) => funcMetadata.tags.find((t) => t.key === key))
+      .map(([funcName, funcMetadata]) => ({
+        ...funcMetadata,
+        name: funcName.replace("App_", ""),
+        tags: Object.fromEntries(funcMetadata.tags.map((t) => [t.key, t.value])),
+      }));
+  }
+
+  withTagOf(key: string, value: string) {
     return Object.entries(this.#metadata.funcs)
       .filter(([, funcMetadata]) => funcMetadata.tags.find((t) => t.key === key && t.value === value))
       .map(([funcName, funcMetadata]) => ({

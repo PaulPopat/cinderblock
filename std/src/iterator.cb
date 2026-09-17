@@ -1,20 +1,80 @@
 namespace std {
   struct iterator
-    current: T
-    next: iterator<T: T>
+    data: T
+    next: unknown
     done: bool
   ;
 
   let iterator_fromArray (_s: T[]): iterator<T: T> =
       let internal (index: int): iterator<T: T> =
-          let current =  _s @ index;
-          let done = null == current;
-        { 
-          current = current,
+          let data =  _s @ index;
+          let done = null == data;
+        {
+          data = data,
           next = !done ? { index = index + 1 } -> internal : null,
           done = done,
         }
       ;
     { index = 0 } -> internal
+  ;
+
+  let iterator_reduce (
+    _s: iterator<T: T>,
+    initial: TResult,
+    reducer: (_s: T, current: TResult): TResult
+  ): TResult =
+    let internal (current: TResult, entry: iterator<T: T>):
+      struct
+        current: TResult
+        entry: iterator<T: T>
+      ;
+    =
+      entry.done
+        ? {
+            current = current,
+            entry = null
+          }
+        : {
+            current = { _s = entry.data, current = current } -> reducer,
+            entry = entry.next,
+          } -> internal
+    ;
+
+    (
+      { current = initial, entry = _s } -> internal
+    ).current
+  ;
+
+  let iterator_select (
+    _s: iterator<T: T>,
+    selector: (_s: T): TResult
+  ): iterator<T: TResult> =
+    {
+      data = !_s.done ? _s.data -> selector : null,
+      next = !_s.done
+        ? { _s = _s.next, selector = selector } -> iterator_select
+        : null,
+      done = _s.done,
+    }
+  ;
+
+  let iterator_length (
+    _s: iterator<T: unknown>
+  ) =
+    {
+      _s = _s,
+      initial = 0,
+      reducer = let (current: int) = current + 1;
+    } -> iterator_reduce<T: unknown, TResult: int>
+  ;
+
+  let iterator_toArray (
+    _s: iterator<T: T>
+  ) =
+    {
+      _s = _s,
+      initial = [] as T[],
+      reducer = let (_s: T, current: T[]) = current ++ _s;
+    } -> iterator_reduce<T: unknown, TResult: T[]>
   ;
 }

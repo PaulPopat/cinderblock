@@ -1,8 +1,9 @@
 namespace cinder_tokeniser {
+  use std;
   use cinder_utils;
 
   struct TokenWalker
-    tokens: Token[]
+    tokens: iterator<T: Token>
     index: int
     current: Token | null
     ctx: Dictionary
@@ -14,13 +15,13 @@ namespace cinder_tokeniser {
   ;
 
   let TokenWalker_Create (
-    _s: Token[],
+    _s: iterator<T: Token>,
     index: int,
     ctx: unknown,
     types: TokenType[],
     errors: CompilerError[]
   ): TokenWalker =
-      let done = _s -> std_array_length <= index;
+      let done = _s -> iterator_length <= index;
       let current: Token = !done ?
         { _s = _s, i = index } -> std_array_get
         : { data = "", range = Range_Empty };

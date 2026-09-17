@@ -4,6 +4,7 @@ import {
   ExpressionAccess,
   ExpressionReference,
   ExpressionTuplePart,
+  loadConfig,
   Project,
   Range,
   Type,
@@ -29,21 +30,22 @@ export class DefinitionProvider implements vscode.DefinitionProvider, vscode.Hov
     }
   }
 
-  #resolve(document: vscode.TextDocument, position: vscode.Position) {
+  async #resolve(document: vscode.TextDocument, position: vscode.Position) {
     // This should definitely improve
     if (!document.uri.fsPath.startsWith(this.#workspacePath.uri.fsPath + "/")) return;
     const relativePath = document.uri.fsPath.replace(this.#workspacePath.uri.fsPath + "/", "");
 
-    const project = new Project(this.#workspacePath.uri.fsPath);
+    const config = await loadConfig(this.#workspacePath.uri.fsPath);
+    const project = new Project(this.#workspacePath.uri.fsPath, ...(config.lib_dirs ?? []));
     return project.types.find((t) => t.entry && t.range.within(relativePath, position.line + 1, position.character + 1))?.entry;
   }
 
-  provideDefinition(
+  async provideDefinition(
     document: vscode.TextDocument,
     position: vscode.Position,
     token: vscode.CancellationToken,
-  ): vscode.ProviderResult<vscode.Definition | vscode.DefinitionLink[]> {
-    const found = this.#resolve(document, position);
+  ): Promise<vscode.Definition | vscode.DefinitionLink[] | null | undefined> {
+    const found = await this.#resolve(document, position);
     if (!found) return;
 
     const goTo = (range: Range) => ({
@@ -55,11 +57,14 @@ export class DefinitionProvider implements vscode.DefinitionProvider, vscode.Hov
     });
 
     if (found instanceof ExpressionReference) return goTo(found.subject.range);
-    if (found instanceof TypeReference) return goTo(found.flattened().range);
+    if (found instanceof TypeReference) {
+      const range = found.subject?.range;
+      if (range) return goTo(range);
+    }
   }
 
-  provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Hover> {
-    const found = this.#resolve(document, position);
+  async provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Hover | undefined> {
+    const found = await this.#resolve(document, position);
     if (!found) return;
 
     const display = (type: Type, range: Range) => {

@@ -52,6 +52,10 @@ export class TypeReference extends Type {
     return this.#name;
   }
 
+  get subject() {
+    return this.float(this.#name);
+  }
+
   flattened(): Type {
     const result = this.float(this.#name);
     if (result instanceof EntityStruct) {

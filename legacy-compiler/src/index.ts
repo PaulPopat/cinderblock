@@ -1,6 +1,4 @@
-export * from "./Project.ts";
-export * from "./Inline.ts";
-
+export * from "#project";
 export * from "#ast";
 
 export { CompilerError, Range, Location } from "#utils";

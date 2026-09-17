@@ -1,6 +1,11 @@
 namespace cinder_tokeniser {
-  let Tokenise (file: string, text: string) =
-      let character_split = { on = "" } -> std_string_split;
+  use std;
+  
+  let Tokenise (file: string, text: string): iterator<T: Token> =
+      let character_split = 
+        { on = "" }
+        -> std_string_split
+        -> std_iterator_fromArray<T: string>;
 
       let allowedLiterals = [
         "[]",
@@ -112,8 +117,10 @@ namespace cinder_tokeniser {
         reducer = let (item: string, current: TokenisationContext) =
           { ctx = current, character = item } -> process
         ;
-      } -> std_array_reduce as
+      } -> std_iterator_reduce as
       TokenisationContext
-    ).result
+    )
+    .result
+    -> std_iterator_fromArray<T: Token>
   ;
 }

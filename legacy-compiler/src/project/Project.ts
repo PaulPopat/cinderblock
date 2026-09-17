@@ -42,17 +42,7 @@ export class Project extends App {
   }
 
   binary(globals?: Record<string, unknown>): CinderBlockBinary {
-    const lib = this.#roots
-      .flatMap((root) =>
-        fs
-          .readdirSync(root, { recursive: true, encoding: "utf-8" })
-          .filter((f) => f.endsWith(".cb.ts"))
-          .map((f) => import(path.resolve(root, f)))
-          .reduce((existing, imported) => existing.then((p) => imported.then((i) => ({ ...p, ...i }))), Promise.resolve({} as Record<string, any>)),
-      )
-      .reduce((existing, imported) => existing.then((p) => imported.then((i) => ({ ...p, ...i }))), Promise.resolve(globals));
-
-    return super.binary(lib);
+    return super.binary(globals);
   }
 
   get root() {
