@@ -16,7 +16,7 @@ class VariablePrimitiveLong : public VariableArithmetic {
 
   const static char TypeName = 8;
   const char IsType = 8;
-  VariablePrimitiveLong(long value);
+  VariablePrimitiveLong(long long value);
   VariablePrimitiveLong(val value);
 
   const char get_type_name() const
@@ -25,15 +25,15 @@ class VariablePrimitiveLong : public VariableArithmetic {
   }
 
   const val raw() const;
-  long get_value() const;
+  long long get_value() const;
 
   char get_char() const;
   int get_int() const;
-  long get_long() const;
+  long long get_long() const;
   float get_float() const;
   double get_double() const;
 
   private:
-  long value;
+  long long value;
 };
 }

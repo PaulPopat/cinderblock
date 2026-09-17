@@ -29,7 +29,7 @@ class VariablePrimitiveFloat : public VariableArithmetic {
 
   char get_char() const;
   int get_int() const;
-  long get_long() const;
+  long long get_long() const;
   float get_float() const;
   double get_double() const;
 

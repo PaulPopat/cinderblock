@@ -1,14 +1,14 @@
 #include "VariablePrimitiveLong.h"
 
 namespace Storage {
-VariablePrimitiveLong::VariablePrimitiveLong(long value)
+VariablePrimitiveLong::VariablePrimitiveLong(long long value)
 {
   this->value = value;
 }
 
 VariablePrimitiveLong::VariablePrimitiveLong(val value)
 {
-  this->value = value.as<long>();
+  this->value = value.as<long long>();
 }
 
 const val VariablePrimitiveLong::raw() const
@@ -20,7 +20,7 @@ const val VariablePrimitiveLong::raw() const
   return result;
 }
 
-long VariablePrimitiveLong::get_value() const
+long long VariablePrimitiveLong::get_value() const
 {
   return this->value;
 }
@@ -35,7 +35,7 @@ int VariablePrimitiveLong::get_int() const
   return this->value;
 }
 
-long VariablePrimitiveLong::get_long() const
+long long VariablePrimitiveLong::get_long() const
 {
   return this->value;
 }

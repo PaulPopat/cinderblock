@@ -1,0 +1,25 @@
+namespace std_iterator {
+  let [test="creates an iterator from an array"] =
+    {
+      actual = [1, 2, 3]
+        -> iterator_fromArray<T: int>
+        --> ({
+          initial = 0,
+          reducer = let (_s: int, current: int) = _s + current;,
+        } -> iterator_reduce<T: int>),
+      expected = 6,
+    }
+  ;
+
+  let [test="selects over an iterator"] =
+    {
+      actual = [1, 2, 3]
+        -> iterator_fromArray<T: int>
+        --> ({
+          selector = let (_s: int) = _s + 1;,
+        } -> iterator_select<T: int, TResult: int>)
+        --> iterator_toArray<T: int>,
+      expected = [2, 3, 4],
+    }
+  ;
+}

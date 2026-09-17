@@ -5,7 +5,7 @@
 
 namespace Binary {
 template <typename T>
-T* extract(const char* binary, unsigned long offset)
+T* extract(const char* binary, unsigned long long offset)
 {
   return (T*)(binary + offset);
 }

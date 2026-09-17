@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { extract, variablise, variabliseTuple } from "./variablise.ts";
 import type { Variable } from "#variable";
-import type { AppMetadata } from "./AppMetadata.ts";
+import type { AppFunc, AppMetadata } from "./AppMetadata.ts";
 
 export class CinderBlockBinary {
   static async FromBinary(dir: string, globals: Record<string, unknown>) {
@@ -40,11 +40,11 @@ export class CinderBlockBinary {
     this.#metadata = metadata;
   }
 
-  async run(letName: string, args: Record<string, unknown>) {
+  async run(letName: string | AppFunc, args: Record<string, unknown>) {
     const module = await this.#module;
-    const target = this.#metadata.funcs[["App", letName].join("_")];
+    const target = typeof letName === "object" ? letName.id : this.#metadata.funcs[["App", letName].join("_")]?.id;
     if (!target) throw new Error(`Could not find name ${letName}`);
-    const response = await module.Run(target.id, variabliseTuple(args));
+    const response = await module.Run(target, variabliseTuple(args));
     return extract(response as Variable);
   }
 

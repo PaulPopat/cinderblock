@@ -1,7 +1,7 @@
 type DateIsoProps = {
-  _s: number;
+  _s: bigint;
 };
 
 export function std_date_iso(props: DateIsoProps) {
-  return new Date(props._s).toISOString();
+  return new Date(Number(props._s)).toISOString();
 }

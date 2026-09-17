@@ -7,3 +7,9 @@ export type AppMetadata = {
     }
   >;
 };
+
+export type AppFunc = {
+  id: string;
+  name: string;
+  tags: Record<string, string>;
+};

@@ -36,7 +36,7 @@ int VariablePrimitiveFloat::get_int() const
   return this->value;
 }
 
-long VariablePrimitiveFloat::get_long() const
+long long VariablePrimitiveFloat::get_long() const
 {
   return this->value;
 }

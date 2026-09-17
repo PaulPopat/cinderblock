@@ -1,3 +1,1 @@
-namespace std {
-  extern app_tagged(_s: string, key: string): unknown[];
-}
+extern std_app_tagged(_s: string, key: string): unknown[];

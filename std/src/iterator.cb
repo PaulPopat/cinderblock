@@ -74,7 +74,7 @@ namespace std {
     {
       _s = _s,
       initial = [] as T[],
-      reducer = let (_s: T, current: T[]) = current ++ _s;
+      reducer = let (_s: T, current: T[]) = current ++ _s;,
     } -> iterator_reduce<T: unknown, TResult: T[]>
   ;
 }

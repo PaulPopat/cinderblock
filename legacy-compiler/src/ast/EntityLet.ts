@@ -61,7 +61,10 @@ export class EntityLet extends EntityNamespace {
             )
             .expect("]", TokenTypeName.Punctuation),
       )
-      .text("name", TokenTypeName.FunctionName, () => this)
+      .if(
+        (s) => !!s.data.match(/^[a-zA-Z0-9_$#]+$/gm),
+        (s) => s.text("name", TokenTypeName.FunctionName, () => this),
+      )
       .if(
         (s) => s.data === "(",
         (walker) =>
@@ -87,7 +90,7 @@ export class EntityLet extends EntityNamespace {
       .expect(";", TokenTypeName.Punctuation)
       .finish();
 
-    super(walker.location, done, parent, name, entities);
+    super(walker.location, done, parent, name ?? internalName, entities);
     this.#walker = walker;
     this.#tags = tags ?? [];
     this.#args = args ?? [];

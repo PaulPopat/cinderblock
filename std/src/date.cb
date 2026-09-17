@@ -1,3 +1,1 @@
-namespace std {
-  extern date_iso(_s: number): string;
-}
+extern std_date_iso(_s: long): string;

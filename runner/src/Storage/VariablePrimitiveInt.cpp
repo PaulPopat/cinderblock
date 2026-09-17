@@ -35,7 +35,7 @@ int VariablePrimitiveInt::get_int() const
   return this->value;
 }
 
-long VariablePrimitiveInt::get_long() const
+long long VariablePrimitiveInt::get_long() const
 {
   return this->value;
 }

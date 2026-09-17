@@ -5,8 +5,8 @@
 namespace Binary {
 LiteralLong::LiteralLong(const char* binary, int offset)
 {
-  this->end = offset + sizeof(long);
-  this->value = *extract<long>(binary, offset);
+  this->end = offset + sizeof(long long);
+  this->value = *extract<long long>(binary, offset);
 }
 
 LiteralLong::~LiteralLong()

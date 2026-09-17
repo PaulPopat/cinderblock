@@ -79,7 +79,8 @@ function serialiseLiteralInt(data: InstructionLiteralInt): Buffer {
 
 function serialiseLiteralLong(data: InstructionLiteralInt): Buffer {
   const result = Buffer.from(new Uint8Array(8));
-  result.writeBigInt64LE(BigInt(data.value), 0);
+  const big = BigInt(data.value);
+  result.writeBigInt64LE(big, 0);
   return Buffer.concat([new Uint8Array([10]), result]);
 }
 

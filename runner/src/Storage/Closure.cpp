@@ -25,12 +25,13 @@ const Variable* Closure::search(std::string name)
 
 Closure* Closure::with_frame(Frame* frame)
 {
+
   auto input = std::vector<Frame*>();
+  input.push_back(frame);
+
   for (const auto& frame : this->frames) {
     input.push_back(frame);
   }
-
-  input.push_back(frame);
 
   return new Closure(this->globals, input);
 }

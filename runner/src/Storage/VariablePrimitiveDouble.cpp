@@ -36,7 +36,7 @@ int VariablePrimitiveDouble::get_int() const
   return this->value;
 }
 
-long VariablePrimitiveDouble::get_long() const
+long long VariablePrimitiveDouble::get_long() const
 {
   return this->value;
 }

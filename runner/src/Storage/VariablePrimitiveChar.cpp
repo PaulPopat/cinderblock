@@ -35,7 +35,7 @@ int VariablePrimitiveChar::get_int() const
   return this->value;
 }
 
-long VariablePrimitiveChar::get_long() const
+long long VariablePrimitiveChar::get_long() const
 {
   return this->value;
 }
