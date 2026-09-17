@@ -5,12 +5,28 @@ import { EntityStruct } from "./EntityStruct.ts";
 import type { Entry } from "./Entry.ts";
 import { LinkerError } from "./LinkerError.ts";
 import { Type } from "./Type.ts";
+import { TypeArg } from "./TypeArg.ts";
+import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
 
 export class TypeReference extends Type {
   static ParseReference(walker: TokenWalker, parent: () => Entry | undefined, left?: Type) {
-    const [{ value }, done] = walker.text("value", TokenTypeName.StructReference, (): TypeReference => result).finish();
+    const [{ value, args }, done] = walker
+      .text("value", TokenTypeName.StructReference, (): TypeReference => result)
+      .if(
+        (s) => s.data === "<",
+        (s) =>
+          s
+            .expect("<", TokenTypeName.Punctuation)
+            .while(
+              "args",
+              (s) => s.data !== ">",
+              (s): TypeArg => TypeArg.Parse(s, () => result),
+            )
+            .expect(">", TokenTypeName.Punctuation),
+      )
+      .finish();
 
-    const result = new TypeReference(walker.location, done, parent, value);
+    const result = new TypeReference(walker.location, done, parent, value, args ?? []);
     return result;
   }
 
@@ -24,31 +40,30 @@ export class TypeReference extends Type {
   }
 
   readonly #name: string;
+  readonly #generics: Array<TypeArg>;
 
-  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined, name: string) {
+  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined, name: string, generics: Array<TypeArg>) {
     super(location, done, parent);
     this.#name = name;
+    this.#generics = generics;
   }
 
   get name() {
     return this.#name;
   }
 
-  get struct() {
+  flattened(): Type {
     const result = this.float(this.#name);
-    if (!(result instanceof EntityStruct)) throw new LinkerError("Reference not found", this.range);
+    if (result instanceof EntityStruct) {
+      const final = new EntityStruct(result, this.#generics);
+      return final.type.flattened();
+    }
 
-    return result;
-  }
+    if (result instanceof Type) {
+      return result.flattened();
+    }
 
-  get args() {
-    return this.struct.args;
-  }
-
-  flattened(generics: Record<string, Type>): Type {
-    const result = this.float(this.#name);
-    if (!(result instanceof EntityStruct)) throw new LinkerError("Reference not found", this.range);
-    return result.type.flattened(generics);
+    return new TypePrimitiveUnknown(this.location, this.done, () => this);
   }
 
   matches(input: Type): boolean {
@@ -56,13 +71,10 @@ export class TypeReference extends Type {
   }
 
   representation(depth: number): string {
-    return depth > 1 ? this.#name : `{ ${this.args.map((a) => a.representation(depth + 1)).join(", ")} }`;
+    return this.flattened().representation(depth + 1);
   }
 
   shape(): Shape {
-    return {
-      type: "tuple",
-      args: this.struct.args.map((a) => ({ key: a.name, value: a.type.shape() })),
-    };
+    return this.flattened().shape();
   }
 }

@@ -43,8 +43,8 @@ export class TypeArg extends Type {
     return this.#name;
   }
 
-  flattened(generics: Record<string, Type>): TypeArg {
-    return new TypeArg(this.location, this.done, () => this.parent, this.#type.flattened(generics), this.#name);
+  flattened(): TypeArg {
+    return new TypeArg(this.location, this.done, () => this.parent, this.#type.flattened(), this.#name);
   }
 
   matches(input: Type): boolean {
@@ -57,5 +57,10 @@ export class TypeArg extends Type {
 
   shape(): Shape {
     return { type: "null" };
+  }
+
+  dig(name: string) {
+    if (name === this.#name) return this.type.flattened();
+    return undefined;
   }
 }

@@ -44,7 +44,7 @@ export abstract class Type extends Entry {
     return undefined;
   }
 
-  abstract flattened(generics: Record<string, Type>): Type;
+  abstract flattened(): Type;
   abstract matches(input: Type): boolean;
   abstract representation(depth: number): string;
   abstract shape(): Shape;

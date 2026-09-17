@@ -29,8 +29,8 @@ export class TypeArray extends Type {
     return this.#contains;
   }
 
-  flattened(generics: Record<string, Type>): Type {
-    return new TypeArray(this.location, this.done, () => this.parent, this.#contains.flattened(generics));
+  flattened(): Type {
+    return new TypeArray(this.location, this.done, () => this.parent, this.#contains.flattened());
   }
 
   matches(input: Type): boolean {

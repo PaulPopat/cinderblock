@@ -41,13 +41,13 @@ export class TypeIntersection extends Type {
     return this.#parts;
   }
 
-  flattened(generics: Record<string, Type>): Type {
+  flattened(): Type {
     return new TypeTuple(
       this.location,
       this.done,
       () => this.parent,
       this.#parts
-        .map((p) => p.flattened(generics))
+        .map((p) => p.flattened())
         .flatMap((p) => {
           if (!(p instanceof TypeTuple)) {
             throw new LinkerError("Tuple required for intersection", this.range);

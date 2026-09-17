@@ -55,7 +55,7 @@ export class DefinitionProvider implements vscode.DefinitionProvider, vscode.Hov
     });
 
     if (found instanceof ExpressionReference) return goTo(found.subject.range);
-    if (found instanceof TypeReference) return goTo(found.struct.range);
+    if (found instanceof TypeReference) return goTo(found.flattened().range);
   }
 
   provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): vscode.ProviderResult<vscode.Hover> {

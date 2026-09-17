@@ -3,7 +3,7 @@ import { Type } from "./Type.ts";
 export abstract class TypePrimitive extends Type {
   abstract get name(): string;
 
-  flattened(generics: Record<string, Type>): Type {
+  flattened(): Type {
     return this;
   }
 

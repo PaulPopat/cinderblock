@@ -9,6 +9,7 @@ import { EntityArg } from "./EntityArg.ts";
 import { EntityExternal } from "./EntityExternal.ts";
 import { WriterError } from "./WriterError.ts";
 import type { Type } from "./Type.ts";
+import { TypeArg } from "./TypeArg.ts";
 
 export class ExpressionReference extends Expression {
   static {
@@ -20,11 +21,27 @@ export class ExpressionReference extends Expression {
   }
 
   readonly #name: string;
+  readonly #generics: Array<TypeArg>;
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
-    const [{ value }, done] = walker.text("value", TokenTypeName.VariableName, () => this).finish();
+    const [{ value, args }, done] = walker
+      .text("value", TokenTypeName.VariableName, () => this)
+      .if(
+        (s) => s.data === "<",
+        (s) =>
+          s
+            .expect("<", TokenTypeName.Punctuation)
+            .while(
+              "args",
+              (s) => s.data !== ">",
+              (s): TypeArg => TypeArg.Parse(s, () => this),
+            )
+            .expect(">", TokenTypeName.Punctuation),
+      )
+      .finish();
     super(walker.location, done, parent);
     this.#name = value;
+    this.#generics = args ?? [];
   }
 
   get name() {
@@ -33,6 +50,10 @@ export class ExpressionReference extends Expression {
 
   get subject() {
     const result = this.float(this.#name);
+    if (result instanceof EntityLet && this.#generics.length) {
+      return new EntityLet(result, this.#generics);
+    }
+
     if (!(result instanceof EntityLet) && !(result instanceof EntityArg) && !(result instanceof EntityExternal)) {
       throw new LinkerError("Unresolved reference", this.range);
     }
@@ -41,7 +62,7 @@ export class ExpressionReference extends Expression {
   }
 
   get resolution(): Type {
-    return this.subject.type.flattened({});
+    return this.subject.type.flattened();
   }
 
   get instruction(): Instruction {

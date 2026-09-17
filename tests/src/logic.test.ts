@@ -182,11 +182,26 @@ describe("logic", () => {
     assert.equal(result, true);
   });
 
-  test.skip("unknown argument inference", async () => {
+  test("generic let", async () => {
     const code = new Inline(
       `
-        let internal (_s: unknown) = _s;
-        let result = ({ test = "data" } --> internal).test;
+        let internal (_s: Test) = _s;
+        let result = ({ test = "data" } --> internal<Test: struct test: string ;>).test;
+      `,
+    );
+    const result = await code.binary().run("result", {});
+    assert.equal(result, "data");
+  });
+
+  test("generic struct", async () => {
+    const code = new Inline(
+      `
+        struct uses_generic
+          part: Test
+        ;
+
+        let internal (_s: uses_generic<Test: string>) = _s;
+        let result = ({ part = "data" } --> internal).part;
       `,
     );
     const result = await code.binary().run("result", {});

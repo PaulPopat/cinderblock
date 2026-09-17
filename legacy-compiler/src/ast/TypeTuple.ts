@@ -5,6 +5,7 @@ import { Location } from "#utils";
 import { TokenTypeName, TokenWalker } from "#tokeniser";
 import type { Shape } from "#writer";
 import { TypeReference } from "./TypeReference.ts";
+import { LinkerError } from "./LinkerError.ts";
 
 export class TypeTuple extends Type {
   static {
@@ -51,15 +52,22 @@ export class TypeTuple extends Type {
   }
 
   get args() {
-    return [...this.#args, ...this.#extending.flatMap((e) => e.struct.args)];
+    return [
+      ...this.#args,
+      ...this.#extending.flatMap((e): Array<TypeArg> => {
+        const found = e.flattened();
+        if (found instanceof TypeTuple) return found.args;
+        throw new LinkerError("Tuple required", e.range);
+      }),
+    ];
   }
 
-  flattened(generics: Record<string, Type>): Type {
+  flattened(): Type {
     return new TypeTuple(
       this.location,
       this.done,
       () => this.parent,
-      this.args.map((a) => a.flattened(generics)),
+      this.args.map((a) => a.flattened()),
     );
   }
 
