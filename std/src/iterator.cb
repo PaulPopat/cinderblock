@@ -1,0 +1,20 @@
+namespace std {
+  struct iterator
+    current: T
+    next: iterator<T: T>
+    done: bool
+  ;
+
+  let iterator_fromArray (_s: T[]): iterator<T: T> =
+      let internal (index: int): iterator<T: T> =
+          let current =  _s @ index;
+          let done = null == current;
+        { 
+          current = current,
+          next = !done ? { index = index + 1 } -> internal : null,
+          done = done,
+        }
+      ;
+    { index = 0 } -> internal
+  ;
+}
