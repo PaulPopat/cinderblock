@@ -1,4 +1,4 @@
-import type { CinderBlockBinary } from "../CinderBlockBinary.ts";
+import type { CinderBlockBinary } from "@cinderblock-lang/runner";
 
 type AppTaggedProps = {
   key: string;

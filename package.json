@@ -12,6 +12,7 @@
     "typescript": "^6.0.3"
   },
   "workspaces": [
+    "std",
     "runner",
     "legacy-compiler",
     "compiler",

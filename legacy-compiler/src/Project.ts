@@ -3,6 +3,7 @@ import { Tokeniser, TokenType, TokenWalker } from "#tokeniser";
 import path from "node:path";
 import { App } from "./App.ts";
 import fs from "node:fs";
+import type { CinderBlockBinary } from "@cinderblock-lang/runner";
 
 export class Project extends App {
   readonly #roots: Array<string>;
@@ -38,6 +39,20 @@ export class Project extends App {
     const { data, metadata } = this.binaryData;
     fs.writeFileSync(path.resolve(this.root, ".cinder/app.block"), data);
     fs.writeFileSync(path.resolve(this.root, ".cinder/metadata.json"), JSON.stringify(metadata));
+  }
+
+  binary(globals?: Record<string, unknown>): CinderBlockBinary {
+    const lib = this.#roots
+      .flatMap((root) =>
+        fs
+          .readdirSync(root, { recursive: true, encoding: "utf-8" })
+          .filter((f) => f.endsWith(".cb.ts"))
+          .map((f) => import(path.resolve(root, f)))
+          .reduce((existing, imported) => existing.then((p) => imported.then((i) => ({ ...p, ...i }))), Promise.resolve({} as Record<string, any>)),
+      )
+      .reduce((existing, imported) => existing.then((p) => imported.then((i) => ({ ...p, ...i }))), Promise.resolve(globals));
+
+    return super.binary(lib);
   }
 
   get root() {
