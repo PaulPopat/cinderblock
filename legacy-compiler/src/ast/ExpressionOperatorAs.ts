@@ -31,7 +31,7 @@ export class ExpressionOperatorAs extends Expression {
   }
 
   get resolution(): Type {
-    return this.#right.flattened({});
+    return this.#right.flattened();
   }
 
   get instruction(): Instruction {

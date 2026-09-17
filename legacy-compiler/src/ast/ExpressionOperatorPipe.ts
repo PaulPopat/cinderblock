@@ -44,7 +44,7 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
 
     if (!remaining.length) return right.returns;
 
-    return new TypePipeable(this.location, this.done, () => this, remaining, right.returns).flattened({});
+    return new TypePipeable(this.location, this.done, () => this, remaining, right.returns).flattened();
   }
 
   get instruction(): Instruction {

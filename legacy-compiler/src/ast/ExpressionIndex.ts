@@ -40,7 +40,7 @@ export class ExpressionIndex extends Expression {
       throw new LinkerError("Subject is not indexable", this.range);
     }
 
-    return subjectType.contains.flattened({});
+    return subjectType.contains.flattened();
   }
 
   get instruction(): Instruction {

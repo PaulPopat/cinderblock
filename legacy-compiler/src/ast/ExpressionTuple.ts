@@ -62,7 +62,7 @@ export class ExpressionTuple extends Expression {
       this.#parts.flatMap((part) => {
         if (part instanceof ExpressionTupleSpread) {
           const resolution = part.resolution;
-          if (resolution instanceof TypeTuple || resolution instanceof TypeReference) {
+          if (resolution instanceof TypeTuple) {
             return resolution.args;
           }
 
@@ -71,7 +71,7 @@ export class ExpressionTuple extends Expression {
 
         return [new TypeArg(this.location, this.done, () => this, part.value.resolution, part.name)];
       }),
-    ).flattened({});
+    ).flattened();
   }
 
   get instruction(): Instruction {
@@ -80,7 +80,7 @@ export class ExpressionTuple extends Expression {
       parts: this.#parts.flatMap((part) => {
         if (part instanceof ExpressionTupleSpread) {
           const resolution = part.resolution;
-          if (resolution instanceof TypeTuple || resolution instanceof TypeReference) {
+          if (resolution instanceof TypeTuple) {
             return resolution.args.map((a): [string, Instruction] => [a.name, { type: "access", subject: part.instruction, key: a.name }]);
           }
 

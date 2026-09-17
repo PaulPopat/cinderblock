@@ -61,7 +61,7 @@ export class ExpressionLiteralArray extends ExpressionLiteral {
       this.done,
       () => this,
       this.#value[0]?.resolution ?? new TypePrimitiveUnknown(this.location, this.done, () => this),
-    ).flattened({});
+    ).flattened();
   }
 
   get instruction(): Instruction {
