@@ -34,7 +34,8 @@ namespace std {
         }
         -> iterator_find<T: dictionary_entry<T: T>>
       ;
-    "value" in result ? result.value : null
+    result |
+      let (_s: dictionary_entry<T: T>) = _s.value;
   ;
 
   let [test="std_dictionary creates and updates dictionary items"] =
@@ -46,6 +47,15 @@ namespace std {
         --> ({key = "test4", value = "paul" } -> dictionary_set<T: string>)
         --> ({key = "test2"} -> dictionary_get<T: string>),
       expected = "world",
+    }
+  ;
+
+  let [test="std_dictionary returns null when the item does not exist"] =
+    {
+      actual = dictionary_create<T: string>
+        --> ({key = "test1", value = "hello" } -> dictionary_set<T: string>)
+        --> ({key = "test2"} -> dictionary_get<T: string>),
+      expected = null,
     }
   ;
 }
