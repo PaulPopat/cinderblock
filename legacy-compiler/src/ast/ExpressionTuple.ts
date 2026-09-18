@@ -77,18 +77,20 @@ export class ExpressionTuple extends Expression {
   get instruction(): Instruction {
     return {
       type: "tuple",
-      parts: this.#parts.flatMap((part) => {
-        if (part instanceof ExpressionTupleSpread) {
-          const resolution = part.resolution;
-          if (resolution instanceof TypeTuple) {
-            return resolution.args.map((a): [string, Instruction] => [a.name, { type: "access", subject: part.instruction, key: a.name }]);
+      parts: this.#parts
+        .flatMap((part) => {
+          if (part instanceof ExpressionTupleSpread) {
+            const resolution = part.resolution;
+            if (resolution instanceof TypeTuple) {
+              return resolution.args.map((a): [string, Instruction] => [a.name, { type: "access", subject: part.instruction, key: a.name }]);
+            }
+
+            throw new LinkerError("Expected a tuple", this.range);
           }
 
-          throw new LinkerError("Expected a tuple", this.range);
-        }
-
-        return [[part.name, part.instruction]];
-      }),
+          return [[part.name, part.instruction] as [string, Instruction]];
+        })
+        .filter(([p], i, a) => a.findLastIndex(([s]) => s === p) === i),
     };
   }
 

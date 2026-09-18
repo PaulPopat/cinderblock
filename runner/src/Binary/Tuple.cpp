@@ -36,8 +36,8 @@ const int Tuple::get_end() const
 const Variable* Tuple::resolve(Closure* closure) const
 {
   auto parts = std::vector<VariableTuplePart>();
-  for (const auto& part : this->values) {
-    parts.push_back({ part.name->get_value(), part.value->resolve(closure) });
+  for (const auto& value : this->values) {
+    parts.push_back({ value.name->get_value(), value.value->resolve(closure) });
   }
 
   return closure->add_temp_variable(new VariableTuple(parts));

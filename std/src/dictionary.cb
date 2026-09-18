@@ -17,13 +17,11 @@ namespace std {
   let dictionary_set (_s: dictionary<T: T>, key: string, value: T): dictionary<T: T> =
     {
       data =
-        (
-          {
-            _s = _s.data,
-            predicate = let (item: struct key: string ;) = item.key != key;,
-          }
-          -> iterator_where<T: DictionaryEntry<T: T>[]>
-        )
+        {
+          _s = _s.data,
+          predicate = let (item: struct key: string ;) = item.key != key;,
+        }
+        -> iterator_where<T: DictionaryEntry<T: T>[]>
         --> ({ addition = { key = key, value = value } } -> iterator_concat),
     }
   ;

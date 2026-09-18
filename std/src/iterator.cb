@@ -18,6 +18,18 @@ namespace std {
     { index = 0 } -> internal
   ;
 
+  let [test="std_iterator creates an iterator from an array"] =
+    {
+      actual = [1, 2, 3]
+        -> iterator_fromArray<T: int>
+        --> ({
+          initial = 0,
+          reducer = let (_s: int, current: int) = _s + current;,
+        } -> iterator_reduce<T: int>),
+      expected = 6,
+    }
+  ;
+
   let iterator_reduce (
     _s: iterator<T: T>,
     initial: TResult,
@@ -58,6 +70,18 @@ namespace std {
     }
   ;
 
+  let [test="std_iterator selects over an iterator"] =
+    {
+      actual = [1, 2, 3]
+        -> iterator_fromArray<T: int>
+        --> ({
+          selector = let (_s: int) = _s + 1;,
+        } -> iterator_select<T: int, TResult: int>)
+        --> iterator_toArray<T: int>,
+      expected = [2, 3, 4],
+    }
+  ;
+
   let iterator_where (
     _s: iterator<T: T>,
     predicate: (_s: T): bool
@@ -76,17 +100,27 @@ namespace std {
     _s.done
       ? {
           data = addition,
+          done = false,
           next = {
             done = true,
             data = null,
             next = null,
           },
-          done = false,
         }
       : {
           ..._s,
           next = { _s = _s.next, addition = addition } -> iterator_concat,
         }
+  ;
+
+  let [test="std_iterator adds an entry"] =
+    {
+      actual = [1, 2, 3]
+        --> iterator_fromArray
+        --> ({ addition = 4 } -> iterator_concat)
+        --> iterator_toArray,
+      expected = [1, 2, 3, 4],
+    }
   ;
 
   let iterator_length (
@@ -97,6 +131,15 @@ namespace std {
       initial = 0,
       reducer = let (current: int) = current + 1;
     } -> iterator_reduce<T: unknown, TResult: int>
+  ;
+
+  let [test="std_iterator gets the length"] =
+    {
+      actual = [1, 2, 3]
+        --> iterator_fromArray
+        --> iterator_length,
+      expected = 3,
+    }
   ;
 
   let iterator_toArray (
@@ -114,10 +157,19 @@ namespace std {
     predicate: (_s: T): bool
   ) =
     let internal (_s: iterator<T: T>): bool =
-      (_s.data --> predicate) || (_s.next --> internal)
+      _s.done ? null : (_s.data --> predicate) || (_s.next --> internal)
     ;
 
     _s --> internal
+  ;
+
+  let [test="std_iterator matches against some"] =
+    {
+      actual = [1, 2, 3]
+        --> iterator_fromArray
+        --> ({ predicate = let (_s: int) = _s == 2; } -> iterator_some<T: int>),
+      expected = true,
+    }
   ;
 
   let iterator_find (
@@ -125,9 +177,18 @@ namespace std {
     predicate: (_s: T): bool
   ) =
     let internal (_s: iterator<T: T>): T =
-      (_s.data --> predicate) ? _s.data : (_s.next --> internal)
+       _s.done ? null : (_s.data --> predicate) ? _s.data : (_s.next --> internal)
     ;
 
     _s --> internal
+  ;
+
+  let [test="std_iterator finds an entry"] =
+    {
+      actual = [1, 2, 3]
+        --> iterator_fromArray
+        --> ({ predicate = let (_s: int) = _s == 2; } -> iterator_find<T: int>),
+      expected = 2,
+    }
   ;
 }
