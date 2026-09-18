@@ -1,4 +1,4 @@
-let [test="creates an ios string"] =
+let [test="creates an iso string"] =
   {
     expected = "2009-02-13T23:31:31.011Z",
     actual = 1234567891011l -> std_date_iso,

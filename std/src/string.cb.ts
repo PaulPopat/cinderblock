@@ -7,6 +7,15 @@ export function std_string_split(props: StringSplitProps) {
   return props._s.split(props.on);
 }
 
+type StringJoinProps = {
+  _s: Array<string>;
+  separator: string;
+};
+
+export function std_string_join(props: StringJoinProps) {
+  return props._s.join(props.separator);
+}
+
 type StringMatchesProps = {
   _s: string;
   pattern: string;

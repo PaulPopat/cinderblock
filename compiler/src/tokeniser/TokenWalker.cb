@@ -6,7 +6,7 @@ namespace cinder_tokeniser {
     tokens: iterator<T: Token>
     index: int
     current: Token | null
-    ctx: Dictionary
+    ctx: dictionary
     text: string
     done: bool
     types: TokenType[]
@@ -21,9 +21,8 @@ namespace cinder_tokeniser {
     types: TokenType[],
     errors: CompilerError[]
   ): TokenWalker =
-      let done = _s -> iterator_length <= index;
-      let current: Token = !done ?
-        { _s = _s, i = index } -> std_array_get
+      let current: Token = !_s.done
+        ? _s.data
         : { data = "", range = Range_Empty };
       let range: Range = current.range;
 
@@ -61,7 +60,7 @@ namespace cinder_tokeniser {
       predicate = let (item: string) =
         _s.text == item
       ;
-    } -> std_array_some
+    } -> iterator_some
       ? {
         _s = _s.tokens,
         ctx = _s.ctx,
@@ -71,7 +70,7 @@ namespace cinder_tokeniser {
           range = _s.range,
           message =
             "Expected " +
-            ({ _s = expected, separator = ", " } -> std_array_join) +
+            ({ _s = expected, separator = ", " } -> std_string_join) +
             " but found " +
             _s.text,
         },
@@ -97,7 +96,7 @@ namespace cinder_tokeniser {
       let result = { _s = walker, so_far = walker.ctx } -> extractor;
     {
       ...result.done,
-      ctx = { _s = walker.ctx, key = name, value = result } -> Dictionary_Set
+      ctx = { _s = walker.ctx, key = name, value = result } -> dictionary_set
     }
   ;
 
@@ -119,7 +118,7 @@ namespace cinder_tokeniser {
       let result = { _s = _s, so_far = _s.ctx } -> extractor;
     {
       ...result.done,
-      ctx = { _s = _s.ctx, key = name, value = result } -> Dictionary_Set
+      ctx = { _s = _s.ctx, key = name, value = result } -> dictionary_set
     }
   ;
 }

@@ -207,4 +207,20 @@ describe("logic", () => {
     const result = await code.binary().run("result", {});
     assert.equal(result, "data");
   });
+
+  test("parallel use statements", async () => {
+    const code = new Inline(
+      `
+        let internal_test = "hello world";
+        namespace my {
+          use internal;
+          use other;
+
+          let result = test;
+        }
+      `,
+    );
+    const result = await code.binary().run("my_result", {});
+    assert.equal(result, "hello world");
+  });
 });

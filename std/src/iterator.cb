@@ -58,9 +58,40 @@ namespace std {
     }
   ;
 
+  let iterator_where (
+    _s: iterator<T: T>,
+    predicate: (_s: T): bool
+  ): iterator<T: T> =
+    _s.done
+      ? _s
+      : _s.data --> predicate
+      ? _s
+      : _s.next --> ({ predicate = predicate } -> iterator_where)
+  ;
+
+  let iterator_concat (
+    _s: iterator<T: T>,
+    addition: T
+  ): iterator<T: T> =
+    _s.done
+      ? {
+          data = addition,
+          next = {
+            done = true,
+            data = null,
+            next = null,
+          },
+          done = false,
+        }
+      : {
+          ..._s,
+          next = { _s = _s.next, addition = addition } -> iterator_concat,
+        }
+  ;
+
   let iterator_length (
     _s: iterator<T: unknown>
-  ) =
+  ): int =
     {
       _s = _s,
       initial = 0,
@@ -76,5 +107,27 @@ namespace std {
       initial = [] as T[],
       reducer = let (_s: T, current: T[]) = current ++ _s;,
     } -> iterator_reduce<T: unknown, TResult: T[]>
+  ;
+
+  let iterator_some (
+    _s: iterator<T: T>,
+    predicate: (_s: T): bool
+  ) =
+    let internal (_s: iterator<T: T>): bool =
+      (_s.data --> predicate) || (_s.next --> internal)
+    ;
+
+    _s --> internal
+  ;
+
+  let iterator_find (
+    _s: iterator<T: T>,
+    predicate: (_s: T): bool
+  ) =
+    let internal (_s: iterator<T: T>): T =
+      (_s.data --> predicate) ? _s.data : (_s.next --> internal)
+    ;
+
+    _s --> internal
   ;
 }

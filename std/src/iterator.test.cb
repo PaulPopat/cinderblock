@@ -22,4 +22,13 @@ namespace std_iterator {
       expected = [2, 3, 4],
     }
   ;
+
+  let [test="matches against some"] =
+    {
+      actual = [1, 2, 3]
+        --> iterator_fromArray
+        --> ({ predicate = let (_s: int) = _s == 2; } -> iterator_some<T: int>),
+      expected = true,
+    }
+  ;
 }

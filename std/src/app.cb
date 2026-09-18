@@ -1,1 +1,2 @@
-extern std_app_tagged(_s: string, key: string): unknown[];
+extern std_app_tagged(_s: string, key: string): (): unknown[];
+extern std_app_categoried(_s: string): (): unknown[];

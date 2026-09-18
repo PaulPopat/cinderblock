@@ -71,21 +71,19 @@ export class EntityNamespace extends Entity {
   }
 
   dig(name: string): Entry | undefined {
-    if (!name.startsWith(this.#name + "_")) return;
+    if (!name.startsWith(this.#name + "_")) return undefined;
     const digName = name.replace(this.#name + "_", "");
     return this.#entities.reduce((result, entity) => result ?? entity.dig(digName), undefined as Entry | undefined);
   }
 
   float(name: string): Entry | undefined {
+    const potential = this.dig([this.#name, name].join("_"));
+    if (potential) return potential;
+
     const buildUp = this.#name
       .split("_")
       .reduce((current, next) => [...current, [current[current.length - 1], next].filter((l) => l).join("_")], [] as Array<string>);
     const possible = [name, ...buildUp.map((n) => [n, name].join("_"))];
-    for (const p of possible) {
-      const potential = this.dig(p);
-      if (potential) return potential;
-    }
-
     return possible.reduce((result, n) => result ?? this.parent?.float(n), undefined as Entry | undefined);
   }
 

@@ -2,49 +2,53 @@ namespace cinder_tokeniser {
   use std;
   
   let Tokenise (file: string, text: string): iterator<T: Token> =
-      let character_split = 
-        { on = "" }
+      let character_split (_s: string) = 
+        { on = "", _s = _s }
         -> std_string_split
         -> std_iterator_fromArray<T: string>;
 
-      let allowedLiterals = [
-        "[]",
-        "[",
-        "]",
-        "(",
-        ")",
-        ":",
-        "+",
-        "++",
-        "-",
-        "/",
-        "*",
-        "!",
-        "&&",
-        "||",
-        "==",
-        "=",
-        "!=",
-        "<",
-        "<=",
-        ">",
-        ">=",
-        ".",
-        "..",
-        "...",
-        "--",
-        "-->",
-        "->",
-        "@",
-      ];
+      let allowedLiterals =
+        [
+          "[]",
+          "[",
+          "]",
+          "(",
+          ")",
+          ":",
+          "+",
+          "++",
+          "-",
+          "/",
+          "*",
+          "!",
+          "&&",
+          "||",
+          "==",
+          "=",
+          "!=",
+          "<",
+          "<=",
+          ">",
+          ">=",
+          ".",
+          "..",
+          "...",
+          "--",
+          "-->",
+          "->",
+          "@",
+        ] -> std_iterator_fromArray<T: string>
+      ;
 
-      let allowedPatterns = [
-        "^[a-zA-Z0-9_@$#]+$",
-        "^[0-9]+\\.[0-9]*[a-z]?$",
-        "^\"[^\"]*\"?$",
-        "^'[^']?'?$",
-        "^'\\.?'?$",
-      ];
+      let allowedPatterns =
+        [
+          "^[a-zA-Z0-9_@$#]+$",
+          "^[0-9]+\\.[0-9]*[a-z]?$",
+          "^\"[^\"]*\"?$",
+          "^'[^']?'?$",
+          "^'\\.?'?$",
+        ] -> std_iterator_fromArray<T: string>
+      ;
 
       let isValid (_s: string) =
         (
@@ -56,13 +60,13 @@ namespace cinder_tokeniser {
               } -> std_string_matches
             ;,
             _s = allowedPatterns,
-          } -> std_array_some
+          } -> std_iterator_some
         ) ||
         (
           {
             predicate = let (item: string) = item == _s;,
             _s = allowedLiterals,
-          } -> std_array_some
+          } -> std_iterator_some
         )
       ;
 
@@ -77,7 +81,7 @@ namespace cinder_tokeniser {
       let process (
         ctx: TokenisationContext,
         character: string
-      ) = {
+      ): TokenisationContext = {
         result =
           ((ctx.current + character) -> isValid) &&
           ((ctx.current + character) -> std_string_trim != "")
@@ -114,10 +118,10 @@ namespace cinder_tokeniser {
           character = 0,
         },
         _s = text -> character_split,
-        reducer = let (item: string, current: TokenisationContext) =
-          { ctx = current, character = item } -> process
+        reducer = let (_s: string, current: TokenisationContext): TokenisationContext =
+          { ctx = current, character = _s } -> process
         ;
-      } -> std_iterator_reduce as
+      } -> std_iterator_reduce<T: string> as
       TokenisationContext
     )
     .result

@@ -2,7 +2,7 @@
   "name": "@cinderblock-lang/compiler",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "compile": "node ./src/cinderblock.ts"
+    "compile": "cinderblock compile"
   },
   "repository": "https://github.com/PaulPopat/cinderblock",
   "version": "0.0.2",

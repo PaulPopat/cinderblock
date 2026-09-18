@@ -40,7 +40,7 @@ export class EntityUse extends Entity {
   dig(name: string): Entry | undefined {
     if (name.startsWith(this.#namespace + "_")) return undefined;
 
-    return this.float([this.#namespace, name].join("_"));
+    return this.parent?.parent?.float([this.#namespace, name].join("_"));
   }
 
   float(name: string): Entry | undefined {
