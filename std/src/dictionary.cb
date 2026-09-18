@@ -19,7 +19,7 @@ namespace std {
       data =
         {
           _s = _s.data,
-          predicate = let (item: struct key: string ;) = item.key != key;,
+          predicate = let (_s: struct key: string ;) = _s.key != key;,
         }
         -> iterator_where<T: DictionaryEntry<T: T>[]>
         --> ({ addition = { key = key, value = value } } -> iterator_concat),
@@ -27,13 +27,25 @@ namespace std {
   ;
 
   let dictionary_get (_s: dictionary<T: T>, key: string) =
-    (
-      {
-        _s = _s.data,
-        predicate = let (item: dictionary_entry<T: T>) = item.key != key;,
-      }
-      -> iterator_find<T: dictionary_entry<T: T>>
-    )
-    .value
+      let result = 
+        {
+          _s = _s.data,
+          predicate = let (_s: dictionary_entry<T: T>) = _s.key == key;,
+        }
+        -> iterator_find<T: dictionary_entry<T: T>>
+      ;
+    "value" in result ? result.value : null
+  ;
+
+  let [test="std_dictionary creates and updates dictionary items"] =
+    {
+      actual = dictionary_create<T: string>
+        --> ({key = "test1", value = "hello" } -> dictionary_set<T: string>)
+        --> ({key = "test2", value = "world" } -> dictionary_set<T: string>)
+        --> ({key = "test3", value = "from" } -> dictionary_set<T: string>)
+        --> ({key = "test4", value = "paul" } -> dictionary_set<T: string>)
+        --> ({key = "test2"} -> dictionary_get<T: string>),
+      expected = "world",
+    }
   ;
 }
