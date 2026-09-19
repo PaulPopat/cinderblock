@@ -83,4 +83,8 @@ export class TypeIntersection extends Type {
       }),
     };
   }
+
+  compatible(input: Type): boolean {
+    return this.flattened().compatible(input);
+  }
 }

@@ -95,4 +95,8 @@ export class TypeReference extends Type {
   shape(): Shape {
     return this.flattened().shape();
   }
+
+  compatible(input: Type): boolean {
+    return input.flattened().compatible(input);
+  }
 }

@@ -44,4 +44,8 @@ export class TypeArray extends Type {
   shape(): Shape {
     return { type: "array", value: this.#contains.shape() };
   }
+
+  compatible(input: Type): boolean {
+    return input instanceof TypeArray && this.#contains.compatible(input.contains);
+  }
 }

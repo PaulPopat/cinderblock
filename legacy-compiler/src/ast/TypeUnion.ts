@@ -67,4 +67,12 @@ export class TypeUnion extends Type {
   shape(): Shape {
     return { type: "union", args: this.#parts.map((p) => p.shape()) };
   }
+
+  compatible(input: Type): boolean {
+    if (input instanceof TypeUnion) {
+      return !input.parts.some((a) => !this.#parts.some((b) => b.compatible(a)));
+    }
+
+    return this.#parts.some((p) => p.compatible(input));
+  }
 }

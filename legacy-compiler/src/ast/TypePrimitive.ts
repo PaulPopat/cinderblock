@@ -14,4 +14,8 @@ export abstract class TypePrimitive extends Type {
   representation(): string {
     return this.name;
   }
+
+  compatible(input: Type): boolean {
+    return input instanceof TypePrimitive;
+  }
 }

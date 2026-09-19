@@ -21,6 +21,7 @@ export class ErrorReporter implements vscode.Disposable {
     this.#watcher.onDidChange(checker);
     this.#watcher.onDidCreate(checker);
     this.#watcher.onDidDelete(checker);
+    checker();
   }
 
   dispose() {

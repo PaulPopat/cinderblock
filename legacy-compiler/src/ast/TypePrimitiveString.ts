@@ -28,4 +28,8 @@ export class TypePrimitiveString extends TypePrimitive {
   shape(): Shape {
     return { type: "string" };
   }
+
+  compatible(input: Type): boolean {
+    return input instanceof TypePrimitiveString;
+  }
 }

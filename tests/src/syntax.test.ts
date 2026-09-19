@@ -17,7 +17,7 @@ describe("syntax", () => {
 
   test("tags a let", async () => {
     const code = new Inline('let [key="test value"] test_let = "hello";');
-    const found = code.binary().withTag("key", "test value");
+    const found = code.binary().withTag("key");
     assert.equal(found.length, 1);
   });
 
@@ -398,7 +398,7 @@ describe("syntax", () => {
   test("type union", async () => {
     const code = new Inline(`
       let final (test: struct value: int ;) = test.value + 2;
-      let pipeable (test: struct value: int ; | struct value: float ;) = {test = test} -> final;
+      let pipeable (test: struct value: int ; | struct value: float ;) = {test = test as struct value: int ;} -> final;
       let test_let = {test = {value = 2}} -> pipeable;
     `);
     const result = await code.binary().run("test_let", {});
@@ -409,7 +409,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let final (test: struct value: int ;) = test.value + 2;
       let pipeable (test: struct value: int ; & struct another: float ;) = {test = test} -> final;
-      let test_let = {test = {value = 2}} -> pipeable;
+      let test_let = {test = {value = 2, another = 2}} -> pipeable;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, 4);

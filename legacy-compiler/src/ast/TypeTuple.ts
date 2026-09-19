@@ -86,4 +86,8 @@ export class TypeTuple extends Type {
       args: this.args.map((a) => ({ key: a.name, value: a.type.shape() })),
     };
   }
+
+  compatible(input: Type): boolean {
+    return input instanceof TypeTuple && !this.#args.some((a) => !input.#args.some((b) => a.compatible(b)));
+  }
 }

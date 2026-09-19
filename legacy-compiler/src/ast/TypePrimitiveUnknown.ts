@@ -28,4 +28,8 @@ export class TypePrimitiveUnknown extends TypePrimitive {
   shape(): Shape {
     return { type: "unknown" };
   }
+
+  compatible(input: Type): boolean {
+    return true;
+  }
 }

@@ -48,4 +48,5 @@ export abstract class Type extends Entry {
   abstract matches(input: Type): boolean;
   abstract representation(depth: number): string;
   abstract shape(): Shape;
+  abstract compatible(input: Type): boolean;
 }

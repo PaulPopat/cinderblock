@@ -58,6 +58,15 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
       input = new TypeTuple(this.location, this.done, () => this, [new TypeArg(this.location, this.done, () => this, input, "_s")]);
     }
 
+    for (const arg of (input as TypeTuple).args) {
+      const match = right.args.find((a) => a.name === arg.name);
+      if (!match) continue;
+
+      if (!match.flattened().compatible(arg.flattened())) {
+        throw new LinkerError(`Arg ${arg.name} is not compatible`, this.range);
+      }
+    }
+
     const remaining = right.args.filter((r) => !(input as TypeTuple).args.find((a) => a.name === r.name));
 
     if (!remaining.length) {

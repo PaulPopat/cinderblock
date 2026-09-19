@@ -59,6 +59,10 @@ export class TypeArg extends Type {
     return { type: "null" };
   }
 
+  compatible(input: Type): boolean {
+    return input instanceof TypeArg && input.name === this.name && this.type.compatible(input.type);
+  }
+
   dig(name: string) {
     if (name === this.#name) return this.type.flattened();
     return undefined;

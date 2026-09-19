@@ -76,4 +76,13 @@ export class TypePipeable extends Type {
   shape(): Shape {
     return { type: "pipeable" };
   }
+
+  compatible(input: Type): boolean {
+    return (
+      input instanceof TypePipeable &&
+      input.args.length === this.args.length &&
+      !input.#args.some((a) => !this.#args.some((b) => a.compatible(b))) &&
+      input.returns.compatible(this.#returns)
+    );
+  }
 }
