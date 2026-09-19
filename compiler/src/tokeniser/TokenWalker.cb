@@ -79,11 +79,11 @@ namespace cinder_tokeniser {
   ): TokenWalker =
       let walker = _s;
     {
-      _s = expected,
+      _s = expected --> iterator_fromArray<T: string>,
       predicate = let (_s: string) =
         walker.text == _s
       ;
-    } -> iterator_some
+    } -> iterator_some<T: string>
       ? {
         _s = _s.tokens,
         ctx = _s.ctx,

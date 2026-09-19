@@ -49,8 +49,8 @@ namespace cinder_ast {
         --> TokenWalker_Start
         --> (
           {
-            parent = null,
-            lookFor = [],
+            parent = null as EntryParent,
+            lookFor = [] as string[],
             existing = "hello world" as Expression,
           } -> ExpressionAccess_Parse
         )

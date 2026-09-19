@@ -10,7 +10,7 @@ namespace std {
 
   let dictionary_create: dictionary<T: T> =
     {
-      data = [] -> iterator_fromArray<T: dictionary<T: T>[]>,
+      data = [] as dictionary_entry<T: T>[] --> iterator_fromArray<T: dictionary_entry<T: T>[]>,
     }
   ;
 
@@ -19,9 +19,9 @@ namespace std {
       data =
         {
           _s = _s.data,
-          predicate = let (_s: struct key: string ;) = _s.key != key;,
+          predicate = let (_s: dictionary_entry<T: T>) = _s.key != key;,
         }
-        -> iterator_where<T: DictionaryEntry<T: T>[]>
+        -> iterator_where<T: dictionary_entry<T: T>>
         --> ({ addition = { key = key, value = value } } -> iterator_concat),
     }
   ;

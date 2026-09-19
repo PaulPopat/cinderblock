@@ -5,6 +5,10 @@ namespace std {
     done: bool
   ;
 
+  let iterator_next (_s: iterator<T: T>): iterator<T: T> =
+    _s.done ? { data = null as T, next = null, done = true } : _s.next
+  ;
+
   let iterator_fromArray (_s: T[]): iterator<T: T> =
       let internal (index: int): iterator<T: T> =
           let data =  _s @ index;
@@ -44,11 +48,11 @@ namespace std {
       entry.done
         ? {
             current = current,
-            entry = null
+            entry = entry,
           }
         : {
             current = { _s = entry.data, current = current } -> reducer,
-            entry = entry.next,
+            entry = entry --> iterator_next<T: T>
           } -> internal
     ;
 
@@ -64,7 +68,7 @@ namespace std {
     {
       data = !_s.done ? _s.data -> selector : null,
       next = !_s.done
-        ? { _s = _s.next, selector = selector } -> iterator_select
+        ? { _s = _s --> iterator_next<T: T>, selector = selector } -> iterator_select<T: T>
         : null,
       done = _s.done,
     }
@@ -109,7 +113,7 @@ namespace std {
         }
       : {
           ..._s,
-          next = { _s = _s.next, addition = addition } -> iterator_concat,
+          next = { _s = _s --> iterator_next<T: T>, addition = addition } -> iterator_concat,
         }
   ;
 
@@ -129,7 +133,7 @@ namespace std {
     {
       _s = _s,
       initial = 0,
-      reducer = let (current: int) = current + 1;
+      reducer = let (current: int, _s: unknown) = current + 1;
     } -> iterator_reduce<T: unknown, TResult: int>
   ;
 
@@ -160,7 +164,7 @@ namespace std {
     _s.done
       ? false
       : (_s.data --> predicate) ||
-        ({ _s = _s.next, predicate = predicate } -> iterator_some)
+        ({ _s = _s --> iterator_next, predicate = predicate } -> iterator_some)
   ;
 
   let [test="std_iterator matches against some"] =

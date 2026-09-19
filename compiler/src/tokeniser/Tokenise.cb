@@ -55,13 +55,13 @@ namespace cinder_tokeniser {
           } -> std_string_matches
         ;,
         _s = allowedPatterns,
-      } -> iterator_some
+      } -> iterator_some<T: string>
     ) ||
     (
       {
         predicate = let (_s: string) = _s == subject;,
         _s = allowedLiterals,
-      } -> iterator_some
+      } -> iterator_some<T: string>
     )
   ;
   
