@@ -156,11 +156,11 @@ namespace std {
     _s: iterator<T: T>,
     predicate: (_s: T): bool
   ) =
-    let internal (_s: iterator<T: T>): bool =
-      _s.done ? null : (_s.data --> predicate) || (_s.next --> internal)
-    ;
 
-    _s --> internal
+    _s.done
+      ? false
+      : (_s.data --> predicate) ||
+        ({ _s = _s.next, predicate = predicate } -> iterator_some)
   ;
 
   let [test="std_iterator matches against some"] =
@@ -169,6 +169,15 @@ namespace std {
         --> iterator_fromArray
         --> ({ predicate = let (_s: int) = _s == 2; } -> iterator_some<T: int>),
       expected = true,
+    }
+  ;
+
+  let [test="std_iterator matches missing against some"] =
+    {
+      actual = [1, 2, 3]
+        --> iterator_fromArray
+        --> ({ predicate = let (_s: int) = _s == 4; } -> iterator_some<T: int>),
+      expected = false,
     }
   ;
 

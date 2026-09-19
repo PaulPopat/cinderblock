@@ -12,6 +12,22 @@ describe("logic", () => {
     assert.equal(result, "hello");
   });
 
+  test("empty string comparison", async () => {
+    const code = new Inline(`
+      let test_let = "test" != "";
+    `);
+    const result = await code.binary().run("test_let", {});
+    assert.equal(result, true);
+  });
+
+  test("empty string to empty string comparison", async () => {
+    const code = new Inline(`
+      let test_let = "" != "";
+    `);
+    const result = await code.binary().run("test_let", {});
+    assert.equal(result, false);
+  });
+
   test("only calculates a let with no arguments once", async () => {
     let total = 1;
     const code = new Inline(

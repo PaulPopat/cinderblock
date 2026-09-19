@@ -2,3 +2,20 @@ extern std_string_split(_s: string, on: string): string[];
 extern std_string_join(_s: string[], separator: string): string;
 extern std_string_matches(_s: string, pattern: string): bool;
 extern std_string_trim(_s: string): string;
+
+let
+  [test="std_string_trim trims a string"]
+=
+  {
+    actual = "  " -> std_string_trim,
+    expected = "",
+  }
+;
+let
+  [test="std_string_trim comparison to empty"]
+=
+  {
+    actual = " test " -> std_string_trim != "",
+    expected = true,
+  }
+;

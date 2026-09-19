@@ -1,0 +1,6 @@
+namespace cinder_ast {
+  struct EntryParent
+    float: (name: string): Entry | null
+    dig: (name: string): Entry | null
+  ;
+}

@@ -2,7 +2,6 @@ import type { TokenWalker } from "#tokeniser";
 import type { CreateFunc } from "#writer";
 import { Entry } from "./Entry.ts";
 import { ParserError } from "./ParserError.ts";
-import type { TypeTuple } from "./TypeTuple.ts";
 
 type EntityParseable = {
   priority: number;

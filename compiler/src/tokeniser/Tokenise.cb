@@ -1,74 +1,113 @@
 namespace cinder_tokeniser {
   use std;
+
+  let allowedLiterals =
+    [
+      "[]",
+      "[",
+      "]",
+      "(",
+      ")",
+      ":",
+      "+",
+      "++",
+      "-",
+      "/",
+      "*",
+      "!",
+      "&&",
+      "||",
+      "==",
+      "=",
+      "!=",
+      "<",
+      "<=",
+      ">",
+      ">=",
+      ".",
+      "..",
+      "...",
+      "--",
+      "-->",
+      "->",
+      "@",
+    ] -> std_iterator_fromArray<T: string>
+  ;
+
+  let allowedPatterns =
+    [
+      "^[a-zA-Z0-9_@$#]+$",
+      "^[0-9]+\\.[0-9]*[a-z]?$",
+      "^\"[^\"]*\"?$",
+      "^'[^']?'?$",
+      "^'\\.?'?$",
+    ] -> std_iterator_fromArray<T: string>
+  ;
+
+  let isValid (_s: string) =
+      let subject = _s;
+    (
+      {
+        predicate = let (_s: string) =
+          {
+            _s = subject,
+            pattern = _s,
+          } -> std_string_matches
+        ;,
+        _s = allowedPatterns,
+      } -> iterator_some
+    ) ||
+    (
+      {
+        predicate = let (_s: string) = _s == subject;,
+        _s = allowedLiterals,
+      } -> iterator_some
+    )
+  ;
   
-  let Tokenise (file: string, text: string): iterator<T: Token> =
-      let character_split (_s: string) = 
-        { on = "", _s = _s }
-        -> std_string_split
-        -> std_iterator_fromArray<T: string>;
+  let
+    [test="cinder_tokeniser marks . as valid"]
+  =
+    {
+      actual = "." --> isValid,
+      expected = true,
+    }
+  ;
 
-      let allowedLiterals =
-        [
-          "[]",
-          "[",
-          "]",
-          "(",
-          ")",
-          ":",
-          "+",
-          "++",
-          "-",
-          "/",
-          "*",
-          "!",
-          "&&",
-          "||",
-          "==",
-          "=",
-          "!=",
-          "<",
-          "<=",
-          ">",
-          ">=",
-          ".",
-          "..",
-          "...",
-          "--",
-          "-->",
-          "->",
-          "@",
-        ] -> std_iterator_fromArray<T: string>
-      ;
+  let
+    [test="cinder_tokeniser marks test as valid"]
+  =
+    {
+      actual = "test" --> isValid,
+      expected = true,
+    }
+  ;
 
-      let allowedPatterns =
-        [
-          "^[a-zA-Z0-9_@$#]+$",
-          "^[0-9]+\\.[0-9]*[a-z]?$",
-          "^\"[^\"]*\"?$",
-          "^'[^']?'?$",
-          "^'\\.?'?$",
-        ] -> std_iterator_fromArray<T: string>
-      ;
+  let
+    [test="cinder_tokeniser marks .t as invalid"]
+  =
+    {
+      actual = ".t" --> isValid,
+      expected = false,
+    }
+  ;
 
-      let isValid (_s: string) =
-        (
-          {
-            predicate = let (item: string) =
-              {
-                _s = _s,
-                pattern = item,
-              } -> std_string_matches
-            ;,
-            _s = allowedPatterns,
-          } -> std_iterator_some
-        ) ||
-        (
-          {
-            predicate = let (item: string) = item == _s;,
-            _s = allowedLiterals,
-          } -> std_iterator_some
-        )
-      ;
+  let character_split (_s: string) = 
+    { on = "", _s = _s }
+    -> std_string_split
+    --> std_iterator_fromArray<T: string>
+  ;
+
+  let
+    [test="cinder_tokeniser splits on simple characters"]
+  =
+    {
+      actual = "hello" --> character_split --> std_iterator_toArray,
+      expected = ["h", "e", "l", "l", "o"],
+    }
+  ;
+
+  let Tokenise (file: string, text: string): Token[] =
 
       struct TokenisationContext
         result: Token[]
@@ -81,50 +120,93 @@ namespace cinder_tokeniser {
       let process (
         ctx: TokenisationContext,
         character: string
-      ): TokenisationContext = {
-        result =
-          ((ctx.current + character) -> isValid) &&
-          ((ctx.current + character) -> std_string_trim != "")
-            ? ctx.result ++ {
-                data = (ctx.current + character),
-                range = {
-                  from = ctx.location,
-                  to = {
-                    file = file,
-                    line = ctx.line + 1,
-                    character = ctx.character + 1,
-                  },
+      ): TokenisationContext =
+          let done = !(ctx.current + character -> isValid);
+        {
+          result =
+            done && (ctx.current -> std_string_trim != "")
+              ? ctx.result ++ {
+                  data = ctx.current -> std_string_trim,
+                  range = {
+                    from = ctx.location,
+                    to = {
+                      file = file,
+                      line = ctx.line + 1,
+                      character = ctx.character + 1,
+                    },
+                  }
                 }
+              : ctx.result,
+          location = done
+            ? {
+                file = file,
+                line = ctx.line + 1,
+                character = ctx.character + 1,
               }
-            : ctx.result,
-        location = {
-          file = file,
-          line = ctx.line + 1,
-          character = ctx.character + 1,
-        },
-        current = "",
-        line = character == "\n" ? ctx.line + 1 : ctx.line,
-        character = character == "\n" ? 0 : ctx.character + 1,
-      }
-    ;
+            : ctx.location,
+          current = done ? character : ctx.current + character,
+          line = character == "\n" ? ctx.line + 1 : ctx.line,
+          character = character == "\n" ? 0 : ctx.character + 1,
+        }
+      ;
 
     (
       {
-        initial = {
-          result = [] as Token[],
-          location = { file = file, line = 0, character = 0 },
-          current = "",
-          line = 0,
-          character = 0,
+        ctx = {
+          initial = {
+            result = [] as Token[],
+            location = { file = file, line = 0, character = 0 },
+            current = "",
+            line = 0,
+            character = 0,
+          },
+          _s = text -> character_split,
+          reducer = let (_s: string, current: TokenisationContext): TokenisationContext =
+            { ctx = current, character = _s } -> process
+          ;
+        } -> std_iterator_reduce<T: string, TResult: TokenisationContext>,
+        character = "\n",
+      } -> process
+    ).result
+  ;
+
+  let
+    [test="cinder_tokeniser parses an access"]
+  =
+    {
+      actual = { file = "hello", text = ".test" } -> Tokenise,
+      expected = [
+        {
+          data = ".",
+          range = {
+            from = {
+              character = 0,
+              file = "hello",
+              line = 0
+            },
+            to = {
+              character = 2,
+              file = "hello",
+              line = 1
+            }
+          }
         },
-        _s = text -> character_split,
-        reducer = let (_s: string, current: TokenisationContext): TokenisationContext =
-          { ctx = current, character = _s } -> process
-        ;
-      } -> std_iterator_reduce<T: string> as
-      TokenisationContext
-    )
-    .result
-    -> std_iterator_fromArray<T: Token>
+        {
+          data = "test",
+          range = {
+            from = {
+              character = 2,
+              file = "hello",
+              line = 1
+            },
+            to = {
+              character = 6,
+              file = "hello",
+              line = 1
+            }
+          }
+        }
+      ]
+    }
   ;
 }

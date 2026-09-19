@@ -374,6 +374,7 @@ const Variable* Operator::resolve(Closure* closure) const
       if (right->get_type_name() != VariablePrimitiveString::TypeName) {
         throw "Invalid maths";
       }
+
       return closure->add_temp_variable(new VariablePrimitiveBool(
         VariablePrimitiveString::FromVariable(left)->get_value().compare(
           VariablePrimitiveString::FromVariable(right)->get_value()

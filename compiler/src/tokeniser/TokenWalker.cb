@@ -3,7 +3,7 @@ namespace cinder_tokeniser {
   use cinder_utils;
 
   struct TokenWalker
-    tokens: iterator<T: Token>
+    tokens: Token[]
     index: int
     current: Token | null
     ctx: dictionary
@@ -15,28 +15,51 @@ namespace cinder_tokeniser {
   ;
 
   let TokenWalker_Create (
-    _s: iterator<T: Token>,
+    _s: Token[],
     index: int,
     ctx: unknown,
     types: TokenType[],
     errors: CompilerError[]
   ): TokenWalker =
-      let current: Token = !_s.done
-        ? _s.data
-        : { data = "", range = Range_Empty };
-      let range: Range = current.range;
+      let all = _s;
+    _s @ index |
+      let (_s: Token) =
+        {
+          tokens = all,
+          index = index,
+          current = _s,
+          ctx = ctx,
+          text = _s.data,
+          types = types,
+          range = _s.range,
+          location = _s.range.from,
+          errors = errors,
+          done = false,
+        }
+      ;
+      let (_s: unknown) =
+        {
+          tokens = all,
+          index = index,
+          current = { data = "", range = Range_Empty },
+          ctx = ctx,
+          text = "",
+          types = types,
+          range = Range_Empty,
+          location = Range_Empty.from,
+          errors = errors,
+          done = false,
+        }
+      ;
+  ;
 
-    {
-      tokens = _s,
-      index = index,
-      current = current,
-      ctx = ctx,
-      text = current.data,
-      types = types,
-      range = range,
-      location = range.from,
-      errors = errors,
-    }
+  let TokenWalker_Start (_s: Token[]): TokenWalker =
+    _s --> ({
+      index = 0,
+      ctx = dictionary_create,
+      types = [] as TokenType[],
+      errors = [] as CompilerError[],
+    } -> TokenWalker_Create)
   ;
 
   let TokenWalker_Previous (_s: TokenWalker): TokenWalker =
@@ -52,13 +75,13 @@ namespace cinder_tokeniser {
   let TokenWalker_Expect (
     _s: TokenWalker,
     expected: string[],
-    typeName: string,
-    self: (): unknown
+    typeName: string
   ): TokenWalker =
+      let walker = _s;
     {
       _s = expected,
-      predicate = let (item: string) =
-        _s.text == item
+      predicate = let (_s: string) =
+        walker.text == _s
       ;
     } -> iterator_some
       ? {
@@ -82,6 +105,34 @@ namespace cinder_tokeniser {
         types = _s.types,
         errors = _s.errors,
       } -> TokenWalker_Create
+  ;
+
+  let TokenWalker_Text (
+    _s: TokenWalker,
+    property: string,
+    typeName: string
+  ): TokenWalker =
+    {
+      _s = _s.tokens,
+      index = _s.index + 1,
+      ctx = { _s = _s.ctx, key = property, value = _s.text } -> dictionary_set,
+      types = _s.types,
+      errors = _s.errors,
+    } -> TokenWalker_Create
+  ;
+
+  let TokenWalker_Finish (_s: TokenWalker) =
+    {
+      walker =
+        {
+          _s = _s.tokens,
+          index = _s.index,
+          ctx = dictionary_create,
+          types = _s.types,
+          errors = _s.errors,
+        } -> TokenWalker_Create,
+      ctx = _s.ctx,
+    }
   ;
 
   struct ExtractResult

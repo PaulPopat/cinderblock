@@ -3,7 +3,6 @@ import { Expression } from "./Expression.ts";
 import { LinkerError } from "./LinkerError.ts";
 import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
-import { TypeReference } from "./TypeReference.ts";
 import { TypeTuple } from "./TypeTuple.ts";
 import { WriterError } from "./WriterError.ts";
 import { TokenTypeName } from "#tokeniser";

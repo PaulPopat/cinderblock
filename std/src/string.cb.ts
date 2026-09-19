@@ -30,5 +30,5 @@ type StringTrimProps = {
 };
 
 export function std_string_trim(props: StringTrimProps) {
-  return !!props._s.trim();
+  return props._s.trim();
 }

@@ -1,0 +1,71 @@
+namespace cinder_ast {
+  use cinder_tokeniser;
+
+  struct ExpressionAccess : Entry
+    is_access: bool
+    subject: Expression
+    name: string
+  ;
+
+  let
+    [parses="expression", match="^\\.$", inone="true", priority="100"]
+    ExpressionAccess_Parse (
+      _s: TokenWalker,
+      parent: EntryParent,
+      lookFor: string[],
+      existing: Expression | null
+    ): ExpressionAccess
+  =
+      let final =
+        _s
+          --> (
+            {
+              expected = ["."],
+              typeName = TokenTypeName.Operator,
+            } -> TokenWalker_Expect
+          )
+          --> (
+            {
+              property = "name",
+              typeName = TokenTypeName.Operator,
+            } -> TokenWalker_Text
+          )
+          --> TokenWalker_Finish
+      ;
+    {
+      location = _s.range.from,
+      done = final.walker,
+      is_access = true,
+      subject = existing as Expression,
+      name = final.ctx --> ({ key = "name" } -> dictionary_get<T: string>),
+    }
+  ;
+
+  let
+    [test="cinder_ast parses an expression"]
+  =
+      let sut = { file = "hello", text = ".test" }
+        -> Tokenise
+        --> TokenWalker_Start
+        --> (
+          {
+            parent = null,
+            lookFor = [],
+            existing = "hello world" as Expression,
+          } -> ExpressionAccess_Parse
+        )
+      ;
+    {
+      actual = {
+        is_access = sut.is_access,
+        subject = sut.subject,
+        name = sut.name,
+      },
+      expected = {
+        is_access = true,
+        subject = "hello world",
+        name = "test",
+      },
+    }
+  ;
+}

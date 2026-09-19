@@ -3,7 +3,6 @@ import { ParserError } from "./ParserError.ts";
 import { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import type { Type } from "./Type.ts";
 import type { CreateFunc, Instruction } from "#writer";
-import type { TypeTuple } from "./TypeTuple.ts";
 
 type ExpressionParseable = {
   priority: number;

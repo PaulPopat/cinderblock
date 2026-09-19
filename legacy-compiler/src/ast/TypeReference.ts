@@ -75,7 +75,21 @@ export class TypeReference extends Type {
   }
 
   representation(depth: number): string {
-    return this.flattened().representation(depth + 1);
+    const result = this.float(this.#name);
+    if (result instanceof EntityStruct) {
+      const final = new EntityStruct(result, this.#generics);
+      if (depth > 1) {
+        return final.name;
+      }
+
+      return final.type.representation(depth + 1);
+    }
+
+    if (result instanceof Type) {
+      return result.representation(depth + 1);
+    }
+
+    return this.#name;
   }
 
   shape(): Shape {
