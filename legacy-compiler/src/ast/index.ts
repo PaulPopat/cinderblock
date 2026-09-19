@@ -58,6 +58,7 @@ export * from "./TypePrimitiveDouble.ts";
 export * from "./TypePrimitiveFloat.ts";
 export * from "./TypePrimitiveInt.ts";
 export * from "./TypePrimitiveLong.ts";
+export * from "./TypePrimitiveNull.ts";
 export * from "./TypePrimitiveString.ts";
 export * from "./TypePrimitiveUnknown.ts";
 export * from "./TypeReference.ts";

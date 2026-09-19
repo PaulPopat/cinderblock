@@ -12,7 +12,7 @@ export class TypePrimitiveInt extends TypePrimitive {
       match: /^int+$/gm,
       chainable: false,
       factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
-        return new TypePrimitiveInt(walker.location, walker.expect("int", TokenTypeName.Primitive), parent);
+        return new TypePrimitiveInt(walker.location, walker.expect("int", TokenTypeName.KeyWord), parent);
       },
     });
   }

@@ -41,7 +41,13 @@ export class TypeUnion extends Type {
   }
 
   flattened(): Type {
-    const result = this.#parts.map((p) => p.flattened()).filter((p, i, a) => a.findIndex((b) => b.matches(p)) === i);
+    const flattenedParts = this.#parts.map((p) => p.flattened());
+    const result: Array<Type> = [];
+    for (const part of flattenedParts) {
+      if (result.some((b) => b.matches(part))) continue;
+      result.push(part);
+    }
+
     if (result.length === 1) {
       return result[0]!;
     }

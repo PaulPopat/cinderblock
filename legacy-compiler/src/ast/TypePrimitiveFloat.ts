@@ -12,7 +12,7 @@ export class TypePrimitiveFloat extends TypePrimitive {
       match: /^float+$/gm,
       chainable: false,
       factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
-        return new TypePrimitiveFloat(walker.location, walker.expect("float", TokenTypeName.Primitive), parent);
+        return new TypePrimitiveFloat(walker.location, walker.expect("float", TokenTypeName.KeyWord), parent);
       },
     });
   }

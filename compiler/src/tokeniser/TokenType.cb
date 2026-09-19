@@ -3,7 +3,6 @@ namespace cinder_tokeniser {
 
   struct TokenType
     range: Range
-    entry: unknown
     type_name: string
   ;
 }

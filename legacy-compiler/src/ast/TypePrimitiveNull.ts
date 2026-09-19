@@ -5,14 +5,14 @@ import type { Entry } from "./Entry.ts";
 import { Type } from "./Type.ts";
 import { TypePrimitive } from "./TypePrimitive.ts";
 
-export class TypePrimitiveBool extends TypePrimitive {
+export class TypePrimitiveNull extends TypePrimitive {
   static {
     Type.RegisterType({
       priority: 150,
-      match: /^bool+$/gm,
+      match: /^null+$/gm,
       chainable: false,
       factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
-        return new TypePrimitiveBool(walker.location, walker.expect("bool", TokenTypeName.KeyWord), parent);
+        return new TypePrimitiveNull(walker.location, walker.expect("null", TokenTypeName.KeyWord), parent);
       },
     });
   }
@@ -22,10 +22,14 @@ export class TypePrimitiveBool extends TypePrimitive {
   }
 
   get name() {
-    return "bool";
+    return "null";
   }
 
   shape(): Shape {
-    return { type: "bool" };
+    return { type: "null" };
+  }
+
+  compatible(input: Type): boolean {
+    return input instanceof TypePrimitiveNull;
   }
 }

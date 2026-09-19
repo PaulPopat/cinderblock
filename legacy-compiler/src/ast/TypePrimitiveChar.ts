@@ -12,7 +12,7 @@ export class TypePrimitiveChar extends TypePrimitive {
       match: /^char+$/gm,
       chainable: false,
       factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
-        return new TypePrimitiveChar(walker.location, walker.expect("char", TokenTypeName.Primitive), parent);
+        return new TypePrimitiveChar(walker.location, walker.expect("char", TokenTypeName.KeyWord), parent);
       },
     });
   }

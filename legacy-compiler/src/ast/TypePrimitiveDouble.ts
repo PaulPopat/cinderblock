@@ -12,7 +12,7 @@ export class TypePrimitiveDouble extends TypePrimitive {
       match: /^double+$/gm,
       chainable: false,
       factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
-        return new TypePrimitiveDouble(walker.location, walker.expect("double", TokenTypeName.Primitive), parent);
+        return new TypePrimitiveDouble(walker.location, walker.expect("double", TokenTypeName.KeyWord), parent);
       },
     });
   }

@@ -37,7 +37,7 @@ namespace cinder_tokeniser {
           done = false,
         }
       ;
-      let (_s: unknown) =
+      let (_s: null) =
         {
           tokens = all,
           index = index,
@@ -48,18 +48,19 @@ namespace cinder_tokeniser {
           range = Range_Empty,
           location = Range_Empty.from,
           errors = errors,
-          done = false,
+          done = true,
         }
       ;
   ;
 
   let TokenWalker_Start (_s: Token[]): TokenWalker =
-    _s --> ({
+    {
+      _s = _s,
       index = 0,
       ctx = dictionary_create,
       types = [] as TokenType[],
       errors = [] as CompilerError[],
-    } -> TokenWalker_Create)
+    } -> TokenWalker_Create
   ;
 
   let TokenWalker_Previous (_s: TokenWalker): TokenWalker =
@@ -78,33 +79,63 @@ namespace cinder_tokeniser {
     typeName: string
   ): TokenWalker =
       let walker = _s;
-    {
-      _s = expected --> iterator_fromArray<T: string>,
-      predicate = let (_s: string) =
-        walker.text == _s
-      ;
-    } -> iterator_some<T: string>
+    _s.done
       ? {
-        _s = _s.tokens,
-        ctx = _s.ctx,
-        types = _s.types,
-        index = _s.index + 1,
-        errors = _s.errors ++ {
-          range = _s.range,
-          message =
-            "Expected " +
-            ({ _s = expected, separator = ", " } -> std_string_join) +
-            " but found " +
-            _s.text,
-        },
-      } -> TokenWalker_Create
+          _s = _s.tokens,
+          index = _s.index,
+          ctx = _s.ctx,
+          types = _s.types,
+          errors = _s.errors ++ {
+            range = _s.range,
+            message = "Unexpected end of file",
+            },
+        } -> TokenWalker_Create
       : {
-        _s = _s.tokens,
-        index = _s.index + 1,
-        ctx = _s.ctx,
-        types = _s.types,
-        errors = _s.errors,
-      } -> TokenWalker_Create
+          _s = expected --> iterator_fromArray<T: string>,
+          predicate = let (_s: string) =
+            walker.text == _s
+          ;
+        } -> iterator_some<T: string>
+      ? {
+          _s = _s.tokens,
+          ctx = _s.ctx,
+          types = _s.types ++ {
+            range = _s.range,
+            type_name = typeName,
+          },
+          index = _s.index + 1,
+          errors = _s.errors,
+        } -> TokenWalker_Create
+      : {
+          _s = _s.tokens,
+          index = _s.index + 1,
+          ctx = _s.ctx,
+          types = _s.types,
+          errors = _s.errors ++ {
+            range = _s.range,
+            message =
+              "Expected " +
+              ({ _s = expected, separator = ", " } -> std_string_join) +
+              " but found " +
+              _s.text,
+            },
+        } -> TokenWalker_Create
+  ;
+
+  let
+    [test="cinder_tokeniser expects a token"]
+  =
+    {
+      actual = 
+        (
+          { file = "hello", text = ".test" }
+          -> Tokenise
+          --> TokenWalker_Start
+          --> ({ expected = ["."], typeName = TokenTypeName.KeyWord } -> TokenWalker_Expect)
+        )
+        .errors,
+      expected = [],
+    }
   ;
 
   let TokenWalker_Text (
@@ -116,7 +147,10 @@ namespace cinder_tokeniser {
       _s = _s.tokens,
       index = _s.index + 1,
       ctx = { _s = _s.ctx, key = property, value = _s.text } -> dictionary_set,
-      types = _s.types,
+      types = _s.types ++ {
+        range = _s.range,
+        type_name = typeName,
+      },
       errors = _s.errors,
     } -> TokenWalker_Create
   ;

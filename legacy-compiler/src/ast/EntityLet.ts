@@ -11,6 +11,7 @@ import { EntityNamespace } from "./EntityNamespace.ts";
 import type { CreateFunc } from "#writer";
 import { Namer } from "./Namer.ts";
 import type { TypeArg } from "./TypeArg.ts";
+import { LinkerError } from "./LinkerError.ts";
 
 export class EntityLet extends EntityNamespace {
   static {
@@ -157,6 +158,10 @@ export class EntityLet extends EntityNamespace {
   }
 
   get model(): Array<CreateFunc> {
+    if (this.#returns && !this.#returns.compatible(this.#contents.resolution)) {
+      throw new LinkerError("Invalid return type", this.range);
+    }
+
     return [
       {
         name: this.#internalName,

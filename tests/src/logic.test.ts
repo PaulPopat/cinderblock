@@ -239,4 +239,18 @@ describe("logic", () => {
     const result = await code.binary().run("my_result", {});
     assert.equal(result, "hello world");
   });
+
+  test("pattern match on an array index", async () => {
+    const code = new Inline(
+      `
+        let my_test (input: string[]) =
+          input @ 1 |
+            let (_s: string) = "i exist";
+            let (_s: null) = "i do not exist";
+        ;
+      `,
+    );
+    const result = await code.binary().run("my_test", { input: ["hello", "world"] });
+    assert.equal(result, "i exist");
+  });
 });

@@ -12,7 +12,7 @@ export class TypePrimitiveLong extends TypePrimitive {
       match: /^long+$/gm,
       chainable: false,
       factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
-        return new TypePrimitiveLong(walker.location, walker.expect("long", TokenTypeName.Primitive), parent);
+        return new TypePrimitiveLong(walker.location, walker.expect("long", TokenTypeName.KeyWord), parent);
       },
     });
   }
