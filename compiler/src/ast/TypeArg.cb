@@ -1,0 +1,77 @@
+namespace cinder_ast {
+  use std;
+  use cinder_tokeniser;
+
+  struct TypeArg : Type
+    is_arg: bool
+    type: Type
+    name: string
+  ;
+
+  let TypeIntersection_Parse (
+    _s: TokenWalker,
+    parent: EntryParent
+  ): TypeArg
+  =
+      let walker = _s;
+      let final =
+        _s
+          --> (
+            {
+              property = "name",
+              typeName = TokenTypeName.PropertyName,
+            } -> TokenWalker_Text
+          )
+          --> (
+            {
+              predicate = let (_s: TokenWalker) = _s.text == ":";,
+              extractor =
+                let (_s: TokenWalker) =
+                  _s
+                  --> (
+                    {
+                      expected = [":"],
+                      typeName = TokenTypeName.Punctuation,
+                    } -> TokenWalker_Expect
+                  )
+                  --> (
+                    {
+                      name = "type",
+                      extractor =
+                        let (_s: TokenWalker, so_far: dictionary): ExtractResult =
+                          _s --> (
+                            {
+                              parent = { float = parent.float, dig = parent.dig }
+                            } -> Type_Parse
+                          )
+                        ;
+                    } -> TokenWalker_Extract
+                  )
+                ;
+            } -> TokenWalker_If
+          )
+          --> TokenWalker_Finish
+      ;
+
+      let type = final.ctx --> ({ key = "type" } -> dictionary_get<T: Type>);
+    {
+      range = _s.range,
+      done = final.walker,
+      errors =
+        (
+          type |
+            let (_s: Type) = _s.errors;
+            let (_s: null) = [];
+        ),
+      is_type = true,
+      is_arg = true,
+      name = final.ctx --> ({ key = "name" } -> dictionary_get<T: string>),
+      type = 
+        (
+          type |
+            let (_s: Type) = _s;
+            let (_s: null) = {};
+        )
+    }
+  ;
+}

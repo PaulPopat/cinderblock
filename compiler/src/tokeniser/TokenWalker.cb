@@ -174,36 +174,49 @@ namespace cinder_tokeniser {
   ;
 
   let TokenWalker_Extract (
-    walker: TokenWalker,
-    name: string,
-    extractor: (_s: TokenWalker, so_far: dictionary): ExtractResult
-  ) =
-      let result = { _s = walker, so_far = walker.ctx } -> extractor;
-    {
-      ...result.done,
-      ctx = { _s = walker.ctx, key = name, value = result } -> dictionary_set
-    }
-  ;
-
-  let TokenWalker_If (
-    walker: TokenWalker,
-    predicate: (_s: TokenWalker): bool,
-    extractor: (_s: TokenWalker): TokenWalker
-  ) = 
-    walker --> predicate
-      ? walker --> extractor
-      : walker
-  ;
-
-  let TokenWalker_While (
     _s: TokenWalker,
     name: string,
-    extractor: (_s: TokenWalker, so_far: Dictionary): ExtractResult
-  ) =
+    extractor: (_s: TokenWalker, so_far: dictionary): ExtractResult
+  ): TokenWalker =
       let result = { _s = _s, so_far = _s.ctx } -> extractor;
     {
       ...result.done,
       ctx = { _s = _s.ctx, key = name, value = result } -> dictionary_set
     }
+  ;
+
+  let TokenWalker_If (
+    _s: TokenWalker,
+    predicate: (_s: TokenWalker): bool,
+    extractor: (_s: TokenWalker): TokenWalker
+  ): TokenWalker = 
+    _s --> predicate
+      ? _s --> extractor
+      : _s
+  ;
+
+  let TokenWalker_While (
+    _s: TokenWalker,
+    name: string,
+    predicate: (_s: TokenWalker): bool,
+    extractor: (_s: TokenWalker): ExtractResult
+  ): TokenWalker =
+      let walker = _s;
+      let result = !_s.done && (_s --> predicate) ? (_s --> extractor) : null;
+    result |
+      let (_s: ExtractResult) =
+        {
+          ..._s.done,
+          ctx =
+            {
+              _s = _s.done.ctx,
+              key = name,
+              value = { _s = _s.done.ctx, key = name } -> dictionary_get |
+                let (_s: ExtractResult[]) = _s ++ _s;
+                let (_s: null) = [_s];
+            } -> dictionary_set,
+        }
+      ;
+      let (_s: null) = walker;
   ;
 }

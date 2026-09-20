@@ -88,6 +88,6 @@ export class TypeTuple extends Type {
   }
 
   compatible(input: Type): boolean {
-    return input instanceof TypeTuple && !this.#args.some((a) => !input.#args.some((b) => a.compatible(b)));
+    return input instanceof TypeTuple && !this.args.some((a) => !input.args.some((b) => a.compatible(b)));
   }
 }

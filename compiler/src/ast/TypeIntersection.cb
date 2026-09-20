@@ -40,7 +40,7 @@ namespace cinder_ast {
           --> TokenWalker_Finish
       ;
 
-      let right = final.ctx --> ({ key = "right" } -> dictionary_get<T: string>);
+      let right = final.ctx --> ({ key = "right" } -> dictionary_get<T: Type>);
 
       let parse_left_intersection (_s: TypeIntersection) =
           let left = _s;

@@ -38,6 +38,14 @@ describe("syntax", () => {
     assert.equal(result, "hello world");
   });
 
+  test("inline let with internal lets", async () => {
+    const code = new Inline(`
+      let test_let = "hello " + ("world" -> (let (_s: string) = let result = _s; result;));
+    `);
+    const result = await code.binary().run("test_let", {});
+    assert.equal(result, "hello world");
+  });
+
   test("returns an array", async () => {
     const code = new Inline(`
       let test_let = ["hello", "world"];
