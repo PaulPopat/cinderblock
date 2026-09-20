@@ -3,7 +3,8 @@ namespace cinder_ast {
   use cinder_tokeniser;
 
   struct Entry
-    location: Location
+    range: Range
     done: TokenWalker
+    errors: CompilerError[]
   ;
 }

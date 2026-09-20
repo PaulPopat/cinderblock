@@ -1,2 +1,10 @@
-extern std_app_tagged(_s: string, key: string): (): unknown[];
-extern std_app_categoried(_s: string): (): unknown[];
+struct std_app_func
+  data: unknown
+  tags: struct
+    key: string
+    value: string
+  ;[]
+;
+
+extern std_app_tagged(_s: string, key: string): (): std_app_func[];
+extern std_app_categoried(_s: string): (): std_app_func[];

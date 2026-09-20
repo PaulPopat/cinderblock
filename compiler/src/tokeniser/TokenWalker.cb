@@ -176,7 +176,7 @@ namespace cinder_tokeniser {
   let TokenWalker_Extract (
     walker: TokenWalker,
     name: string,
-    extractor: (_s: TokenWalker, so_far: Dictionary): ExtractResult
+    extractor: (_s: TokenWalker, so_far: dictionary): ExtractResult
   ) =
       let result = { _s = walker, so_far = walker.ctx } -> extractor;
     {

@@ -6,11 +6,10 @@ type AppTaggedProps = {
 };
 
 export function std_app_tagged(this: CinderBlockBinary, props: AppTaggedProps) {
-  return this.withTagOf(props.key, props._s).map(
-    ({ name }) =>
-      (args: Record<string, unknown>) =>
-        this.run(name, args),
-  );
+  return this.withTagOf(props.key, props._s).map(({ name, tags }) => ({
+    data: (args: Record<string, unknown>) => this.run(name, args),
+    tags: Object.entries(tags).map(([key, value]) => ({ key, value })),
+  }));
 }
 
 type AppCategoriedProps = {
@@ -18,9 +17,8 @@ type AppCategoriedProps = {
 };
 
 export function std_app_categoried(this: CinderBlockBinary, props: AppCategoriedProps) {
-  return this.withTag(props._s).map(
-    ({ name }) =>
-      (args: Record<string, unknown>) =>
-        this.run(name, args),
-  );
+  return this.withTag(props._s).map(({ name, tags }) => ({
+    data: (args: Record<string, unknown>) => this.run(name, args),
+    tags: Object.entries(tags).map(([key, value]) => ({ key, value })),
+  }));
 }

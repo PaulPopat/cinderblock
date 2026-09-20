@@ -1,7 +1,7 @@
 namespace cinder_ast {
   use cinder_tokeniser;
 
-  struct ExpressionAccess : Entry
+  struct ExpressionAccess : Expression
     is_access: bool
     subject: Expression
     name: string
@@ -16,6 +16,7 @@ namespace cinder_ast {
       existing: Expression | null
     ): ExpressionAccess
   =
+      let walker = _s;
       let final =
         _s
           --> (
@@ -33,16 +34,20 @@ namespace cinder_ast {
           --> TokenWalker_Finish
       ;
     {
-      location = _s.range.from,
+      range = _s.range,
       done = final.walker,
+      errors = existing |
+        let (_s: Expression) = _s.errors;
+        let (_s: null) = [{ range = walker.range, message = "Left required" }];,
       is_access = true,
+      is_expression = true,
       subject = existing as Expression,
       name = final.ctx --> ({ key = "name" } -> dictionary_get<T: string>),
     }
   ;
 
   let
-    [test="cinder_ast parses an expression"]
+    [test="cinder_ast parses an access expression"]
   =
       let sut = { file = "hello", text = ".test" }
         -> Tokenise

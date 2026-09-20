@@ -2,11 +2,11 @@ namespace cinder_ast {
   use std;
   use cinder_tokeniser;
 
-  struct Expression : Entry
-    is_expression: bool
+  struct Type : Entry
+    is_type: bool
   ;
 
-  let Expression_Parse (_s: TokenWalker, parent: EntryParent): Expression =
+  let Type_Parse (_s: TokenWalker, parent: EntryParent): Type =
     { key="parses", _s = "expression" }
     -> std_app_tagged
     --> iterator_fromArray<T: app_func>

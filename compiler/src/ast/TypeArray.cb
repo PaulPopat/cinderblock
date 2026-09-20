@@ -1,0 +1,39 @@
+namespace cinder_ast {
+  use cinder_tokeniser;
+
+  struct TypeArray : Type
+    is_array: bool
+    contains: Type
+  ;
+
+  let
+    [parses="type", match="^\\[\\]$", chainable="true", priority="100"]
+    TypeArray_Parse (
+      _s: TokenWalker,
+      parent: EntryParent,
+      left: Type | null
+    ): TypeArray
+  =
+      let walker = _s;
+      let final =
+        _s
+          --> (
+            {
+              expected = ["[]"],
+              typeName = TokenTypeName.Operator,
+            } -> TokenWalker_Expect
+          )
+          --> TokenWalker_Finish
+      ;
+    {
+      range = _s.range,
+      done = final.walker,
+      errors = left |
+        let (_s: Type) = _s.errors;
+        let (_s: null) = [{ range = walker.range, message = "Left required" }];,
+      is_type = true,
+      is_array = true,
+      contains = left as Type,
+    }
+  ;
+}
