@@ -205,6 +205,7 @@ namespace cinder_tokeniser {
       let result = !_s.done && (_s --> predicate) ? (_s --> extractor) : null;
     result |
       let (_s: ExtractResult) =
+          let result = _s;
         {
           ..._s.done,
           ctx =
@@ -212,8 +213,8 @@ namespace cinder_tokeniser {
               _s = _s.done.ctx,
               key = name,
               value = { _s = _s.done.ctx, key = name } -> dictionary_get |
-                let (_s: ExtractResult[]) = _s ++ _s;
-                let (_s: null) = [_s];
+                let (_s: ExtractResult[]) = _s ++ result;
+                let (_s: null) = [result];
             } -> dictionary_set,
         }
       ;

@@ -39,11 +39,7 @@ namespace cinder_ast {
                       name = "type",
                       extractor =
                         let (_s: TokenWalker, so_far: dictionary): ExtractResult =
-                          _s --> (
-                            {
-                              parent = { float = parent.float, dig = parent.dig }
-                            } -> Type_Parse
-                          )
+                          _s --> ({ parent = parent } -> Type_Parse)
                         ;
                     } -> TokenWalker_Extract
                   )

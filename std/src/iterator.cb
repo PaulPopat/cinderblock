@@ -127,6 +127,27 @@ namespace std {
     }
   ;
 
+  let iterator_flatten (
+    _s: iterator<T: iterator<: T>>
+  ) =
+    {
+      _s = _s,
+      initial =
+        {
+          data = null,
+          next = null,
+          done = true,
+        } as iterator<T: T>,
+      reducer =
+        let (_s: iterator<T: T>, current: iterator<T: T>) =
+          {
+            _s = current,
+            addition = _s,
+          } -> iterator_concat<T: T>
+        ;,
+    } -> iterator_reduce<T: iterator<T: T>, TResult: iterator<T: T>>
+  ;
+
   let iterator_length (
     _s: iterator<T: unknown>
   ): int =
