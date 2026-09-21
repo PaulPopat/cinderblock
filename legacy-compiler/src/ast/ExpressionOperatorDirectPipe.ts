@@ -1,17 +1,14 @@
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
-import { ExpressionOperator } from "./ExpressionOperator.ts";
-import { LinkerError } from "./LinkerError.ts";
 import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypeArg } from "./TypeArg.ts";
-import { TypePipeable } from "./TypePipeable.ts";
-import { TypeTuple } from "./TypeTuple.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { Instruction } from "#writer";
-import type { Type } from "./Type.ts";
+import { ExpressionOperatorPipeBase } from "./ExpressionOperatorPipeBase.ts";
+import { TypeTuple } from "./TypeTuple.ts";
 
-export class ExpressionOperatorDirectPipe extends ExpressionOperator {
+export class ExpressionOperatorDirectPipe extends ExpressionOperatorPipeBase {
   static {
     Expression.RegisterExpression({
       priority: 100,
@@ -29,55 +26,14 @@ export class ExpressionOperatorDirectPipe extends ExpressionOperator {
     super(walker.location, done, parent, existing, right);
   }
 
-  get resolution(): Type {
-    const input = new TypeTuple(this.location, this.done, () => this, [
-      new TypeArg(this.location, this.done, () => this, this.left.resolution, "_s"),
-    ]);
-
-    const right = this.right.resolution;
-    if (!(right instanceof TypePipeable)) {
-      throw new LinkerError("Target not pipeable", this.range);
-    }
-
-    const remaining = right.args.filter((r) => !(input as TypeTuple).args.find((a) => a.name === r.name));
-
-    if (!remaining.length) return right.returns;
-
-    return new TypePipeable(this.location, this.done, () => this, remaining, right.returns).flattened();
+  get leftType() {
+    return new TypeTuple(this.location, this.done, () => this, [new TypeArg(this.location, this.done, () => this, this.left.resolution, "_s")]);
   }
 
-  get instruction(): Instruction {
-    const right = this.right.resolution;
-    if (!(right instanceof TypePipeable)) {
-      throw new LinkerError("Target not pipeable", this.range);
-    }
-
-    const input = new TypeTuple(this.location, this.done, () => this, [
-      new TypeArg(this.location, this.done, () => this, this.left.resolution, "_s"),
-    ]);
-
-    const remaining = right.args.filter((r) => !(input as TypeTuple).args.find((a) => a.name === r.name));
-
-    if (!remaining.length) {
-      return {
-        type: "operator",
-        operator: "pipe",
-        left: {
-          type: "tuple",
-          parts: [["_s", this.left.instruction]],
-        },
-        right: this.right.instruction,
-      };
-    }
-
+  get leftInstructions(): Instruction {
     return {
-      type: "operator",
-      operator: "partial_pipe",
-      left: {
-        type: "tuple",
-        parts: [["_s", this.left.instruction]],
-      },
-      right: this.right.instruction,
+      type: "tuple",
+      parts: [["_s", this.left.instruction]],
     };
   }
 }

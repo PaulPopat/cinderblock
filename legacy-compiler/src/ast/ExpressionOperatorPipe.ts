@@ -1,17 +1,13 @@
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
-import { ExpressionOperator } from "./ExpressionOperator.ts";
 import { LinkerError } from "./LinkerError.ts";
 import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
-import { TypeArg } from "./TypeArg.ts";
-import { TypePipeable } from "./TypePipeable.ts";
 import { TypeTuple } from "./TypeTuple.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { Instruction } from "#writer";
-import type { Type } from "./Type.ts";
+import { ExpressionOperatorPipeBase } from "./ExpressionOperatorPipeBase.ts";
 
-export class ExpressionOperatorPipe extends ExpressionOperator {
+export class ExpressionOperatorPipe extends ExpressionOperatorPipeBase {
   static {
     Expression.RegisterExpression({
       priority: 100,
@@ -29,60 +25,16 @@ export class ExpressionOperatorPipe extends ExpressionOperator {
     super(walker.location, done, parent, existing, right);
   }
 
-  get resolution(): Type {
-    let input = this.left.resolution;
+  get leftType() {
+    const input = this.left.resolution;
     if (!(input instanceof TypeTuple)) {
-      input = new TypeTuple(this.location, this.done, () => this, [new TypeArg(this.location, this.done, () => this, input, "_s")]);
+      throw new LinkerError("Tuple required", this.range);
     }
 
-    const right = this.right.resolution;
-    if (!(right instanceof TypePipeable)) {
-      throw new LinkerError("Target not pipeable", this.range);
-    }
-
-    const remaining = right.args.filter((r) => !(input as TypeTuple).args.find((a) => a.name === r.name));
-
-    if (!remaining.length) return right.returns;
-
-    return new TypePipeable(this.location, this.done, () => this, remaining, right.returns).flattened();
+    return input;
   }
 
-  get instruction(): Instruction {
-    const right = this.right.resolution;
-    if (!(right instanceof TypePipeable)) {
-      throw new LinkerError("Target not pipeable", this.range);
-    }
-
-    let input = this.left.resolution;
-    if (!(input instanceof TypeTuple)) {
-      input = new TypeTuple(this.location, this.done, () => this, [new TypeArg(this.location, this.done, () => this, input, "_s")]);
-    }
-
-    for (const arg of (input as TypeTuple).args) {
-      const match = right.args.find((a) => a.name === arg.name);
-      if (!match) continue;
-
-      if (!match.flattened().compatible(arg.flattened())) {
-        throw new LinkerError(`Arg ${arg.name} is not compatible`, this.range);
-      }
-    }
-
-    const remaining = right.args.filter((r) => !(input as TypeTuple).args.find((a) => a.name === r.name));
-
-    if (!remaining.length) {
-      return {
-        type: "operator",
-        operator: "pipe",
-        left: this.left.instruction,
-        right: this.right.instruction,
-      };
-    }
-
-    return {
-      type: "operator",
-      operator: "partial_pipe",
-      left: this.left.instruction,
-      right: this.right.instruction,
-    };
+  get leftInstructions() {
+    return this.left.instruction;
   }
 }

@@ -453,4 +453,20 @@ describe("syntax", () => {
     const result = await code.binary().run("test_let", { arg: [] });
     assert.equal(result, null);
   });
+
+  test("piping one tuple into another", async () => {
+    const code = new Inline(`
+      let test_let = { hello = "world" } -> { test = "data" };
+    `);
+    const result = await code.binary().run("test_let", {});
+    assert.deepEqual(result, { hello: "world", test: "data" });
+  });
+
+  test("direct piping one tuple into another", async () => {
+    const code = new Inline(`
+      let test_let = { hello = "world" } --> { test = "data" };
+    `);
+    const result = await code.binary().run("test_let", {});
+    assert.deepEqual(result, { _s: { hello: "world" }, test: "data" });
+  });
 });
