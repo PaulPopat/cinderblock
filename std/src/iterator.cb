@@ -25,7 +25,7 @@ namespace std {
   let [test="std_iterator creates an iterator from an array"] =
     {
       actual = [1, 2, 3]
-        -> iterator_fromArray<T: int>
+        --> iterator_fromArray<T: int>
         --> ({
           initial = 0,
           reducer = let (_s: int, current: int) = _s + current;,
@@ -66,7 +66,7 @@ namespace std {
     selector: (_s: T): TResult
   ): iterator<T: TResult> =
     {
-      data = !_s.done ? _s.data -> selector : null,
+      data = !_s.done ? _s.data --> selector : null,
       next = !_s.done
         ? { _s = _s --> iterator_next<T: T>, selector = selector } -> iterator_select<T: T>
         : null,
@@ -77,7 +77,7 @@ namespace std {
   let [test="std_iterator selects over an iterator"] =
     {
       actual = [1, 2, 3]
-        -> iterator_fromArray<T: int>
+        --> iterator_fromArray<T: int>
         --> ({
           selector = let (_s: int) = _s + 1;,
         } -> iterator_select<T: int, TResult: int>)
@@ -94,7 +94,7 @@ namespace std {
       ? _s
       : _s.data --> predicate
       ? _s
-      : _s.next --> ({ predicate = predicate } -> iterator_where)
+      : (_s.next as iterator<T: T>) --> { predicate = predicate } -> iterator_where
   ;
 
   let iterator_concat (
@@ -211,7 +211,11 @@ namespace std {
     predicate: (_s: T): bool
   ) =
     let internal (_s: iterator<T: T>): T =
-       _s.done ? null : (_s.data --> predicate) ? _s.data : (_s.next --> internal)
+       _s.done
+        ? null
+        : (_s.data --> predicate)
+        ? _s.data
+        : (_s.next as iterator<T: T> --> internal)
     ;
 
     _s --> internal

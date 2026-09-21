@@ -8,7 +8,7 @@ namespace cinder_ast {
     name: string
   ;
 
-  let TypeIntersection_Parse (
+  let TypeArg_Parse (
     _s: TokenWalker,
     parent: EntryParent
   ): TypeArg
@@ -49,7 +49,11 @@ namespace cinder_ast {
           --> TokenWalker_Finish
       ;
 
-      let type = final.ctx --> ({ key = "type" } -> dictionary_get<T: Type>);
+      let type =
+        final.ctx as dictionary<T: Type>
+        --> { key = "type" }
+        -> dictionary_get<T: Type>
+      ;
     {
       range = _s.range,
       done = final.walker,
@@ -61,7 +65,7 @@ namespace cinder_ast {
         ),
       is_type = true,
       is_arg = true,
-      name = final.ctx --> ({ key = "name" } -> dictionary_get<T: string>),
+      name = final.ctx as dictionary<T: string> --> ({ key = "name" } -> dictionary_get<T: string>),
       type = 
         (
           type |

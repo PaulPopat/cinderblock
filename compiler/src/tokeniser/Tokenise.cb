@@ -31,7 +31,7 @@ namespace cinder_tokeniser {
       "-->",
       "->",
       "@",
-    ] -> std_iterator_fromArray<T: string>
+    ] --> std_iterator_fromArray<T: string>
   ;
 
   let allowedPatterns =
@@ -41,7 +41,7 @@ namespace cinder_tokeniser {
       "^\"[^\"]*\"?$",
       "^'[^']?'?$",
       "^'\\.?'?$",
-    ] -> std_iterator_fromArray<T: string>
+    ] --> std_iterator_fromArray<T: string>
   ;
 
   let isValid (_s: string) =
@@ -121,12 +121,12 @@ namespace cinder_tokeniser {
         ctx: TokenisationContext,
         character: string
       ): TokenisationContext =
-          let done = !(ctx.current + character -> isValid);
+          let done = !(ctx.current + character --> isValid);
         {
           result =
-            done && (ctx.current -> std_string_trim != "")
+            done && (ctx.current --> std_string_trim != "")
               ? ctx.result ++ {
-                  data = ctx.current -> std_string_trim,
+                  data = ctx.current --> std_string_trim,
                   range = {
                     from = ctx.location,
                     to = {
@@ -160,7 +160,7 @@ namespace cinder_tokeniser {
             line = 0,
             character = 0,
           },
-          _s = text -> character_split,
+          _s = text --> character_split,
           reducer = let (_s: string, current: TokenisationContext): TokenisationContext =
             { ctx = current, character = _s } -> process
           ;

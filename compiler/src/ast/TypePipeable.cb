@@ -35,8 +35,11 @@ namespace cinder_ast {
                   ).text != ")"
                 )
               ;,
-              extractor = {},
-            } --> TokenWalker_While
+              extractor =
+                let (_s: TokenWalker): ExtractResult =
+                  _s --> TypeArg_Parse
+                ;,
+            } -> TokenWalker_While
           )
           --> (
             {
@@ -77,8 +80,8 @@ namespace cinder_ast {
           --> TokenWalker_Finish
       ;
 
-      let returns = final.ctx --> ({ key = "returns" } -> dictionary_get<T: Type>);
-      let args = final.ctx --> ({ key = "args" } -> dictionary_get<T: Type[]>);
+      let returns = final.ctx --> ({ key = "returns" } -> dictionary_get);
+      let args = final.ctx --> ({ key = "args" } -> dictionary_get);
     {
       range = _s.range,
       done = final.walker,

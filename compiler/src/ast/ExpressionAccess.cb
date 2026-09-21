@@ -42,7 +42,9 @@ namespace cinder_ast {
       is_access = true,
       is_expression = true,
       subject = existing as Expression,
-      name = final.ctx --> ({ key = "name" } -> dictionary_get<T: string>),
+      name = final.ctx as dictionary<T: string>
+        --> { key = "name" }
+        -> dictionary_get<T: string>,
     }
   ;
 

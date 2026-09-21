@@ -7,7 +7,7 @@ let
   [test="std_string_trim trims a string"]
 =
   {
-    actual = "  " -> std_string_trim,
+    actual = "  " --> std_string_trim,
     expected = "",
   }
 ;
@@ -15,7 +15,7 @@ let
   [test="std_string_trim comparison to empty"]
 =
   {
-    actual = " test " -> std_string_trim != "",
+    actual = " test " --> std_string_trim != "",
     expected = true,
   }
 ;

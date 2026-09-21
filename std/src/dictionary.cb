@@ -10,7 +10,8 @@ namespace std {
 
   let dictionary_create: dictionary<T: T> =
     {
-      data = [] as dictionary_entry<T: T>[] --> iterator_fromArray<T: dictionary_entry<T: T>[]>,
+      data = [] as dictionary_entry<T: T>[]
+        --> iterator_fromArray<T: dictionary_entry<T: T>>,
     }
   ;
 
