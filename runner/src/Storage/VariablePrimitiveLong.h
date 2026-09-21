@@ -1,9 +1,9 @@
 #pragma once
 
-#include "VariableArithmetic.h"
+#include "Variable.h"
 
 namespace Storage {
-class VariablePrimitiveLong : public VariableArithmetic {
+class VariablePrimitiveLong : public Variable {
   public:
   static const VariablePrimitiveLong* FromVariable(const Variable* var)
   {
@@ -32,6 +32,18 @@ class VariablePrimitiveLong : public VariableArithmetic {
   long long get_long() const;
   float get_float() const;
   double get_double() const;
+
+  const Variable* operate_add(const Variable* right) const;
+  const Variable* operate_divide(const Variable* right) const;
+  const Variable* operate_equals(const Variable* right) const;
+  const Variable* operate_greater_than(const Variable* right) const;
+  const Variable* operate_greater_than_or_equal_to(const Variable* right) const;
+  const Variable* operate_less_than(const Variable* right) const;
+  const Variable* operate_less_than_or_equal_to(const Variable* right) const;
+  const Variable* operate_multiply(const Variable* right) const;
+  const Variable* operate_not_equals(const Variable* right) const;
+  const Variable* operate_subtract(const Variable* right) const;
+  const Variable* operate_modulo(const Variable* right) const;
 
   private:
   long long value;

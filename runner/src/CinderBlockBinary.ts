@@ -13,8 +13,11 @@ export class CinderBlockBinary {
   }
 
   static FromMemory(data: Buffer, metadata: AppMetadata, globals: Record<string, unknown> | Promise<Record<string, unknown>>) {
-    const module = CinderBlockRunner().then((m) => {
-      m.LoadApp(data);
+    const module = CinderBlockRunner().then(async (m) => {
+      const report = m.LoadApp(data);
+      if (!report.is_success) {
+        throw new Error(`ERR! CinderBlock initialise failed with error ${report.error}`);
+      }
 
       return m;
     });
@@ -26,26 +29,38 @@ export class CinderBlockBinary {
   readonly #metadata: AppMetadata;
 
   constructor(module: MainModule | Promise<MainModule>, metadata: AppMetadata, globals: Record<string, unknown> | Promise<Record<string, unknown>>) {
-    this.#module = Promise.resolve(module).then((m) => {
-      return Promise.resolve(globals).then((g) => {
-        m.LoadGlobals([
-          ...Object.entries(g)
-            .filter(([key]) => typeof key === "string")
-            .map(([key, value]) => ({ name: key as string, value: variablise(typeof value === "function" ? value.bind(this) : value) })),
-        ]);
+    this.#module = Promise.resolve(module).then(async (m) => {
+      const g = await Promise.resolve(globals);
 
-        return m;
-      });
+      const report = m.LoadGlobals([
+        ...Object.entries(g)
+          .filter(([key]) => typeof key === "string")
+          .map(([key_1, value_2]) => ({ name: key_1 as string, value: variablise(typeof value_2 === "function" ? value_2.bind(this) : value_2) })),
+      ]);
+
+      if (!report.is_success) {
+        throw new Error(`ERR! CinderBlock initialise failed with error ${report.error}`);
+      }
+
+      return m;
     });
     this.#metadata = metadata;
   }
 
   async run(letName: string | AppFunc, args: Record<string, unknown>) {
     const module = await this.#module;
-    const target = typeof letName === "object" ? letName.id : this.#metadata.funcs[["App", letName].join("_")]?.id;
-    if (!target) throw new Error(`Could not find name ${letName}`);
-    const response = await module.Run(target, variabliseTuple(args));
-    return extract(response as Variable);
+    try {
+      const target = typeof letName === "object" ? letName.id : this.#metadata.funcs[["App", letName].join("_")]?.id;
+      if (!target) throw new Error(`Could not find name ${letName}`);
+      const response = await module.Run(target, variabliseTuple(args));
+      if (response.is_success) {
+        return extract(response.data as Variable);
+      }
+
+      throw new Error(`ERR! CinderBlock run failed with error ${response.error}`);
+    } catch (err) {
+      throw module.getExceptionMessage(err);
+    }
   }
 
   withTag(key: string) {

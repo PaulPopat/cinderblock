@@ -32,7 +32,7 @@ describe("syntax", () => {
 
   test("inline let", async () => {
     const code = new Inline(`
-      let test_let = "hello " + ("world" -> (let (_s: string) = _s;));
+      let test_let = "hello " + ("world" --> (let (_s: string) = _s;));
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, "hello world");
@@ -40,7 +40,7 @@ describe("syntax", () => {
 
   test("inline let with internal lets", async () => {
     const code = new Inline(`
-      let test_let = "hello " + ("world" -> (let (_s: string) = let result = _s; result;));
+      let test_let = "hello " + ("world" --> (let (_s: string) = let result = _s; result;));
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, "hello world");
@@ -340,7 +340,7 @@ describe("syntax", () => {
   test("performs a pipe of a basic", async () => {
     const code = new Inline(`
       let pipeable (_s: int) = _s + 2;
-      let test_let = 2 -> pipeable;
+      let test_let = 2 --> pipeable;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, 4);

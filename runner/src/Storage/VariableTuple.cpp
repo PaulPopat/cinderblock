@@ -1,4 +1,6 @@
 #include "VariableTuple.h"
+#include "../CinderblockException.h"
+#include "VariablePipeable.h"
 #include "VariablePrimitiveNull.h"
 #include <string>
 
@@ -75,5 +77,30 @@ const val VariableTuple::raw() const
 const std::vector<VariableTuplePart> VariableTuple::get_parts() const
 {
   return this->value;
+}
+
+const Variable* VariableTuple::operate_pipe(const Variable* right) const
+{
+  auto pipeable = VariablePipeable::FromVariable(right);
+  if (pipeable != nullptr) {
+    return pipeable->invoke(this);
+  }
+
+  auto tuple = VariableTuple::FromVariable(right);
+  if (tuple != nullptr) {
+    return this->merge(tuple);
+  }
+
+  throw CinderblockException("Invalid pipe");
+}
+
+const Variable* VariableTuple::operate_partial_pipe(const Variable* right) const
+{
+  return new VariablePipeable(
+    [this, right](const VariableTuple* args) {
+      return VariablePipeable::FromVariable(right)->invoke(this->merge(args));
+    },
+    false
+  );
 }
 }

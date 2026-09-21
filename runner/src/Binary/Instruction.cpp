@@ -1,15 +1,16 @@
 #include "Instruction.h"
+#include "../CinderblockException.h"
 #include <vector>
 
 namespace Binary {
 struct ParserInfo {
   char identifier;
-  std::function<Instruction*(const char*binary, int offset)> init;
+  std::function<Instruction*(const char* binary, int offset)> init;
 };
 
 std::vector<ParserInfo*> parsers = std::vector<ParserInfo*>();
 
-Instruction* Instruction::Parse(const char*binary, int offset)
+Instruction* Instruction::Parse(const char* binary, int offset)
 {
   auto identifier = binary[offset];
   for (const auto& parser : parsers) {
@@ -18,10 +19,10 @@ Instruction* Instruction::Parse(const char*binary, int offset)
     }
   }
 
-  throw "Invalid instruction. Check compiler version vs runner version.";
+  throw CinderblockException("Invalid instruction. Check compiler version vs runner version.");
 }
 
-void Instruction::Register(char identifier, std::function<Instruction*(const char*binary, int offset)> init)
+void Instruction::Register(char identifier, std::function<Instruction*(const char* binary, int offset)> init)
 {
   auto info = new ParserInfo();
   info->identifier = identifier;

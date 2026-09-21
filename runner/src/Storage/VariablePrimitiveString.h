@@ -27,6 +27,11 @@ class VariablePrimitiveString : public Variable {
 
   const val raw() const;
   std::string get_value() const;
+  std::string get_string() const;
+  const Variable* operate_add(const Variable* right) const;
+  const Variable* operate_in(const Variable* right) const;
+  const Variable* operate_equals(const Variable* right) const;
+  const Variable* operate_not_equals(const Variable* right) const;
 
   private:
   std::string value;

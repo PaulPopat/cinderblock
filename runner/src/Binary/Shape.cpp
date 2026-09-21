@@ -1,4 +1,5 @@
 #include "Shape.h"
+#include "../CinderblockException.h"
 
 namespace Binary {
 struct ShapeParserInfo {
@@ -17,7 +18,7 @@ Shape* Shape::Parse(const char* binary, int offset)
     }
   }
 
-  throw "Invalid shape. Check compiler version vs runner version.";
+  throw CinderblockException("Invalid shape. Check compiler version vs runner version.");
 }
 
 void Shape::Register(char identifier, std::function<Shape*(const char* binary, int offset)> init)

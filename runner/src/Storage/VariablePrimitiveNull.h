@@ -25,5 +25,7 @@ class VariablePrimitiveNull : public Variable {
   }
 
   const val raw() const;
+  virtual const Variable* operate_equals(const Variable* right) const;
+  virtual const Variable* operate_not_equals(const Variable* right) const;
 };
 }

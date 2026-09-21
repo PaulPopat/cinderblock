@@ -1,4 +1,5 @@
 #include "VariableArray.h"
+#include "../CinderblockException.h"
 #include "Variable.h"
 
 namespace Storage {
@@ -14,7 +15,7 @@ VariableArray::~VariableArray()
 VariableArray::VariableArray(val value)
 {
   if (!value.isArray()) {
-    throw "Value not array";
+    throw CinderblockException("Value not array");
   }
 
   auto values = std::vector<const Variable*>();

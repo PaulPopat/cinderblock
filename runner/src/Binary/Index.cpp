@@ -1,7 +1,8 @@
 #include "Index.h"
 #include "../Storage/VariableArray.h"
 #include "../Storage/VariablePrimitiveNull.h"
-#include "../Storage/VariableArithmetic.h"
+#include "../Storage/Variable.h"
+
 #include "extract.h"
 
 using namespace Storage;
@@ -30,7 +31,7 @@ const Variable* Index::resolve(Closure* closure) const
     return closure->add_temp_variable(new VariablePrimitiveNull());
   }
 
-  auto index = VariableArithmetic::FromVariable(this->index->resolve(closure))->get_int();
+  auto index = this->index->resolve(closure)->get_int();
   auto subject_values = subject->get_values();
   if (index >= subject_values.size()) {
     return closure->add_temp_variable(new VariablePrimitiveNull());

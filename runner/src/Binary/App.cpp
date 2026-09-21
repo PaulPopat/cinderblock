@@ -1,9 +1,12 @@
 #include "App.h"
+#include "../CinderblockException.h"
+#include "../Storage/VariablePipeable.h"
 #include "Access.h"
 #include "Arg.h"
 #include "ArrayAdd.h"
 #include "CreateFunc.h"
 #include "External.h"
+#include "Index.h"
 #include "Is.h"
 #include "LiteralArray.h"
 #include "LiteralBool.h"
@@ -14,13 +17,9 @@
 #include "LiteralLong.h"
 #include "LiteralNull.h"
 #include "LiteralString.h"
-#include "Index.h"
 #include "Not.h"
 #include "Operator.h"
 #include "Reference.h"
-#include "Ternary.h"
-#include "Tuple.h"
-#include "extract.h"
 #include "Shape.h"
 #include "ShapeArray.h"
 #include "ShapeBool.h"
@@ -33,9 +32,11 @@
 #include "ShapePipeable.h"
 #include "ShapeString.h"
 #include "ShapeTuple.h"
-#include "ShapeUnknown.h"
 #include "ShapeUnion.h"
-#include "../Storage/VariablePipeable.h"
+#include "ShapeUnknown.h"
+#include "Ternary.h"
+#include "Tuple.h"
+#include "extract.h"
 #include <string>
 
 namespace Binary {
@@ -175,6 +176,6 @@ const CreateFunc* App::find(std::string name) const
     }
   }
 
-  throw "Func not found";
+  throw CinderblockException("Func not found");
 }
 }

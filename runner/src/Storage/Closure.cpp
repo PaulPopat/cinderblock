@@ -1,4 +1,5 @@
 #include "Closure.h"
+#include "../CinderblockException.h"
 
 namespace Storage {
 Closure::Closure(Frame* globals, std::vector<Frame*> frames)
@@ -20,7 +21,7 @@ const Variable* Closure::search(std::string name)
     }
   }
 
-  throw "Variable not resolved";
+  throw CinderblockException("Variable not resolved");
 }
 
 Closure* Closure::with_frame(Frame* frame)
@@ -57,6 +58,6 @@ const Variable* Closure::search_global(std::string name)
     return possible;
   }
 
-  throw "Global not resolved";
+  throw CinderblockException("Global not resolved");
 }
 }

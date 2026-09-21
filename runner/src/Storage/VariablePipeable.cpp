@@ -1,4 +1,5 @@
 #include "VariablePipeable.h"
+#include "../CinderblockException.h"
 #include <emscripten.h>
 #include <emscripten/em_js.h>
 
@@ -25,7 +26,7 @@ const bool VariablePipeable::get_no_args() const
 
 const val VariablePipeable::raw() const
 {
-  throw "Cannot return functions to JavaScript";
+  throw CinderblockException("Cannot return functions to JavaScript");
 }
 
 const Variable* VariablePipeable::invoke(const VariableTuple* args) const

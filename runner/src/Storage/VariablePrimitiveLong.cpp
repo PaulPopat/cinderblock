@@ -1,4 +1,5 @@
 #include "VariablePrimitiveLong.h"
+#include "VariablePrimitiveBool.h"
 
 namespace Storage {
 VariablePrimitiveLong::VariablePrimitiveLong(long long value)
@@ -48,5 +49,60 @@ float VariablePrimitiveLong::get_float() const
 double VariablePrimitiveLong::get_double() const
 {
   return this->value;
+}
+
+const Variable* VariablePrimitiveLong::operate_add(const Variable* right) const
+{
+  return new VariablePrimitiveLong(this->value + right->get_long());
+}
+
+const Variable* VariablePrimitiveLong::operate_divide(const Variable* right) const
+{
+  return new VariablePrimitiveLong(this->value / right->get_long());
+}
+
+const Variable* VariablePrimitiveLong::operate_equals(const Variable* right) const
+{
+  return new VariablePrimitiveBool(this->value == right->get_long());
+}
+
+const Variable* VariablePrimitiveLong::operate_greater_than(const Variable* right) const
+{
+  return new VariablePrimitiveBool(this->value > right->get_long());
+}
+
+const Variable* VariablePrimitiveLong::operate_greater_than_or_equal_to(const Variable* right) const
+{
+  return new VariablePrimitiveBool(this->value >= right->get_long());
+}
+
+const Variable* VariablePrimitiveLong::operate_less_than(const Variable* right) const
+{
+  return new VariablePrimitiveBool(this->value < right->get_long());
+}
+
+const Variable* VariablePrimitiveLong::operate_less_than_or_equal_to(const Variable* right) const
+{
+  return new VariablePrimitiveBool(this->value <= right->get_long());
+}
+
+const Variable* VariablePrimitiveLong::operate_multiply(const Variable* right) const
+{
+  return new VariablePrimitiveLong(this->value * right->get_long());
+}
+
+const Variable* VariablePrimitiveLong::operate_not_equals(const Variable* right) const
+{
+  return new VariablePrimitiveBool(this->value != right->get_long());
+}
+
+const Variable* VariablePrimitiveLong::operate_subtract(const Variable* right) const
+{
+  return new VariablePrimitiveLong(this->value - right->get_long());
+}
+
+const Variable* VariablePrimitiveLong::operate_modulo(const Variable* right) const
+{
+  return new VariablePrimitiveLong(this->value % right->get_long());
 }
 }

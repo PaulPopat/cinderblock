@@ -1,4 +1,5 @@
 #include "Binary/App.h"
+#include "CinderblockException.h"
 #include "Storage/Closure.h"
 #include "Storage/Frame.h"
 #include "Storage/Variable.h"
@@ -19,6 +20,7 @@
 
 using namespace emscripten;
 
+EMSCRIPTEN_DECLARE_VAL_TYPE(ActionReport);
 EMSCRIPTEN_DECLARE_VAL_TYPE(CinderBlockVal);
 EMSCRIPTEN_DECLARE_VAL_TYPE(CinderBlockFrame);
 EMSCRIPTEN_DECLARE_VAL_TYPE(CinderBlockTuple);
@@ -26,7 +28,7 @@ EMSCRIPTEN_DECLARE_VAL_TYPE(CinderBlockTuple);
 Binary::App* app;
 Storage::Frame* globals;
 
-void LoadApp(std::string buf)
+ActionReport LoadApp(std::string buf)
 {
   app = new Binary::App(buf.data());
   Variable::Register(VariableArray::TypeName, [](val value) {
@@ -62,11 +64,21 @@ void LoadApp(std::string buf)
   Variable::Register(VariableTuple::TypeName, [](val value) {
     return new VariableTuple(value);
   });
+
+  auto result = val::object();
+  result.set("is_success", true);
+
+  return (ActionReport)result;
 }
 
-void LoadGlobals(CinderBlockFrame subject)
+ActionReport LoadGlobals(CinderBlockFrame subject)
 {
   globals = Storage::Frame::From(subject);
+
+  auto result = val::object();
+  result.set("is_success", true);
+
+  return (ActionReport)result;
 }
 
 CinderBlockVal Run(std::string name, CinderBlockTuple args)
@@ -91,7 +103,12 @@ CinderBlockVal Run(std::string name, CinderBlockTuple args)
 
   auto var = func->exec(closure, new VariableTuple(args["data"]));
 
-  auto result = var->raw();
+  auto value = var->raw();
+
+  auto result = val::object();
+  result.set("is_success", true);
+  result.set("data", value);
+
   return (CinderBlockVal)result;
 }
 
@@ -101,7 +118,8 @@ EMSCRIPTEN_BINDINGS(my_module)
   function("LoadGlobals", &LoadGlobals);
   function("LoadApp", &LoadApp);
 
-  register_type<CinderBlockVal>("{ type: number, data: any }");
+  register_type<CinderBlockVal>("{ is_success: true, data: { type: number, data: any } } | { is_success: false, error: string }");
   register_type<CinderBlockFrame>("Array<{ name: string, value: any }>");
   register_type<CinderBlockTuple>("{ type: 10, data: Array<any> }");
+  register_type<ActionReport>("{ is_success: boolean, error?: string }");
 }

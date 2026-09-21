@@ -16,6 +16,8 @@ file(GLOB
 
 file(GLOB
   CinderBlockRunnerSourceFiles
+  "src/CinderblockException.cpp"
+  "src/CinderblockException.h"
   "src/**/*.h"
   "src/**/*.cpp"
 )
@@ -45,12 +47,14 @@ if(EMSCRIPTEN)
     "SHELL:-s WASM=1"
     "SHELL:-l embind"
     "SHELL:-s ALLOW_MEMORY_GROWTH=1"
-    "SHELL:-s NO_DISABLE_EXCEPTION_CATCHING=1"
     "SHELL:-s MODULARIZE=1"
     "SHELL:-s EXPORT_ES6=1"
     "SHELL:-s STACK_SIZE=262144"
     "SHELL:-s JSPI=1"
     "SHELL:-s JSPI_EXPORTS=Run"
+    "SHELL:-fwasm-exceptions"
+    "SHELL:-s ASSERTIONS=1"
+    "SHELL:-s EXPORTED_RUNTIME_METHODS=getExceptionMessage,decrementExceptionRefcount"
     "SHELL:--bind"
     "SHELL:--emit-tsd CinderBlockRunner.d.ts"
   )

@@ -32,6 +32,8 @@ class VariableTuple : public Variable {
   const Variable* get(std::string name) const;
   const val raw() const;
   const std::vector<VariableTuplePart> get_parts() const;
+  const Variable* operate_pipe(const Variable* right) const;
+  const Variable* operate_partial_pipe(const Variable* right) const;
 
   private:
   std::vector<VariableTuplePart> value;

@@ -1,0 +1,5 @@
+namespace cinder_ast {
+  struct TypePrimitive : Type
+    name: string
+  ;
+}

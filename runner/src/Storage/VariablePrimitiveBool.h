@@ -23,8 +23,13 @@ class VariablePrimitiveBool : public Variable {
     return VariablePrimitiveBool::TypeName;
   }
 
+  bool get_bool() const;
   const val raw() const;
   bool get_value() const;
+  const Variable* operate_and(const Variable* right) const;
+  const Variable* operate_equals(const Variable* right) const;
+  const Variable* operate_not_equals(const Variable* right) const;
+  const Variable* operate_or(const Variable* right) const;
 
   private:
   bool value;

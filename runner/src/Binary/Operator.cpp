@@ -1,5 +1,6 @@
 #include "Operator.h"
-#include "../Storage/VariableArithmetic.h"
+#include "../CinderblockException.h"
+#include "../Storage/Variable.h"
 #include "../Storage/VariablePipeable.h"
 #include "../Storage/VariablePrimitiveBool.h"
 #include "../Storage/VariablePrimitiveChar.h"
@@ -35,510 +36,55 @@ const Variable* Operator::resolve(Closure* closure) const
 {
   switch (this->type) {
   case OperatorType::Add: {
-    auto left = this->left->resolve(closure);
-    auto right = this->right->resolve(closure);
-    switch (left->get_type_name()) {
-    case VariablePrimitiveString::TypeName: {
-      if (right->get_type_name() != VariablePrimitiveString::TypeName) {
-        throw "Invalid maths";
-      }
-      auto result = VariablePrimitiveString::FromVariable(left)->get_value();
-      return closure->add_temp_variable(new VariablePrimitiveString(result.append(VariablePrimitiveString::FromVariable(right)->get_value())));
-    }
-    case VariablePrimitiveChar::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveChar(
-        VariablePrimitiveChar::FromVariable(left)->get_value() + VariableArithmetic::FromVariable(right)->get_char()
-      ));
-    }
-    case VariablePrimitiveDouble::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveDouble(
-        VariablePrimitiveDouble::FromVariable(left)->get_value() + VariableArithmetic::FromVariable(right)->get_double()
-      ));
-    }
-    case VariablePrimitiveFloat::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveFloat(
-        VariablePrimitiveFloat::FromVariable(left)->get_value() + VariableArithmetic::FromVariable(right)->get_float()
-      ));
-    }
-    case VariablePrimitiveInt::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveInt(
-        VariablePrimitiveInt::FromVariable(left)->get_value() + VariableArithmetic::FromVariable(right)->get_int()
-      ));
-    }
-    case VariablePrimitiveLong::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveLong(
-        VariablePrimitiveLong::FromVariable(left)->get_value() + VariableArithmetic::FromVariable(right)->get_long()
-      ));
-    }
-    default: {
-      throw "Invalid maths";
-    }
-    }
+    return closure->add_temp_variable(this->left->resolve(closure)->operate_add(this->right->resolve(closure)));
   }
   case OperatorType::And: {
-    auto left = this->left->resolve(closure);
-    switch (left->get_type_name()) {
-    case VariablePrimitiveBool::TypeName: {
-      if (!VariablePrimitiveBool::FromVariable(left)->get_value()) {
-        return closure->add_temp_variable(new VariablePrimitiveBool(false));
-      }
-
-      auto right = this->right->resolve(closure);
-      return closure->add_temp_variable(new VariablePrimitiveBool(VariablePrimitiveBool::FromVariable(right)->get_value()));
-    }
-    default: {
-      throw "Invalid maths";
-    }
-    }
+    return closure->add_temp_variable(this->left->resolve(closure)->operate_and(this->right->resolve(closure)));
   }
   case OperatorType::Divide: {
-    auto left = this->left->resolve(closure);
-    auto right = this->right->resolve(closure);
-    switch (left->get_type_name()) {
-    case VariablePrimitiveChar::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveChar(
-        VariablePrimitiveChar::FromVariable(left)->get_value() / VariableArithmetic::FromVariable(right)->get_char()
-      ));
-    }
-    case VariablePrimitiveDouble::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveDouble(
-        VariablePrimitiveDouble::FromVariable(left)->get_value() / VariableArithmetic::FromVariable(right)->get_double()
-      ));
-    }
-    case VariablePrimitiveFloat::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveFloat(
-        VariablePrimitiveFloat::FromVariable(left)->get_value() / VariableArithmetic::FromVariable(right)->get_float()
-      ));
-    }
-    case VariablePrimitiveInt::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveInt(
-        VariablePrimitiveInt::FromVariable(left)->get_value() / VariableArithmetic::FromVariable(right)->get_int()
-      ));
-    }
-    case VariablePrimitiveLong::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveLong(
-        VariablePrimitiveLong::FromVariable(left)->get_value() / VariableArithmetic::FromVariable(right)->get_long()
-      ));
-    }
-    default: {
-      throw "Invalid maths";
-    }
-    }
+    return closure->add_temp_variable(this->left->resolve(closure)->operate_divide(this->right->resolve(closure)));
   }
   case OperatorType::Equals: {
-    auto left = this->left->resolve(closure);
-    auto right = this->right->resolve(closure);
-    switch (left->get_type_name()) {
-    case VariablePrimitiveString::TypeName: {
-      if (right->get_type_name() != VariablePrimitiveString::TypeName) {
-        throw "Invalid maths";
-      }
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveString::FromVariable(left)->get_value().compare(
-          VariablePrimitiveString::FromVariable(right)->get_value()
-        )
-        == 0
-      ));
-    }
-    case VariablePrimitiveNull::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(left->get_type_name() == right->get_type_name()));
-    }
-    case VariablePrimitiveBool::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveBool::FromVariable(left)->get_value() == VariablePrimitiveBool::FromVariable(right)->get_value()
-      ));
-    }
-    case VariablePrimitiveChar::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveChar::FromVariable(left)->get_value() == VariableArithmetic::FromVariable(right)->get_char()
-      ));
-    }
-    case VariablePrimitiveDouble::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveDouble::FromVariable(left)->get_value() == VariableArithmetic::FromVariable(right)->get_double()
-      ));
-    }
-    case VariablePrimitiveFloat::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveFloat::FromVariable(left)->get_value() == VariableArithmetic::FromVariable(right)->get_float()
-      ));
-    }
-    case VariablePrimitiveInt::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveInt::FromVariable(left)->get_value() == VariableArithmetic::FromVariable(right)->get_int()
-      ));
-    }
-    case VariablePrimitiveLong::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveLong::FromVariable(left)->get_value() == VariableArithmetic::FromVariable(right)->get_long()
-      ));
-    }
-    default: {
-      throw "Invalid maths";
-    }
-    }
+    return closure->add_temp_variable(this->left->resolve(closure)->operate_equals(this->right->resolve(closure)));
   }
   case OperatorType::GreaterThan: {
-    auto left = this->left->resolve(closure);
-    auto right = this->right->resolve(closure);
-    switch (left->get_type_name()) {
-    case VariablePrimitiveChar::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveChar::FromVariable(left)->get_value() > VariableArithmetic::FromVariable(right)->get_char()
-      ));
-    }
-    case VariablePrimitiveDouble::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveDouble::FromVariable(left)->get_value() > VariableArithmetic::FromVariable(right)->get_double()
-      ));
-    }
-    case VariablePrimitiveFloat::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveFloat::FromVariable(left)->get_value() > VariableArithmetic::FromVariable(right)->get_float()
-      ));
-    }
-    case VariablePrimitiveInt::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveInt::FromVariable(left)->get_value() > VariableArithmetic::FromVariable(right)->get_int()
-      ));
-    }
-    case VariablePrimitiveLong::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveLong::FromVariable(left)->get_value() > VariableArithmetic::FromVariable(right)->get_long()
-      ));
-    }
-    default: {
-      throw "Invalid maths";
-    }
-    }
+    return closure->add_temp_variable(this->left->resolve(closure)->operate_greater_than(this->right->resolve(closure)));
   }
   case OperatorType::GreaterThanOrEqualTo: {
-    auto left = this->left->resolve(closure);
-    auto right = this->right->resolve(closure);
-    switch (left->get_type_name()) {
-    case VariablePrimitiveChar::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveChar::FromVariable(left)->get_value() >= VariableArithmetic::FromVariable(right)->get_char()
-      ));
-    }
-    case VariablePrimitiveDouble::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveDouble::FromVariable(left)->get_value() >= VariableArithmetic::FromVariable(right)->get_double()
-      ));
-    }
-    case VariablePrimitiveFloat::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveFloat::FromVariable(left)->get_value() >= VariableArithmetic::FromVariable(right)->get_float()
-      ));
-    }
-    case VariablePrimitiveInt::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveInt::FromVariable(left)->get_value() >= VariableArithmetic::FromVariable(right)->get_int()
-      ));
-    }
-    case VariablePrimitiveLong::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveLong::FromVariable(left)->get_value() >= VariableArithmetic::FromVariable(right)->get_long()
-      ));
-    }
-    default: {
-      throw "Invalid maths";
-    }
-    }
+    return closure->add_temp_variable(this->left->resolve(closure)->operate_greater_than_or_equal_to(this->right->resolve(closure)));
   }
   case OperatorType::In: {
-    auto left = this->left->resolve(closure);
-    auto right = this->right->resolve(closure);
-    if (left->get_type_name() != VariablePrimitiveString::TypeName) {
-      throw "Invalid maths";
-    }
-
-    if (right->get_type_name() != VariableTuple::TypeName) {
-      throw "Invalid maths";
-    }
-
-    return closure->add_temp_variable(new VariablePrimitiveBool(
-      VariableTuple::FromVariable(right)
-        ->get(VariablePrimitiveString::FromVariable(left)->get_value())
-        ->get_type_name()
-      != VariablePrimitiveNull::TypeName
-    ));
+    return closure->add_temp_variable(this->left->resolve(closure)->operate_in(this->right->resolve(closure)));
   }
   case OperatorType::LessThan: {
-    auto left = this->left->resolve(closure);
-    auto right = this->right->resolve(closure);
-    switch (left->get_type_name()) {
-    case VariablePrimitiveChar::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveChar::FromVariable(left)->get_value() < VariableArithmetic::FromVariable(right)->get_char()
-      ));
-    }
-    case VariablePrimitiveDouble::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveDouble::FromVariable(left)->get_value() < VariableArithmetic::FromVariable(right)->get_double()
-      ));
-    }
-    case VariablePrimitiveFloat::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveFloat::FromVariable(left)->get_value() < VariableArithmetic::FromVariable(right)->get_float()
-      ));
-    }
-    case VariablePrimitiveInt::TypeName: {
-      auto left_val = VariablePrimitiveInt::FromVariable(left)->get_value();
-      auto right_val = VariableArithmetic::FromVariable(right)->get_int();
-      return closure->add_temp_variable(new VariablePrimitiveBool(left_val < right_val));
-    }
-    case VariablePrimitiveLong::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveLong::FromVariable(left)->get_value() < VariableArithmetic::FromVariable(right)->get_long()
-      ));
-    }
-    default: {
-      throw "Invalid maths";
-    }
-    }
+    return closure->add_temp_variable(this->left->resolve(closure)->operate_less_than(this->right->resolve(closure)));
   }
   case OperatorType::LessThanOrEqualTo: {
-    auto left = this->left->resolve(closure);
-    auto right = this->right->resolve(closure);
-    switch (left->get_type_name()) {
-    case VariablePrimitiveChar::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveChar::FromVariable(left)->get_value() <= VariableArithmetic::FromVariable(right)->get_char()
-      ));
-    }
-    case VariablePrimitiveDouble::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveDouble::FromVariable(left)->get_value() <= VariableArithmetic::FromVariable(right)->get_double()
-      ));
-    }
-    case VariablePrimitiveFloat::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveFloat::FromVariable(left)->get_value() <= VariableArithmetic::FromVariable(right)->get_float()
-      ));
-    }
-    case VariablePrimitiveInt::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveInt::FromVariable(left)->get_value() <= VariableArithmetic::FromVariable(right)->get_int()
-      ));
-    }
-    case VariablePrimitiveLong::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveLong::FromVariable(left)->get_value() <= VariableArithmetic::FromVariable(right)->get_long()
-      ));
-    }
-    default: {
-      throw "Invalid maths";
-    }
-    }
+    return closure->add_temp_variable(this->left->resolve(closure)->operate_less_than_or_equal_to(this->right->resolve(closure)));
   }
   case OperatorType::Multiply: {
-    auto left = this->left->resolve(closure);
-    auto right = this->right->resolve(closure);
-    switch (left->get_type_name()) {
-    case VariablePrimitiveChar::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveChar(
-        VariablePrimitiveChar::FromVariable(left)->get_value() * VariableArithmetic::FromVariable(right)->get_char()
-      ));
-    }
-    case VariablePrimitiveDouble::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveDouble(
-        VariablePrimitiveDouble::FromVariable(left)->get_value() * VariableArithmetic::FromVariable(right)->get_double()
-      ));
-    }
-    case VariablePrimitiveFloat::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveFloat(
-        VariablePrimitiveFloat::FromVariable(left)->get_value() * VariableArithmetic::FromVariable(right)->get_float()
-      ));
-    }
-    case VariablePrimitiveInt::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveInt(
-        VariablePrimitiveInt::FromVariable(left)->get_value() * VariableArithmetic::FromVariable(right)->get_int()
-      ));
-    }
-    case VariablePrimitiveLong::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveLong(
-        VariablePrimitiveLong::FromVariable(left)->get_value() * VariableArithmetic::FromVariable(right)->get_long()
-      ));
-    }
-    default: {
-      throw "Invalid maths";
-    }
-    }
+    return closure->add_temp_variable(this->left->resolve(closure)->operate_multiply(this->right->resolve(closure)));
   }
   case OperatorType::NotEquals: {
-    auto left = this->left->resolve(closure);
-    auto right = this->right->resolve(closure);
-    switch (left->get_type_name()) {
-    case VariablePrimitiveString::TypeName: {
-      if (right->get_type_name() != VariablePrimitiveString::TypeName) {
-        throw "Invalid maths";
-      }
-
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveString::FromVariable(left)->get_value().compare(
-          VariablePrimitiveString::FromVariable(right)->get_value()
-        )
-        != 0
-      ));
-    }
-    case VariablePrimitiveNull::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(left->get_type_name() != right->get_type_name()));
-    }
-    case VariablePrimitiveBool::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveBool::FromVariable(left)->get_value() != VariablePrimitiveBool::FromVariable(right)->get_value()
-      ));
-    }
-    case VariablePrimitiveChar::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveChar::FromVariable(left)->get_value() != VariableArithmetic::FromVariable(right)->get_char()
-      ));
-    }
-    case VariablePrimitiveDouble::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveDouble::FromVariable(left)->get_value() != VariableArithmetic::FromVariable(right)->get_double()
-      ));
-    }
-    case VariablePrimitiveFloat::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveFloat::FromVariable(left)->get_value() != VariableArithmetic::FromVariable(right)->get_float()
-      ));
-    }
-    case VariablePrimitiveInt::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveInt::FromVariable(left)->get_value() != VariableArithmetic::FromVariable(right)->get_int()
-      ));
-    }
-    case VariablePrimitiveLong::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveBool(
-        VariablePrimitiveLong::FromVariable(left)->get_value() != VariableArithmetic::FromVariable(right)->get_long()
-      ));
-    }
-    default: {
-      throw "Invalid maths";
-    }
-    }
+    return closure->add_temp_variable(this->left->resolve(closure)->operate_not_equals(this->right->resolve(closure)));
   }
   case OperatorType::Or: {
-    auto left = this->left->resolve(closure);
-    switch (left->get_type_name()) {
-    case VariablePrimitiveBool::TypeName: {
-      if (VariablePrimitiveBool::FromVariable(left)->get_value()) {
-        return closure->add_temp_variable(new VariablePrimitiveBool(true));
-      }
-
-      auto right = this->right->resolve(closure);
-      return closure->add_temp_variable(new VariablePrimitiveBool(VariablePrimitiveBool::FromVariable(right)->get_value()));
-    }
-    default: {
-      throw "Invalid maths";
-    }
-    }
-  }
-  case OperatorType::PartialPipe: {
-    auto left = this->left->resolve(closure);
-    auto right = this->right->resolve(closure);
-
-    if (left->get_type_name() != VariableTuple::TypeName) {
-      throw "Invalid maths";
-    }
-
-    if (right->get_type_name() != VariablePipeable::TypeName) {
-      throw "Invalid maths";
-    }
-
-    return closure->add_temp_variable(new VariablePipeable(
-      [left, right, closure](const VariableTuple* args) {
-        return VariablePipeable::FromVariable(right)->invoke(
-          VariableTuple::FromVariable(
-            VariableTuple::FromVariable(left)->merge(args)
-          )
-        );
-      },
-      false
-    ));
+    return closure->add_temp_variable(this->left->resolve(closure)->operate_or(this->right->resolve(closure)));
   }
   case OperatorType::Pipe: {
-    auto left = this->left->resolve(closure);
-    auto right = this->right->resolve(closure);
-
-    if (left->get_type_name() != VariableTuple::TypeName) {
-      auto input = std::vector<VariableTuplePart>();
-      input.push_back({ std::string("_s"), left });
-      left = closure->add_temp_variable(new VariableTuple(input));
-    }
-
-    if (right->get_type_name() != VariablePipeable::TypeName) {
-      throw "Invalid maths";
-    }
-
-    return VariablePipeable::FromVariable(right)->invoke(
-      VariableTuple::FromVariable(
-        VariableTuple::FromVariable(left)
-      )
-    );
+    return closure->add_temp_variable(this->left->resolve(closure)->operate_pipe(this->right->resolve(closure)));
+  }
+  case OperatorType::PartialPipe: {
+    return closure->add_temp_variable(this->left->resolve(closure)->operate_partial_pipe(this->right->resolve(closure)));
   }
   case OperatorType::Subtract: {
-    auto left = this->left->resolve(closure);
-    auto right = this->right->resolve(closure);
-    switch (left->get_type_name()) {
-    case VariablePrimitiveChar::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveChar(
-        VariablePrimitiveChar::FromVariable(left)->get_value() - VariableArithmetic::FromVariable(right)->get_char()
-      ));
-    }
-    case VariablePrimitiveDouble::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveDouble(
-        VariablePrimitiveDouble::FromVariable(left)->get_value() - VariableArithmetic::FromVariable(right)->get_double()
-      ));
-    }
-    case VariablePrimitiveFloat::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveFloat(
-        VariablePrimitiveFloat::FromVariable(left)->get_value() - VariableArithmetic::FromVariable(right)->get_float()
-      ));
-    }
-    case VariablePrimitiveInt::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveInt(
-        VariablePrimitiveInt::FromVariable(left)->get_value() - VariableArithmetic::FromVariable(right)->get_int()
-      ));
-    }
-    case VariablePrimitiveLong::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveLong(
-        VariablePrimitiveLong::FromVariable(left)->get_value() - VariableArithmetic::FromVariable(right)->get_long()
-      ));
-    }
-    default: {
-      throw "Invalid maths";
-    }
-    }
+    return closure->add_temp_variable(this->left->resolve(closure)->operate_subtract(this->right->resolve(closure)));
   }
   case OperatorType::Modulo: {
-    auto left = this->left->resolve(closure);
-    auto right = this->right->resolve(closure);
-    switch (left->get_type_name()) {
-    case VariablePrimitiveChar::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveChar(
-        VariablePrimitiveChar::FromVariable(left)->get_value() % VariableArithmetic::FromVariable(right)->get_char()
-      ));
-    }
-    case VariablePrimitiveInt::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveInt(
-        VariablePrimitiveInt::FromVariable(left)->get_value() % VariableArithmetic::FromVariable(right)->get_int()
-      ));
-    }
-    case VariablePrimitiveLong::TypeName: {
-      return closure->add_temp_variable(new VariablePrimitiveLong(
-        VariablePrimitiveLong::FromVariable(left)->get_value() % VariableArithmetic::FromVariable(right)->get_long()
-      ));
-    }
-    default: {
-      throw "Invalid maths";
-    }
-    }
+    return closure->add_temp_variable(this->left->resolve(closure)->operate_modulo(this->right->resolve(closure)));
   }
   default: {
-    throw "Unknown operation";
+    throw CinderblockException("Unknown operation");
   }
   }
 }
