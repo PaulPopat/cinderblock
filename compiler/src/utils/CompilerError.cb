@@ -3,4 +3,6 @@ namespace cinder_utils {
     range: Range
     message: string
   ;
+
+  let NoErrors: CompilerError[] = [];
 }

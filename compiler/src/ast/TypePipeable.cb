@@ -18,50 +18,8 @@ namespace cinder_ast {
       let walker = _s;
       let final =
         _s
-          --> (
-            {
-              name = "args",
-              predicate = let (_s: TokenWalker) =
-                (_s.text == ",") ||
-                (_s.text == "(") && 
-                (
-                  (
-                    _s --> (
-                      {
-                        expected = ["[]"],
-                        typeName = TokenTypeName.Operator,
-                      } -> TokenWalker_Expect
-                    )
-                  ).text != ")"
-                )
-              ;,
-              extractor =
-                let (_s: TokenWalker): ExtractResult =
-                  _s --> TypeArg_Parse
-                ;,
-            } -> TokenWalker_While
-          )
-          --> (
-            {
-              predicate = let (_s: TokenWalker) = _s.text == "(";,
-              extractor =
-                let (_s: TokenWalker) =
-                  _s
-                  --> (
-                    {
-                      expected = ["("],
-                      typeName = TokenTypeName.Punctuation,
-                    } -> TokenWalker_Expect
-                  )
-                ;
-            } -> TokenWalker_If
-          )
-          --> (
-            {
-              expected = [")"],
-              typeName = TokenTypeName.Operator,
-            } -> TokenWalker_Expect
-          )
+          --> { start = "(", end = ")" }
+            -> TypeArg_ParseArray
           --> (
             {
               expected = [":"],
@@ -93,17 +51,8 @@ namespace cinder_ast {
         ) ++
         (
           args |
-            let (_s: Type[]): CompilerError[] =
-              _s
-              --> iterator_fromArray<T: Type>
-              --> (
-                { selector = let (_s: Type) = _s.errors --> iterator_fromArray<T: CompilerError>; }
-                -> iterator_select<T: Type, TResult: iterator<T: CompilerError>>
-              )
-              --> iterator_flatten<T: CompilerError>
-              --> iterator_toArray<T: CompilerError>
-            ;
-            let (_s: null) = [];
+            let (_s: Type[]) = _s --> utils_EntryArrayErrors;
+            let (_s: null) = NoErrors;
         ),
       is_type = true,
       is_pipeable = true,

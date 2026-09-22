@@ -1,5 +1,6 @@
 namespace cinder_ast {
   struct TypePrimitive : Type
+    is_primitive: bool
     name: string
   ;
 }

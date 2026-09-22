@@ -3,7 +3,6 @@ import type { Location } from "#utils";
 import type { Shape } from "#writer";
 import { EntityStruct } from "./EntityStruct.ts";
 import type { Entry } from "./Entry.ts";
-import { LinkerError } from "./LinkerError.ts";
 import { Type } from "./Type.ts";
 import { TypeArg } from "./TypeArg.ts";
 import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";

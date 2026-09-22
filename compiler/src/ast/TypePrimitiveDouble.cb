@@ -1,0 +1,34 @@
+namespace cinder_ast {
+  struct TypePrimitiveDouble : TypePrimitive
+    is_double: bool
+  ;
+
+  let
+    [parses="type", match="^double$", chainable="false", priority="150"]
+    TypePrimitiveDouble_Parse (
+      _s: TokenWalker,
+      parent: EntryParent,
+      left: Type | null
+    ): TypePrimitiveDouble
+  =
+      let walker = _s;
+      let final =
+        _s
+          --> (
+            {
+              expected = ["double"],
+              typeName = TokenTypeName.Operator,
+            } -> TokenWalker_Expect
+          )
+          --> TokenWalker_Finish
+      ;
+    {
+      range = _s.range,
+      done = final.walker,
+      errors = [],
+      is_type = true,
+      is_primitive = true,
+      is_double = true,
+    }
+  ;
+}

@@ -1,0 +1,34 @@
+namespace cinder_ast {
+  struct TypePrimitiveInt : TypePrimitive
+    is_int: bool
+  ;
+
+  let
+    [parses="type", match="^int$", chainable="false", priority="150"]
+    TypePrimitiveInt_Parse (
+      _s: TokenWalker,
+      parent: EntryParent,
+      left: Type | null
+    ): TypePrimitiveInt
+  =
+      let walker = _s;
+      let final =
+        _s
+          --> (
+            {
+              expected = ["int"],
+              typeName = TokenTypeName.Operator,
+            } -> TokenWalker_Expect
+          )
+          --> TokenWalker_Finish
+      ;
+    {
+      range = _s.range,
+      done = final.walker,
+      errors = [],
+      is_type = true,
+      is_primitive = true,
+      is_int = true,
+    }
+  ;
+}

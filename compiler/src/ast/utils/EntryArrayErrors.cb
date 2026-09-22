@@ -1,0 +1,14 @@
+namespace cinder_ast_utils {
+  use std;
+
+  let EntryArrayErrors (_s: Entry[]): CompilerError[] =
+    _s
+      --> iterator_fromArray<T: Entry>
+      --> (
+        { selector = let (_s: Entry) = _s.errors --> iterator_fromArray<T: CompilerError>; }
+        -> iterator_select<T: Entry, TResult: iterator<T: CompilerError>>
+      )
+      --> iterator_flatten<T: CompilerError>
+      --> iterator_toArray<T: CompilerError>
+  ;
+}

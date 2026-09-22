@@ -9,7 +9,6 @@ import type { Entry } from "./Entry.ts";
 import { TokenTypeName } from "#tokeniser";
 import { EntityNamespace } from "./EntityNamespace.ts";
 import type { CreateFunc } from "#writer";
-import { Namer } from "./Namer.ts";
 import type { TypeArg } from "./TypeArg.ts";
 import { LinkerError } from "./LinkerError.ts";
 
@@ -34,23 +33,23 @@ export class EntityLet extends EntityNamespace {
   constructor(base: EntityLet, generics: Array<TypeArg>);
   constructor(...input: [walker: TokenWalker, parent: () => Entry | undefined] | [base: EntityLet, generics: Array<TypeArg>]) {
     let generics: Array<TypeArg>;
-    let internalName: string;
+    let existingInternalName: string | undefined = undefined;
     let walker: TokenWalker;
     let parent: () => Entry | undefined;
     if (input[0] instanceof TokenWalker && typeof input[1] === "function") {
       [walker, parent] = input;
       generics = [];
-      internalName = Namer.Next;
     } else {
       const [base, gen] = input as [base: EntityLet, generics: Array<TypeArg>];
       walker = base.#walker;
       parent = () => base.parent;
       generics = gen;
-      internalName = base.#internalName;
+      existingInternalName = base.#internalName;
     }
 
-    const [{ name, args, returns, contents, tags, entities }, done] = walker
+    const [{ name, args, returns, contents, tags, entities, internalName }, done] = walker
       .expect("let", TokenTypeName.KeyWord, () => this)
+      .internal("internalName", existingInternalName)
       .if(
         (s) => s.data === "[",
         (s) =>

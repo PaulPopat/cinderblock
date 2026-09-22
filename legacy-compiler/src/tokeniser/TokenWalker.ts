@@ -1,13 +1,14 @@
 import { Location, Range } from "#utils";
 import type { Entry } from "../ast/Entry.ts";
 import { ParserError } from "../ast/ParserError.ts";
+import { Namer } from "./Namer.ts";
 import type { Token } from "./Token.ts";
 import { TokenType } from "./TokenType.ts";
 import type { TokenTypeName } from "./TokenTypeName.ts";
 
 export class TokenWalker<TContext extends Record<never, never> = Record<never, never>> {
   static start(tokens: Array<Token>) {
-    return new TokenWalker({}, tokens, [], 0);
+    return new TokenWalker({}, tokens, [], 0, Namer.Start);
   }
 
   static get empty() {
@@ -18,12 +19,14 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
   readonly #tokens: Array<Token>;
   readonly #types: Array<TokenType>;
   readonly #index: number;
+  readonly #namer: Namer;
 
-  private constructor(data: TContext, tokens: Array<Token>, types: Array<TokenType>, index: number) {
+  private constructor(data: TContext, tokens: Array<Token>, types: Array<TokenType>, index: number, namer: Namer) {
     this.#data = data;
     this.#tokens = tokens;
     this.#types = types;
     this.#index = index;
+    this.#namer = namer;
   }
 
   get current() {
@@ -45,7 +48,7 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
   }
 
   get previous() {
-    return new TokenWalker(this.#data, this.#tokens, this.#types, this.#index - 1);
+    return new TokenWalker(this.#data, this.#tokens, this.#types, this.#index - 1, this.#namer);
   }
 
   get range() {
@@ -64,16 +67,22 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
       throw new ParserError(`Expected ${expected.join(", ")} but found ${this.data}`, this);
     }
 
-    return new TokenWalker(this.#data, this.#tokens, [...this.#types, new TokenType(this.range, self, typeName)], this.#index + 1);
+    return new TokenWalker(this.#data, this.#tokens, [...this.#types, new TokenType(this.range, self, typeName)], this.#index + 1, this.#namer);
   }
 
   extract<TKey extends string, TResult extends Entry>(name: TKey, extractor: (walker: TokenWalker, soFar: TContext) => TResult) {
     type NewContext = TContext & {
       [key in TKey]: TResult;
     };
-    const result = extractor(new TokenWalker({}, this.#tokens, this.#types, this.#index), this.#data);
+    const result = extractor(new TokenWalker({}, this.#tokens, this.#types, this.#index, this.#namer), this.#data);
 
-    return new TokenWalker<NewContext>({ ...this.#data, [name]: result } as NewContext, result.done.#tokens, result.done.#types, result.done.#index);
+    return new TokenWalker<NewContext>(
+      { ...this.#data, [name]: result } as NewContext,
+      result.done.#tokens,
+      result.done.#types,
+      result.done.#index,
+      result.done.#namer,
+    );
   }
 
   if<TResult extends Record<never, never>>(
@@ -96,6 +105,23 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
       this.#tokens,
       [...this.#types, new TokenType(this.range, self, typeName)],
       this.#index + 1,
+      this.#namer,
+    );
+  }
+
+  internal<TKey extends string>(name: TKey, existing?: string) {
+    type NewContext = TContext & {
+      [key in TKey]: string;
+    };
+    return new TokenWalker<NewContext>(
+      {
+        ...this.#data,
+        [name]: existing ?? this.#namer.name,
+      } as NewContext,
+      this.#tokens,
+      this.#types,
+      this.#index,
+      existing != null ? this.#namer : this.#namer.next,
     );
   }
 
@@ -110,12 +136,18 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
     let newStore: TokenWalker = this;
 
     while (!newStore.done && (whileResult = predicate(newStore))) {
-      const baseExtract = extractor(new TokenWalker({}, newStore.#tokens, newStore.#types, newStore.#index), whileResult);
+      const baseExtract = extractor(new TokenWalker({}, newStore.#tokens, newStore.#types, newStore.#index, newStore.#namer), whileResult);
       result = [...result, baseExtract];
       newStore = baseExtract.done;
     }
 
-    return new TokenWalker<NewContext>({ ...this.#data, [name]: result } as NewContext, newStore.#tokens, newStore.#types, newStore.#index);
+    return new TokenWalker<NewContext>(
+      { ...this.#data, [name]: result } as NewContext,
+      newStore.#tokens,
+      newStore.#types,
+      newStore.#index,
+      newStore.#namer,
+    );
   }
 
   reduce<TKey extends string, TResult extends Entry, TWhile>(
@@ -130,11 +162,17 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
     let newStore: TokenWalker = this;
 
     while (!newStore.done && (whileResult = predicate(newStore, result))) {
-      result = extractor(new TokenWalker({}, newStore.#tokens, newStore.#types, newStore.#index), whileResult, result);
+      result = extractor(new TokenWalker({}, newStore.#tokens, newStore.#types, newStore.#index, newStore.#namer), whileResult, result);
       newStore = result.done;
     }
 
-    return new TokenWalker<NewContext>({ ...this.#data, [name]: result } as NewContext, newStore.#tokens, newStore.#types, newStore.#index);
+    return new TokenWalker<NewContext>(
+      { ...this.#data, [name]: result } as NewContext,
+      newStore.#tokens,
+      newStore.#types,
+      newStore.#index,
+      newStore.#namer,
+    );
   }
 
   finish() {
@@ -142,6 +180,6 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
   }
 
   with(tokens: Array<Token>) {
-    return new TokenWalker(this.#data, [...this.#tokens, ...tokens], this.#types, this.#index);
+    return new TokenWalker(this.#data, [...this.#tokens, ...tokens], this.#types, this.#index, this.#namer);
   }
 }

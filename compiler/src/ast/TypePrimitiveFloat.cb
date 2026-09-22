@@ -1,0 +1,34 @@
+namespace cinder_ast {
+  struct TypePrimitiveFloat : TypePrimitive
+    is_float: bool
+  ;
+
+  let
+    [parses="type", match="^float$", chainable="false", priority="150"]
+    TypePrimitiveFloat_Parse (
+      _s: TokenWalker,
+      parent: EntryParent,
+      left: Type | null
+    ): TypePrimitiveFloat
+  =
+      let walker = _s;
+      let final =
+        _s
+          --> (
+            {
+              expected = ["float"],
+              typeName = TokenTypeName.Operator,
+            } -> TokenWalker_Expect
+          )
+          --> TokenWalker_Finish
+      ;
+    {
+      range = _s.range,
+      done = final.walker,
+      errors = [],
+      is_type = true,
+      is_primitive = true,
+      is_float = true,
+    }
+  ;
+}

@@ -4,7 +4,6 @@ import { Entity } from "./Entity.ts";
 import { EntityArg } from "./EntityArg.ts";
 import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
-import { Namer } from "./Namer.ts";
 import { Type } from "./Type.ts";
 import { TypePipeable } from "./TypePipeable.ts";
 
@@ -21,11 +20,12 @@ export class ExpressionLet extends Expression {
   readonly #returns: Type | undefined;
   readonly #entities: Array<Entity>;
   readonly #contents: Expression;
-  readonly #internalName = Namer.Next;
+  readonly #internalName: string;
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
-    const [{ args, returns, contents, entities }, done] = walker
+    const [{ args, returns, contents, entities, internalName }, done] = walker
       .expect("let", TokenTypeName.KeyWord, () => this)
+      .internal("internalName")
       .if(
         (s) => s.data === "(",
         (walker) =>
@@ -56,6 +56,7 @@ export class ExpressionLet extends Expression {
     this.#returns = returns;
     this.#entities = entities;
     this.#contents = contents;
+    this.#internalName = internalName;
   }
 
   get args() {

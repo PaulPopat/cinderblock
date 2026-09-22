@@ -49,18 +49,16 @@ export class CinderBlockBinary {
 
   async run(letName: string | AppFunc, args: Record<string, unknown>) {
     const module = await this.#module;
-    try {
-      const target = typeof letName === "object" ? letName.id : this.#metadata.funcs[["App", letName].join("_")]?.id;
-      if (!target) throw new Error(`Could not find name ${letName}`);
-      const response = await module.Run(target, variabliseTuple(args));
-      if (response.is_success) {
-        return extract(response.data as Variable);
-      }
-
-      throw new Error(`ERR! CinderBlock run failed with error ${response.error}`);
-    } catch (err) {
-      throw module.getExceptionMessage(err);
+    const target = typeof letName === "object" ? letName.id : this.#metadata.funcs[["App", letName].join("_")]?.id;
+    if (!target) {
+      throw new Error(`Could not find name ${letName}`);
     }
+    const response = await module.Run(target, variabliseTuple(args));
+    if (response.is_success) {
+      return extract(response.data as Variable);
+    }
+
+    throw new Error(`ERR! CinderBlock run failed with error ${response.error}`);
   }
 
   withTag(key: string) {
