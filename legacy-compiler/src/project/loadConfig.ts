@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-type CinderblockConfig = {
+
+export type CinderblockConfig = {
   main?: string;
   lib_dirs?: Array<string>;
 };

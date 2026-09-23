@@ -2,14 +2,12 @@ import { Entity, EntityLet, EntityNamespace } from "#ast";
 import { TokenWalker } from "#tokeniser";
 import { Location } from "#utils";
 import { serialiseApp } from "#writer";
-import { CinderBlockBinary, type AppMetadata } from "@cinderblock-lang/runner";
+import { type AppMetadata } from "@cinderblock-lang/runner";
 
 type BinaryData = {
   data: Buffer;
   metadata: AppMetadata;
 };
-
-const emptyStart = [Location.empty, TokenWalker.empty, () => undefined] as const;
 
 export abstract class App extends EntityNamespace {
   constructor(entities: Array<Entity>) {
@@ -33,10 +31,5 @@ export abstract class App extends EntityNamespace {
         ),
       },
     };
-  }
-
-  binary(globals: Record<string, unknown> | Promise<Record<string, unknown>> = {}) {
-    const { data, metadata } = this.binaryData;
-    return CinderBlockBinary.FromMemory(data, metadata, globals);
   }
 }

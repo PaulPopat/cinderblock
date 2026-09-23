@@ -9,7 +9,8 @@
   "description": "The compiler for the CinderBlock programming language",
   "author": "Paul Popat",
   "dependencies": {
-    "@cinderblock-lang/runner": "*"
+    "@cinderblock-lang/runner": "*",
+    "esbuild": "^0.28.2"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",

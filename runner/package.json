@@ -18,7 +18,8 @@
   },
   "imports": {
     "#variable": "./src/variable/index.ts",
-    "#std": "./src/std/index.ts"
+    "#project": "./src/project/index.ts",
+    "#app": "./src/index.ts"
   },
   "exports": {
     ".": "./src/index.ts"
@@ -28,5 +29,8 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "bin": {
+    "cbrun": "./bin/runner.ts"
   }
 }
