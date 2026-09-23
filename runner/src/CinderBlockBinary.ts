@@ -116,11 +116,11 @@ export class CinderBlockBinary {
         this.#main.call(this);
       }
       case "test": {
-        let totalTests = 0;
-        let passingTests = 0;
-        for (const test of this.withTag("test")) {
-          totalTests += 1;
-          const testName = test.tags.test!;
+        const [testName] = args;
+        if (testName) {
+          const [test] = this.withTagOf("test", testName);
+          if (!test) throw new Error(`Test "${testName}" not found`);
+
           try {
             const result = await this.run(test, {});
             if (typeof result !== "object" || !result || !("actual" in result) || !("expected" in result)) {
@@ -130,19 +130,41 @@ export class CinderBlockBinary {
 
             assert.deepEqual(result.actual, result.expected);
 
-            passingTests += 1;
             console.log(`${testName} - PASS`);
           } catch (err) {
             console.log(err);
             console.log(`${testName} - FAILED`);
+            process.exit(1);
           }
-        }
-
-        if (totalTests === passingTests) {
-          console.log(`All ${totalTests} tests passed!`);
         } else {
-          console.log(`${passingTests}/${totalTests} passed. See failing tests above.`);
-          process.exit(1);
+          let totalTests = 0;
+          let passingTests = 0;
+          for (const test of this.withTag("test")) {
+            totalTests += 1;
+            const testName = test.tags.test!;
+            try {
+              const result = await this.run(test, {});
+              if (typeof result !== "object" || !result || !("actual" in result) || !("expected" in result)) {
+                console.log("Invalid response type");
+                throw new Error();
+              }
+
+              assert.deepEqual(result.actual, result.expected);
+
+              passingTests += 1;
+              console.log(`${testName} - PASS`);
+            } catch (err) {
+              console.log(err);
+              console.log(`${testName} - FAILED`);
+            }
+          }
+
+          if (totalTests === passingTests) {
+            console.log(`All ${totalTests} tests passed!`);
+          } else {
+            console.log(`${passingTests}/${totalTests} passed. See failing tests above.`);
+            process.exit(1);
+          }
         }
       }
     }
