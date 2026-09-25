@@ -5,14 +5,15 @@ import { App } from "./App.ts";
 import fs from "node:fs";
 import esbuild from "esbuild";
 import crypto from "node:crypto";
-import type { CinderblockConfig } from "./loadConfig.ts";
+import { loadConfig, type CinderblockConfig } from "./loadConfig.ts";
 
 export class Project extends App {
   readonly #root: string;
   readonly #config: CinderblockConfig;
   readonly #types: Array<TokenType>;
 
-  constructor(baseDir: string, config: CinderblockConfig) {
+  constructor(baseDir: string) {
+    const config = loadConfig(baseDir);
     const [{ entities }, done] = TokenWalker.start(
       [baseDir, ...(config.lib_dirs?.map((l) => path.resolve(baseDir, l)) ?? [])].flatMap((root) =>
         fs
@@ -44,6 +45,10 @@ export class Project extends App {
     fs.writeFileSync(path.resolve(this.root, ".cinder/app.block"), data);
     fs.writeFileSync(path.resolve(this.root, ".cinder/metadata.json"), JSON.stringify(metadata));
 
+    try {
+      fs.rmSync(path.resolve(this.root, ".cinder", "imports"), { recursive: true });
+    } catch {}
+
     for (const root of this.#roots) {
       for (const file of fs.readdirSync(root, { recursive: true, encoding: "utf8" })) {
         if (!file.endsWith(".cb.ts")) continue;
@@ -62,7 +67,7 @@ export class Project extends App {
     if (this.#config.main) {
       await esbuild.build({
         entryPoints: [path.resolve(this.#root, this.#config.main)],
-        outfile: path.resolve(this.root, ".cinder", 'main.js'),
+        outfile: path.resolve(this.root, ".cinder", "main.js"),
         format: "esm",
         bundle: true,
         minify: true,

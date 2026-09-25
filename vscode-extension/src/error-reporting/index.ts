@@ -1,1 +1,1 @@
-export * from "./ErrorReporter.ts";
+export * from "./AppExtension.ts";

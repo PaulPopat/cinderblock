@@ -1,4 +1,4 @@
-import fs from "node:fs/promises";
+import fs from "node:fs";
 import path from "node:path";
 
 export type CinderblockConfig = {
@@ -6,10 +6,10 @@ export type CinderblockConfig = {
   lib_dirs?: Array<string>;
 };
 
-export async function loadConfig(dir: string) {
+export function loadConfig(dir: string) {
   let config: CinderblockConfig = {};
   try {
-    const packageJson = JSON.parse(await fs.readFile(path.resolve(dir, "package.json"), "utf8"));
+    const packageJson = JSON.parse(fs.readFileSync(path.resolve(dir, "package.json"), "utf8"));
     if ("cinderblock" in packageJson) {
       config = packageJson.cinderblock;
     }

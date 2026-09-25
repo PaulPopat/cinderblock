@@ -1,27 +1,54 @@
+import * as vscode from "vscode";
 import {
+  Project,
+  CompilerError,
   EntityLet,
   EntityStruct,
   ExpressionAccess,
   ExpressionReference,
   ExpressionTuplePart,
-  loadConfig,
-  Project,
   Range,
   Type,
   TypeReference,
   TypeTuple,
 } from "@cinderblock-lang/legacy-compiler";
-import * as vscode from "vscode";
+import path from "node:path";
 
-export class DefinitionProvider implements vscode.DefinitionProvider, vscode.HoverProvider, vscode.Disposable {
-  readonly #workspacePath: vscode.WorkspaceFolder;
-  readonly #cleanup: Array<vscode.Disposable>;
+export class AppExtension implements vscode.DefinitionProvider, vscode.HoverProvider, vscode.Disposable {
+  #project: Project | undefined = undefined;
+  readonly #cleanup: Array<vscode.Disposable> = [];
+  readonly #diagnostics: vscode.DiagnosticCollection;
+  readonly #workspacePath: vscode.Uri;
+  readonly #watcher: vscode.FileSystemWatcher;
 
-  constructor(workspacePath: vscode.WorkspaceFolder) {
+  constructor(workspacePath: vscode.Uri) {
     this.#workspacePath = workspacePath;
-    this.#cleanup = [];
     this.#cleanup.push(vscode.languages.registerDefinitionProvider({ language: "cinderblock", scheme: "file" }, this));
     this.#cleanup.push(vscode.languages.registerHoverProvider({ language: "cinderblock", scheme: "file" }, this));
+    this.#diagnostics = vscode.languages.createDiagnosticCollection("cinderblock");
+    this.#cleanup.push(this.#diagnostics);
+
+    let timeout: NodeJS.Timeout | number | undefined = undefined;
+    this.#watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(vscode.Uri.file(this.#workspacePath.fsPath), "**/*.cb"));
+    this.#cleanup.push(this.#watcher);
+
+    const checker = () => {
+      if (timeout) clearTimeout(timeout);
+      setTimeout(() => this.check(), 10_000);
+    };
+
+    this.#watcher.onDidChange(checker);
+    this.#watcher.onDidCreate(checker);
+    this.#watcher.onDidDelete(checker);
+    this.check();
+  }
+
+  #tryCreateProject() {
+    try {
+      return new Project(this.#workspacePath.fsPath);
+    } catch {
+      return undefined;
+    }
   }
 
   dispose() {
@@ -30,14 +57,34 @@ export class DefinitionProvider implements vscode.DefinitionProvider, vscode.Hov
     }
   }
 
+  check() {
+    this.#diagnostics.clear();
+
+    try {
+      this.#project = this.#tryCreateProject();
+      this.#project?.binaryData;
+    } catch (err) {
+      if (!(err instanceof CompilerError)) return;
+
+      this.#diagnostics.set(vscode.Uri.file(path.resolve(this.#workspacePath.fsPath, err.range.from.file)), [
+        {
+          range: new vscode.Range(
+            new vscode.Position(err.range.from.line - 1, err.range.from.character - 1),
+            new vscode.Position(err.range.to.line - 1, err.range.to.character - 1),
+          ),
+          message: err.compilerMessage,
+          severity: vscode.DiagnosticSeverity.Error,
+        },
+      ]);
+    }
+  }
+
   async #resolve(document: vscode.TextDocument, position: vscode.Position) {
     // This should definitely improve
-    if (!document.uri.fsPath.startsWith(this.#workspacePath.uri.fsPath + "/")) return;
-    const relativePath = document.uri.fsPath.replace(this.#workspacePath.uri.fsPath + "/", "");
+    if (!document.uri.fsPath.startsWith(this.#workspacePath.fsPath + "/")) return;
+    const relativePath = document.uri.fsPath.replace(this.#workspacePath.fsPath + "/", "");
 
-    const config = await loadConfig(this.#workspacePath.uri.fsPath);
-    const project = new Project(this.#workspacePath.uri.fsPath, ...(config.lib_dirs ?? []));
-    return project.types.find((t) => t.entry && t.range.within(relativePath, position.line + 1, position.character + 1))?.entry;
+    return this.#project?.types.find((t) => t.entry && t.range.within(relativePath, position.line + 1, position.character + 1))?.entry;
   }
 
   async provideDefinition(
@@ -49,7 +96,7 @@ export class DefinitionProvider implements vscode.DefinitionProvider, vscode.Hov
     if (!found) return;
 
     const goTo = (range: Range) => ({
-      uri: vscode.Uri.joinPath(this.#workspacePath.uri, range.from.file),
+      uri: vscode.Uri.joinPath(this.#workspacePath, range.from.file),
       range: new vscode.Range(
         new vscode.Position(range.from.line - 1, range.from.character - 1),
         new vscode.Position(range.from.line - 1, range.to.character - 1),
