@@ -12,17 +12,6 @@
       "args": ["--extensionDevelopmentPath=${workspaceFolder}/vscode-extension"],
       "outFiles": ["${workspaceFolder}/vscode-extension/dist/**/*.js"],
       "preLaunchTask": "${defaultBuildTask}"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Launch Program",
-      "skipFiles": ["<node_internals>/**"],
-      "program": "budget-tracker/src/index.ts",
-      "outFiles": ["${workspaceFolder}/**/*.js"],
-      "env": {
-        "DATABASE_LOCATION": "${workspaceFolder}/budget-tracker/app.db"
-      }
     }
   ]
 }

@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { SemanticHighlighter } from "./syntax-highlighting/index.ts";
-import { AppExtension } from "./error-reporting/index.ts";
+import { AppExtension } from "./app-extension/index.ts";
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(new SemanticHighlighter());
