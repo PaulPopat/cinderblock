@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
 import {
-  Project,
   CompilerError,
   EntityLet,
   EntityStruct,
@@ -13,6 +12,7 @@ import {
   TypeTuple,
 } from "@cinderblock-lang/legacy-compiler";
 import path from "node:path";
+import { Project } from "@cinderblock-lang/sosso";
 
 export class AppExtension implements vscode.DefinitionProvider, vscode.HoverProvider, vscode.Disposable {
   #project: Project | undefined = undefined;

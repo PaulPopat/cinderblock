@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { Inline } from "@cinderblock-lang/legacy-compiler";
+import { Inline } from "@cinderblock-lang/sosso";
 
 export class SemanticHighlighter implements vscode.DocumentSemanticTokensProvider, vscode.Disposable {
   readonly #clenaup: vscode.Disposable;

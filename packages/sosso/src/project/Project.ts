@@ -1,11 +1,9 @@
-import { Entity } from "#ast";
-import { Tokeniser, TokenType, TokenWalker } from "#tokeniser";
 import path from "node:path";
-import { App } from "./App.ts";
 import fs from "node:fs";
 import esbuild from "esbuild";
 import crypto from "node:crypto";
 import { loadConfig, type CinderblockConfig } from "./loadConfig.ts";
+import { TokenType, TokenWalker, Tokeniser, Entity, App } from "@cinderblock-lang/legacy-compiler";
 
 export class Project extends App {
   readonly #root: string;

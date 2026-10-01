@@ -7,10 +7,7 @@
   "scripts": {
     "test": "node --test"
   },
-  "devDependencies": {
-    "@types/node": "^25.6.0",
-    "typescript": "^6.0.3"
-  },
+  "devDependencies": {},
   "dependencies": {
     "@cinderblock-lang/legacy-compiler": "*"
   },

@@ -1,7 +1,5 @@
-import { Entity } from "#ast";
-import { Tokeniser, TokenType, TokenWalker } from "#tokeniser";
+import { App, Entity, Tokeniser, TokenType, TokenWalker } from "@cinderblock-lang/legacy-compiler";
 import { CinderBlockBinary } from "@cinderblock-lang/runner";
-import { App } from "./App.ts";
 
 export class Inline extends App {
   readonly #types: Array<TokenType>;

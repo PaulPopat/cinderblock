@@ -11,9 +11,7 @@
   "description": "The runner for the CinderBlock programming language",
   "author": "Paul Popat",
   "devDependencies": {
-    "@cinderblock-lang/runner": "*",
-    "@types/node": "^25.6.0",
-    "typescript": "^6.0.3"
+    "@cinderblock-lang/runner": "*"
   },
   "imports": {},
   "exports": {

@@ -11,12 +11,10 @@
   "description": "The compiler for the CinderBlock programming language",
   "author": "Paul Popat",
   "dependencies": {
+    "@cinderblock-lang/legacy-compiler": "*",
     "@cinderblock-lang/runner": "*"
   },
-  "devDependencies": {
-    "@types/node": "^25.6.0",
-    "typescript": "^6.0.3"
-  },
+  "devDependencies": {},
   "imports": {
     "#ast": "./src/ast/index.ts",
     "#tokeniser": "./src/tokeniser/index.ts",
@@ -25,8 +23,7 @@
     "#writer": "./src/writer/index.ts"
   },
   "exports": {
-    ".": "./src/index.ts",
-    "./runner": "./src/runner/Binary.ts"
+    ".": "./src/index.ts"
   },
   "prettier": {
     "printWidth": 150

@@ -15,7 +15,7 @@
         "isDefault": true
       },
       "options": {
-        "cwd": "${workspaceFolder}/vscode-extension"
+        "cwd": "${workspaceFolder}/packages/vscode-extension"
       }
     }
   ]

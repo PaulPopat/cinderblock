@@ -1,5 +1,5 @@
 {
-  "name": "@cinderblock-lang/legacy-compiler",
+  "name": "@cinderblock-lang/sosso",
   "scripts": {
     "typecheck": "tsc --noEmit"
   },
@@ -12,19 +12,12 @@
     "@cinderblock-lang/runner": "*",
     "esbuild": "^0.28.2"
   },
-  "devDependencies": {},
   "imports": {
-    "#ast": "./src/ast/index.ts",
-    "#tokeniser": "./src/tokeniser/index.ts",
-    "#utils": "./src/utils/index.ts",
-    "#struct": "./src/struct/index.ts",
-    "#writer": "./src/writer/index.ts",
     "#project": "./src/project/index.ts",
     "#app": "./src/index.ts"
   },
   "exports": {
-    ".": "./src/index.ts",
-    "./runner": "./src/runner/Binary.ts"
+    ".": "./src/index.ts"
   },
   "prettier": {
     "printWidth": 150
