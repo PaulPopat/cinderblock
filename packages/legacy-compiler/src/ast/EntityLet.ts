@@ -91,7 +91,10 @@ export class EntityLet extends EntityNamespace {
     super(walker.location, done, parent, name ?? internalName, entities);
     this.#walker = walker;
     this.#tags = tags ?? [];
-    this.#args = executionArgs?.map((a) => new EntityArg(a)) ?? args ?? [];
+    this.#args = [
+      ...(executionArgs?.map((a) => new EntityArg(a)) ?? []),
+      ...(args?.filter((a) => !executionArgs?.find((e) => e.name === a.name)) ?? []),
+    ];
     this.#returns = returns;
     this.#contents = contents;
     this.#internalName = internalName;
