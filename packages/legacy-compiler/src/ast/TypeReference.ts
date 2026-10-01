@@ -4,28 +4,13 @@ import type { Shape } from "#writer";
 import { EntityStruct } from "./EntityStruct.ts";
 import type { Entry } from "./Entry.ts";
 import { Type } from "./Type.ts";
-import { TypeArg } from "./TypeArg.ts";
 import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
 
 export class TypeReference extends Type {
   static ParseReference(walker: TokenWalker, parent: () => Entry | undefined, left?: Type) {
-    const [{ value, args }, done] = walker
-      .text("value", TokenTypeName.StructReference, (): TypeReference => result)
-      .if(
-        (s) => s.data === "<",
-        (s) =>
-          s
-            .expect("<", TokenTypeName.Punctuation)
-            .while(
-              "args",
-              (s) => s.data !== ">",
-              (s): TypeArg => TypeArg.Parse(s, () => result),
-            )
-            .expect(">", TokenTypeName.Punctuation),
-      )
-      .finish();
+    const [{ value }, done] = walker.text("value", TokenTypeName.StructReference, (): TypeReference => result).finish();
 
-    const result = new TypeReference(walker.location, done, parent, value, args ?? []);
+    const result = new TypeReference(walker.location, done, parent, value);
     return result;
   }
 
@@ -39,12 +24,10 @@ export class TypeReference extends Type {
   }
 
   readonly #name: string;
-  readonly #generics: Array<TypeArg>;
 
-  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined, name: string, generics: Array<TypeArg>) {
+  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined, name: string) {
     super(location, done, parent);
     this.#name = name;
-    this.#generics = generics;
   }
 
   get name() {
@@ -58,8 +41,7 @@ export class TypeReference extends Type {
   flattened(): Type {
     const result = this.float(this.#name);
     if (result instanceof EntityStruct) {
-      const final = new EntityStruct(result, this.#generics);
-      return final.type.flattened();
+      return result.type.flattened();
     }
 
     if (result instanceof Type) {
@@ -76,12 +58,11 @@ export class TypeReference extends Type {
   representation(depth: number): string {
     const result = this.float(this.#name);
     if (result instanceof EntityStruct) {
-      const final = new EntityStruct(result, this.#generics);
       if (depth > 1) {
-        return final.name;
+        return result.name;
       }
 
-      return final.type.representation(depth + 1);
+      return result.type.representation(depth + 1);
     }
 
     if (result instanceof Type) {

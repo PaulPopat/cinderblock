@@ -4,15 +4,26 @@ import { TypePipeable } from "./TypePipeable.ts";
 import { TypeTuple } from "./TypeTuple.ts";
 import type { Instruction } from "#writer";
 import type { Type } from "./Type.ts";
+import type { TypeArg } from "./TypeArg.ts";
+import { ExpressionReference } from "./ExpressionReference.ts";
+import { EntityLet } from "./EntityLet.ts";
 
 export abstract class ExpressionOperatorPipeBase extends ExpressionOperator {
   abstract get leftType(): TypeTuple;
 
   abstract get leftInstructions(): Instruction;
 
+  rightType(args: Array<TypeArg>) {
+    return this.right instanceof ExpressionReference
+      ? this.right.subject instanceof EntityLet
+        ? new EntityLet(this.right.subject, args).type
+        : this.right.resolution
+      : this.right.resolution;
+  }
+
   get resolution(): Type {
     const input = this.leftType;
-    const right = this.right.resolution;
+    const right = this.rightType(input.args);
     if (right instanceof TypePipeable) {
       const remaining = right.args.filter((r) => !(input as TypeTuple).args.find((a) => a.name === r.name));
 
@@ -33,7 +44,7 @@ export abstract class ExpressionOperatorPipeBase extends ExpressionOperator {
 
   get instruction(): Instruction {
     const input = this.leftType;
-    const right = this.right.resolution;
+    const right = this.rightType(input.args);
     if (right instanceof TypePipeable) {
       for (const arg of input.args) {
         const match = right.args.find((a) => a.name === arg.name);

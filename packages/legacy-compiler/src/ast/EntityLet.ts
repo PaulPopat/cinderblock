@@ -24,26 +24,24 @@ export class EntityLet extends EntityNamespace {
   readonly #walker: TokenWalker;
   readonly #tags: Array<EntryTag>;
   readonly #args: Array<EntityArg>;
-  readonly #generics: Array<TypeArg>;
   readonly #returns: Type | undefined;
   readonly #contents: Expression;
   readonly #internalName: string;
 
   constructor(walker: TokenWalker, parent: () => Entry | undefined);
-  constructor(base: EntityLet, generics: Array<TypeArg>);
-  constructor(...input: [walker: TokenWalker, parent: () => Entry | undefined] | [base: EntityLet, generics: Array<TypeArg>]) {
-    let generics: Array<TypeArg>;
+  constructor(base: EntityLet, executionArgs: Array<TypeArg>);
+  constructor(...input: [walker: TokenWalker, parent: () => Entry | undefined] | [base: EntityLet, executionArgs: Array<TypeArg>]) {
+    let executionArgs: Array<TypeArg> | undefined = undefined;
     let existingInternalName: string | undefined = undefined;
     let walker: TokenWalker;
     let parent: () => Entry | undefined;
     if (input[0] instanceof TokenWalker && typeof input[1] === "function") {
       [walker, parent] = input;
-      generics = [];
     } else {
-      const [base, gen] = input as [base: EntityLet, generics: Array<TypeArg>];
+      const [base, gen] = input as [base: EntityLet, executionArgs: Array<TypeArg>];
       walker = base.#walker;
       parent = () => base.parent;
-      generics = gen;
+      executionArgs = gen;
       existingInternalName = base.#internalName;
     }
 
@@ -93,10 +91,9 @@ export class EntityLet extends EntityNamespace {
     super(walker.location, done, parent, name ?? internalName, entities);
     this.#walker = walker;
     this.#tags = tags ?? [];
-    this.#args = args ?? [];
+    this.#args = executionArgs?.map((a) => new EntityArg(a)) ?? args ?? [];
     this.#returns = returns;
     this.#contents = contents;
-    this.#generics = generics;
     this.#internalName = internalName;
   }
 
@@ -149,11 +146,7 @@ export class EntityLet extends EntityNamespace {
   }
 
   float(name: string): Entry | undefined {
-    return (
-      this.#args.reduce((result, arg) => result ?? arg.dig(name), undefined as Entry | undefined) ??
-      this.#generics.reduce((result, arg) => result ?? arg.dig(name), undefined as Entry | undefined) ??
-      super.float(name)
-    );
+    return this.#args.reduce((result, arg) => result ?? arg.dig(name), undefined as Entry | undefined) ?? super.float(name);
   }
 
   get model(): Array<CreateFunc> {
