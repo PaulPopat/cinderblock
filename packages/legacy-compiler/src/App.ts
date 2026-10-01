@@ -26,6 +26,11 @@ export abstract class App extends EntityNamespace {
               {
                 id: e.internalName,
                 tags: e.tags.map((t) => ({ key: t.key, value: t.value?.toString() ?? "" })),
+                location: {
+                  file: e.location.file,
+                  line: e.location.line,
+                  character: e.location.character,
+                },
               },
             ]),
         ),

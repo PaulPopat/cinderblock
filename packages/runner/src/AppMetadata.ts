@@ -4,6 +4,7 @@ export type AppMetadata = {
     {
       id: string;
       tags: Array<{ key: string; value: string }>;
+      location: { file: string; line: number; character: number };
     }
   >;
 };
