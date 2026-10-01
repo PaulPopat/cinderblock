@@ -198,26 +198,15 @@ describe("logic", () => {
     assert.equal(result, true);
   });
 
-  test("generic let", async () => {
-    const code = new Inline(
-      `
-        let internal (_s: Test) = _s;
-        let result = ({ test = "data" } --> internal<Test: struct test: string ;>).test;
-      `,
-    );
-    const result = await code.binary().run("result", {});
-    assert.equal(result, "data");
-  });
-
-  test("generic struct", async () => {
+  test("deep unknown inference", async () => {
     const code = new Inline(
       `
         struct uses_generic
-          part: Test
+          part: unknown
         ;
 
-        let internal (_s: uses_generic<Test: string>) = _s;
-        let result = ({ part = "data" } --> internal).part;
+        let internal (_s: uses_generic) = _s;
+        let result = ({ part = { another = "data" } } --> internal).part.another;
       `,
     );
     const result = await code.binary().run("result", {});

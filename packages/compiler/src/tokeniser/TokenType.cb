@@ -1,8 +1,0 @@
-namespace cinder_tokeniser {
-  use cinder_utils;
-
-  struct TokenType
-    range: Range
-    type_name: string
-  ;
-}
