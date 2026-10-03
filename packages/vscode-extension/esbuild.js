@@ -1,4 +1,6 @@
 import esbuild from "esbuild";
+import fs from "node:fs/promises";
+import path from "node:path";
 
 const production = process.argv.includes("--production");
 const watch = process.argv.includes("--watch");
@@ -24,6 +26,14 @@ const esbuildProblemMatcherPlugin = {
 };
 
 async function main() {
+  try {
+    await fs.rm(path.resolve(import.meta.dirname, "./dist/esbuild"), { recursive: true });
+  } catch {}
+
+  await fs.cp(path.resolve(import.meta.dirname, "../../node_modules/esbuild"), path.resolve(import.meta.dirname, "dist/esbuild"), {
+    recursive: true,
+  });
+
   const ctx = await esbuild.context({
     entryPoints: ["src/extension.ts"],
     bundle: true,
@@ -33,7 +43,10 @@ async function main() {
     sourcesContent: false,
     platform: "node",
     outfile: "dist/extension.js",
-    external: ["vscode", "esbuild"],
+    external: ["vscode", "./esbuild/lib/main.js"],
+    alias: {
+      esbuild: "./esbuild/lib/main.js",
+    },
     logLevel: "silent",
     plugins: [
       /* add to the end of plugins array */

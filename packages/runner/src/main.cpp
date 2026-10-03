@@ -30,86 +30,110 @@ Storage::Frame* globals;
 
 ActionReport LoadApp(std::string buf)
 {
-  app = new Binary::App(buf.data());
-  Variable::Register(VariableArray::TypeName, [](val value) {
-    return new VariableArray(value);
-  });
-  Variable::Register(VariablePipeable::TypeName, [](val value) {
-    return new VariablePipeable(value);
-  });
-  Variable::Register(VariablePrimitiveBool::TypeName, [](val value) {
-    return new VariablePrimitiveBool(value);
-  });
-  Variable::Register(VariablePrimitiveChar::TypeName, [](val value) {
-    return new VariablePrimitiveChar(value);
-  });
-  Variable::Register(VariablePrimitiveDouble::TypeName, [](val value) {
-    return new VariablePrimitiveDouble(value);
-  });
-  Variable::Register(VariablePrimitiveFloat::TypeName, [](val value) {
-    return new VariablePrimitiveFloat(value);
-  });
-  Variable::Register(VariablePrimitiveInt::TypeName, [](val value) {
-    return new VariablePrimitiveInt(value);
-  });
-  Variable::Register(VariablePrimitiveLong::TypeName, [](val value) {
-    return new VariablePrimitiveLong(value);
-  });
-  Variable::Register(VariablePrimitiveNull::TypeName, [](val value) {
-    return new VariablePrimitiveNull(value);
-  });
-  Variable::Register(VariablePrimitiveString::TypeName, [](val value) {
-    return new VariablePrimitiveString(value);
-  });
-  Variable::Register(VariableTuple::TypeName, [](val value) {
-    return new VariableTuple(value);
-  });
+  try {
+    app = new Binary::App(buf.data());
+    Variable::Register(VariableArray::TypeName, [](val value) {
+      return new VariableArray(value);
+    });
+    Variable::Register(VariablePipeable::TypeName, [](val value) {
+      return new VariablePipeable(value);
+    });
+    Variable::Register(VariablePrimitiveBool::TypeName, [](val value) {
+      return new VariablePrimitiveBool(value);
+    });
+    Variable::Register(VariablePrimitiveChar::TypeName, [](val value) {
+      return new VariablePrimitiveChar(value);
+    });
+    Variable::Register(VariablePrimitiveDouble::TypeName, [](val value) {
+      return new VariablePrimitiveDouble(value);
+    });
+    Variable::Register(VariablePrimitiveFloat::TypeName, [](val value) {
+      return new VariablePrimitiveFloat(value);
+    });
+    Variable::Register(VariablePrimitiveInt::TypeName, [](val value) {
+      return new VariablePrimitiveInt(value);
+    });
+    Variable::Register(VariablePrimitiveLong::TypeName, [](val value) {
+      return new VariablePrimitiveLong(value);
+    });
+    Variable::Register(VariablePrimitiveNull::TypeName, [](val value) {
+      return new VariablePrimitiveNull(value);
+    });
+    Variable::Register(VariablePrimitiveString::TypeName, [](val value) {
+      return new VariablePrimitiveString(value);
+    });
+    Variable::Register(VariableTuple::TypeName, [](val value) {
+      return new VariableTuple(value);
+    });
 
-  auto result = val::object();
-  result.set("is_success", true);
+    auto result = val::object();
+    result.set("is_success", true);
 
-  return (ActionReport)result;
+    return (ActionReport)result;
+  } catch (CinderblockException err) {
+    auto result = val::object();
+    result.set("is_success", false);
+    result.set("error", err.what());
+
+    return (ActionReport)result;
+  }
 }
 
 ActionReport LoadGlobals(CinderBlockFrame subject)
 {
-  globals = Storage::Frame::From(subject);
+  try {
+    globals = Storage::Frame::From(subject);
 
-  auto result = val::object();
-  result.set("is_success", true);
+    auto result = val::object();
+    result.set("is_success", true);
 
-  return (ActionReport)result;
+    return (ActionReport)result;
+  } catch (CinderblockException err) {
+    auto result = val::object();
+    result.set("is_success", false);
+    result.set("error", err.what());
+
+    return (ActionReport)result;
+  }
 }
 
 CinderBlockVal Run(std::string name, CinderBlockTuple args)
 {
-  auto func = app->find(name);
-  auto frames = std::vector<Storage::Frame*>();
-  auto frame = new Frame();
-  frames.push_back(frame);
-  auto closure = new Storage::Closure(globals, frames);
+  try {
+    auto func = app->find(name);
+    auto frames = std::vector<Storage::Frame*>();
+    auto frame = new Frame();
+    frames.push_back(frame);
+    auto closure = new Storage::Closure(globals, frames);
 
-  for (const auto& func : app->get_functions()) {
-    frame->add_variable(
-      func->get_name(),
-      new VariablePipeable(
-        [closure, func](const VariableTuple* inner_args) {
-          return func->exec(closure, inner_args);
-        },
-        func->get_no_args()
-      )
-    );
+    for (const auto& func : app->get_functions()) {
+      frame->add_variable(
+        func->get_name(),
+        new VariablePipeable(
+          [closure, func](const VariableTuple* inner_args) {
+            return func->exec(closure, inner_args);
+          },
+          func->get_no_args()
+        )
+      );
+    }
+
+    auto var = func->exec(closure, new VariableTuple(args["data"]));
+
+    auto value = var->raw();
+
+    auto result = val::object();
+    result.set("is_success", true);
+    result.set("data", value);
+
+    return (CinderBlockVal)result;
+  } catch (CinderblockException err) {
+    auto result = val::object();
+    result.set("is_success", false);
+    result.set("error", err.what());
+
+    return (CinderBlockVal)result;
   }
-
-  auto var = func->exec(closure, new VariableTuple(args["data"]));
-
-  auto value = var->raw();
-
-  auto result = val::object();
-  result.set("is_success", true);
-  result.set("data", value);
-
-  return (CinderBlockVal)result;
 }
 
 EMSCRIPTEN_BINDINGS(my_module)

@@ -1,0 +1,59 @@
+namespace std_array {
+  let select (_s: infer T[], selector: (_s: T): infer TResult): TResult[] =
+      let internal (index: int, current: TResult[]): TResult[] =
+        _s @ index |
+          let (_s: T) =
+            {
+             current = current ++ (_s as T --> selector),
+             index = index + 1,
+            }
+            -> internal
+          ;
+          let (_s: null) = current;
+      ;
+
+    { index = 0, current = [] as TResult[] } -> internal
+  ;
+
+  let [test="std_array_select works on an array"] =
+    {
+      actual =
+          {
+            _s = [1, 2, 3],
+            selector = let (_s: int) = _s + 1;,
+          }
+          -> select,
+      expected = [2, 3, 4],
+    }
+  ;
+
+  let where (_s: infer T[], predicate: (_s: T): bool): T[] =
+      let internal (index: int, current: TResult[]): TResult[] =
+        _s @ index |
+          let (_s: T) =
+            {
+             current = (_s as T --> predicate)
+              ? current ++ _s
+              : current,
+             index = index + 1,
+            }
+            -> internal
+          ;
+          let (_s: null) = current;
+      ;
+
+    { index = 0, current = [] as T[] } -> internal
+  ;
+
+  let [test="std_array_where performs a predicate"] =
+    {
+      actual =
+          {
+            _s = [1, 2, 3, 4],
+            predicate = let (_s: int) = (_s == 2) || (_s == 4);,
+          }
+          -> where,
+      expected = [2, 4],
+    }
+  ;
+}

@@ -31,8 +31,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "bin": {
-    "cinderblock": "./bin/cinderblock.ts"
   }
 }

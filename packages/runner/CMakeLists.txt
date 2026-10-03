@@ -39,6 +39,7 @@ if(EMSCRIPTEN)
   target_compile_options(CinderBlockRunner PRIVATE
     "SHELL:-g"
     "SHELL:-gsource-map"
+    "SHELL:-fwasm-exceptions"
   )
   
   target_link_options(CinderBlockRunner PRIVATE
@@ -54,7 +55,6 @@ if(EMSCRIPTEN)
     "SHELL:-s JSPI_EXPORTS=Run"
     "SHELL:-fwasm-exceptions"
     "SHELL:-s ASSERTIONS=1"
-    "SHELL:-s EXPORTED_RUNTIME_METHODS=getExceptionMessage,decrementExceptionRefcount"
     "SHELL:--bind"
     "SHELL:--emit-tsd CinderBlockRunner.d.ts"
   )

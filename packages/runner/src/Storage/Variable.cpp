@@ -65,7 +65,7 @@ std::string Variable::get_string() const
 
 const Variable* Variable::operate_add(const Variable* right) const
 {
-  throw CinderblockException("Invalid maths");
+  throw CinderblockException("Invalid maths from");
 }
 
 const Variable* Variable::operate_and(const Variable* right) const
