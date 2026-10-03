@@ -2,6 +2,7 @@ import { TokenTypeName, type TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
 import type { Shape } from "#writer";
 import type { Entry } from "./Entry.ts";
+import { LinkerError } from "./LinkerError.ts";
 import { ParserError } from "./ParserError.ts";
 import { Type } from "./Type.ts";
 
@@ -45,7 +46,30 @@ export class TypeArray extends Type {
     return { type: "array", value: this.#contains.shape() };
   }
 
-  compatible(input: Type): boolean {
+  compatible(input: Type): input is TypeArray {
     return input instanceof TypeArray && this.#contains.compatible(input.contains);
+  }
+
+  dig(name: string): Entry | undefined {
+    return this.#contains.dig(name);
+  }
+
+  float(name: string): Entry | undefined {
+    return this.dig(name) ?? this.parent?.float(name);
+  }
+
+  consolidate(input: Type, parent: () => Entry): Type {
+    if (!(input instanceof TypeArray)) {
+      throw new LinkerError("Invalid type", input.range);
+    }
+
+    const result = new TypeArray(
+      this.location,
+      this.done,
+      parent,
+      this.#contains.consolidate(input.contains, (): TypeArray => result),
+    );
+
+    return result;
   }
 }

@@ -8,6 +8,7 @@ import { WriterError } from "./WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { CreateFunc, Instruction } from "#writer";
 import type { Type } from "./Type.ts";
+import { TypeReference } from "./TypeReference.ts";
 
 export class ExpressionAccess extends Expression {
   static {
@@ -54,7 +55,12 @@ export class ExpressionAccess extends Expression {
   }
 
   get instruction(): Instruction {
-    let subjectType = this.#subject.resolution;
+    let subjectType: Entry | undefined = this.#subject.resolution;
+
+    if (subjectType instanceof TypeReference) {
+      subjectType = subjectType.subject;
+    }
+
     if (!(subjectType instanceof TypeTuple)) {
       throw new WriterError("Left must be a tuple", this.range);
     }

@@ -4,6 +4,7 @@ import type { Entry } from "./Entry.ts";
 import { TokenTypeName, type TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
 import type { Shape } from "#writer";
+import { LinkerError } from "./LinkerError.ts";
 
 export class TypePipeable extends Type {
   static {
@@ -77,12 +78,36 @@ export class TypePipeable extends Type {
     return { type: "pipeable" };
   }
 
-  compatible(input: Type): boolean {
+  compatible(input: Type): input is TypePipeable {
     return (
       input instanceof TypePipeable &&
       input.args.length === this.args.length &&
       !input.#args.some((a) => !this.#args.some((b) => a.compatible(b))) &&
       input.returns.compatible(this.#returns)
     );
+  }
+
+  dig(name: string): Entry | undefined {
+    return this.#args.find((a) => a.dig(name)) ?? this.#returns.dig(name);
+  }
+
+  float(name: string): Entry | undefined {
+    return this.dig(name) ?? this.parent?.float(name);
+  }
+
+  consolidate(input: Type, parent: () => Entry | undefined): Type {
+    if (!(input instanceof TypePipeable)) {
+      throw new LinkerError("Invalid type", input.range);
+    }
+
+    const result = new TypePipeable(
+      this.location,
+      this.done,
+      parent,
+      this.#args.map((a) => input.args.find((b) => a.name === b.name)?.consolidate(a, (): Entry => result) ?? a),
+      this.#returns.consolidate(input.returns, (): Entry => result),
+    );
+
+    return result;
   }
 }

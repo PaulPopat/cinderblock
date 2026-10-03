@@ -1,16 +1,16 @@
 namespace std {
   struct iterator
-    data: T
+    data: unknown
     next: unknown
     done: bool
   ;
 
-  let iterator_next (_s: iterator<T: T>): iterator<T: T> =
-    _s.done ? { data = null as T, next = null, done = true } : _s.next
+  let iterator_next (_s: iterator) =
+    _s.done ? { data = null, next = null, done = true } : _s.next
   ;
 
-  let iterator_fromArray (_s: T[]): iterator<T: T> =
-      let internal (index: int): iterator<T: T> =
+  let iterator_fromArray (_s: unknown[]) =
+      let internal (index: int) =
           let data =  _s @ index;
           let done = null == data;
         {
@@ -25,26 +25,23 @@ namespace std {
   let [test="std_iterator creates an iterator from an array"] =
     {
       actual = [1, 2, 3]
-        --> iterator_fromArray<T: int>
-        --> ({
-          initial = 0,
-          reducer = let (_s: int, current: int) = _s + current;,
-        } -> iterator_reduce<T: int>),
+        --> iterator_fromArray
+        --> 
+          {
+            initial = 0,
+            reducer = let (_s: int, current: int) = _s + current;,
+          }
+          -> iterator_reduce,
       expected = 6,
     }
   ;
 
   let iterator_reduce (
-    _s: iterator<T: T>,
-    initial: TResult,
-    reducer: (_s: T, current: TResult): TResult
-  ): TResult =
-    let internal (current: TResult, entry: iterator<T: T>):
-      struct
-        current: TResult
-        entry: iterator<T: T>
-      ;
-    =
+    _s: iterator,
+    initial: unknown,
+    reducer: (_s: T, current: unknown): unknown
+  ) =
+    let internal (current: unknown, entry: iterator) =
       entry.done
         ? {
             current = current,
@@ -52,7 +49,7 @@ namespace std {
           }
         : {
             current = { _s = entry.data, current = current } -> reducer,
-            entry = entry --> iterator_next<T: T>
+            entry = entry --> iterator_next
           } -> internal
     ;
 
@@ -61,14 +58,11 @@ namespace std {
     ).current
   ;
 
-  let iterator_select (
-    _s: iterator<T: T>,
-    selector: (_s: T): TResult
-  ): iterator<T: TResult> =
+  let iterator_select (_s: iterator, selector: (_s: unknown): unknown): iterator =
     {
       data = !_s.done ? _s.data --> selector : null,
       next = !_s.done
-        ? { _s = _s --> iterator_next<T: T>, selector = selector } -> iterator_select<T: T>
+        ? { _s = _s --> iterator_next, selector = selector } -> iterator_select
         : null,
       done = _s.done,
     }
@@ -77,30 +71,26 @@ namespace std {
   let [test="std_iterator selects over an iterator"] =
     {
       actual = [1, 2, 3]
-        --> iterator_fromArray<T: int>
-        --> ({
-          selector = let (_s: int) = _s + 1;,
-        } -> iterator_select<T: int, TResult: int>)
-        --> iterator_toArray<T: int>,
+        --> iterator_fromArray
+        -->
+          {
+            selector = let (_s: int) = _s + 1;,
+          }
+          -> iterator_select
+        --> iterator_toArray,
       expected = [2, 3, 4],
     }
   ;
 
-  let iterator_where (
-    _s: iterator<T: T>,
-    predicate: (_s: T): bool
-  ): iterator<T: T> =
+  let iterator_where (_s: iterator, predicate: (_s: unknown): bool) =
     _s.done
       ? _s
       : _s.data --> predicate
       ? _s
-      : (_s.next as iterator<T: T>) --> { predicate = predicate } -> iterator_where
+      : (_s.next as iterator) --> { predicate = predicate } -> iterator_where
   ;
 
-  let iterator_concat (
-    _s: iterator<T: T>,
-    addition: T
-  ): iterator<T: T> =
+  let iterator_concat (_s: iterator, addition: unknown) =
     _s.done
       ? {
           data = addition,
@@ -113,7 +103,7 @@ namespace std {
         }
       : {
           ..._s,
-          next = { _s = _s --> iterator_next<T: T>, addition = addition } -> iterator_concat,
+          next = { _s = _s --> iterator_next, addition = addition } -> iterator_concat,
         }
   ;
 
@@ -121,15 +111,13 @@ namespace std {
     {
       actual = [1, 2, 3]
         --> iterator_fromArray
-        --> ({ addition = 4 } -> iterator_concat)
+        --> { addition = 4 } -> iterator_concat
         --> iterator_toArray,
       expected = [1, 2, 3, 4],
     }
   ;
 
-  let iterator_flatten (
-    _s: iterator<T: iterator<: T>>
-  ) =
+  let iterator_flatten (_s: iterator) =
     {
       _s = _s,
       initial =
@@ -137,25 +125,23 @@ namespace std {
           data = null,
           next = null,
           done = true,
-        } as iterator<T: T>,
+        },
       reducer =
-        let (_s: iterator<T: T>, current: iterator<T: T>) =
+        let (_s: iterator, current: iterator) =
           {
             _s = current,
             addition = _s,
-          } -> iterator_concat<T: T>
+          } -> iterator_concat
         ;,
-    } -> iterator_reduce<T: iterator<T: T>, TResult: iterator<T: T>>
+    } -> iterator_reduce
   ;
 
-  let iterator_length (
-    _s: iterator<T: unknown>
-  ): int =
+  let iterator_length (_s: iterator): int =
     {
       _s = _s,
       initial = 0,
       reducer = let (current: int, _s: unknown) = current + 1;
-    } -> iterator_reduce<T: unknown, TResult: int>
+    } -> iterator_reduce
   ;
 
   let [test="std_iterator gets the length"] =
@@ -167,21 +153,15 @@ namespace std {
     }
   ;
 
-  let iterator_toArray (
-    _s: iterator<T: T>
-  ) =
+  let iterator_toArray (_s: iterator) =
     {
       _s = _s,
-      initial = [] as T[],
-      reducer = let (_s: T, current: T[]) = current ++ _s;,
-    } -> iterator_reduce<T: unknown, TResult: T[]>
+      initial = [],
+      reducer = let (_s: unknown, current: unknown[]) = current ++ _s;,
+    } -> iterator_reduce
   ;
 
-  let iterator_some (
-    _s: iterator<T: T>,
-    predicate: (_s: T): bool
-  ) =
-
+  let iterator_some (_s: iterator,predicate: (_s: unknown): bool) =
     _s.done
       ? false
       : (_s.data --> predicate) ||
@@ -192,7 +172,7 @@ namespace std {
     {
       actual = [1, 2, 3]
         --> iterator_fromArray
-        --> ({ predicate = let (_s: int) = _s == 2; } -> iterator_some<T: int>),
+        --> ({ predicate = let (_s: int) = _s == 2; } -> iterator_some),
       expected = true,
     }
   ;
@@ -201,21 +181,18 @@ namespace std {
     {
       actual = [1, 2, 3]
         --> iterator_fromArray
-        --> ({ predicate = let (_s: int) = _s == 4; } -> iterator_some<T: int>),
+        --> ({ predicate = let (_s: int) = _s == 4; } -> iterator_some),
       expected = false,
     }
   ;
 
-  let iterator_find (
-    _s: iterator<T: T>,
-    predicate: (_s: T): bool
-  ) =
-    let internal (_s: iterator<T: T>): T =
+  let iterator_find (_s: iterator, predicate: (_s: unknown): bool) =
+    let internal (_s: iterator): T =
        _s.done
         ? null
         : (_s.data --> predicate)
         ? _s.data
-        : (_s.next as iterator<T: T> --> internal)
+        : (_s.next as iterator --> internal)
     ;
 
     _s --> internal
@@ -225,7 +202,7 @@ namespace std {
     {
       actual = [1, 2, 3]
         --> iterator_fromArray
-        --> ({ predicate = let (_s: int) = _s == 2; } -> iterator_find<T: int>),
+        --> ({ predicate = let (_s: int) = _s == 2; } -> iterator_find),
       expected = 2,
     }
   ;

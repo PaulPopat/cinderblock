@@ -49,7 +49,7 @@ export class EntityArg extends Entity {
   dig(name: string): Entry | undefined {
     if (name === this.#name) return this;
 
-    return undefined;
+    return this.#type.dig(name);
   }
 
   float(name: string): Entry | undefined {

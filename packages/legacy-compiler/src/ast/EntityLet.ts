@@ -92,7 +92,12 @@ export class EntityLet extends EntityNamespace {
     this.#walker = walker;
     this.#tags = tags ?? [];
     this.#args = [
-      ...(executionArgs?.map((a) => new EntityArg(a)) ?? []),
+      ...(executionArgs?.map((a) => {
+        const b = args?.find((c) => c.name === a.name);
+        if (!b) return new EntityArg(a);
+
+        return new EntityArg(a.consolidate(b.typeArg, parent));
+      }) ?? []),
       ...(args?.filter((a) => !executionArgs?.find((e) => e.name === a.name)) ?? []),
     ];
     this.#returns = returns;

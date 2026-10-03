@@ -32,4 +32,8 @@ export class TypePrimitiveUnknown extends TypePrimitive {
   compatible(input: Type): boolean {
     return true;
   }
+
+  consolidate(input: Type): Type {
+    return input;
+  }
 }

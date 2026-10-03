@@ -49,6 +49,7 @@ export * from "./ParserError.ts";
 export * from "./Type.ts";
 export * from "./TypeArg.ts";
 export * from "./TypeArray.ts";
+export * from "./TypeInfer.ts";
 export * from "./TypeIntersection.ts";
 export * from "./TypePipeable.ts";
 export * from "./TypePrimitive.ts";

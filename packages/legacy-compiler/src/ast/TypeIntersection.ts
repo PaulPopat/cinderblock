@@ -87,4 +87,32 @@ export class TypeIntersection extends Type {
   compatible(input: Type): boolean {
     return this.flattened().compatible(input);
   }
+
+  dig(name: string): Entry | undefined {
+    return this.#parts.find((p) => p.dig(name));
+  }
+
+  float(name: string): Entry | undefined {
+    return this.dig(name) ?? this.parent?.float(name);
+  }
+
+  consolidate(input: Type, parent: () => Entry): Type {
+    const result = new TypeTuple(
+      this.location,
+      this.done,
+      parent,
+      this.#parts
+        .map((p) => p.flattened())
+        .flatMap((p) => {
+          if (!(p instanceof TypeTuple)) {
+            throw new LinkerError("Tuple required for intersection", this.range);
+          }
+
+          return p.args;
+        }),
+      [],
+    ).consolidate(input, (): Entry => result);
+
+    return result;
+  }
 }

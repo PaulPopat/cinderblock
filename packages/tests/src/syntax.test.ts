@@ -469,4 +469,13 @@ describe("syntax", () => {
     const result = await code.binary().run("test_let", {});
     assert.deepEqual(result, { _s: { hello: "world" }, test: "data" });
   });
+
+  test("infer type", async () => {
+    const code = new Inline(`
+      let internal_let (_s: infer T): T = _s;
+      let test_let = ({ hello = "world" } --> internal_let).hello;
+    `);
+    const result = await code.binary().run("test_let", {});
+    assert.deepEqual(result, "world");
+  });
 });

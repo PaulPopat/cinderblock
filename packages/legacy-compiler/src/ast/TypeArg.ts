@@ -2,6 +2,7 @@ import { TokenTypeName, type TokenWalker } from "#tokeniser";
 import type { Location } from "#utils";
 import type { Shape } from "#writer";
 import type { Entry } from "./Entry.ts";
+import { LinkerError } from "./LinkerError.ts";
 import { Type } from "./Type.ts";
 import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
 
@@ -65,6 +66,26 @@ export class TypeArg extends Type {
 
   dig(name: string) {
     if (name === this.#name) return this.type.flattened();
-    return undefined;
+    return this.#type.dig(name);
+  }
+
+  float(name: string): Entry | undefined {
+    return this.dig(name) ?? this.parent?.float(name);
+  }
+
+  consolidate(input: Type, parent: () => Entry | undefined): TypeArg {
+    if (!(input instanceof TypeArg)) {
+      throw new LinkerError("Invalid type", input.range);
+    }
+
+    const result = new TypeArg(
+      this.location,
+      this.done,
+      parent,
+      input.type.consolidate(this.#type, (): TypeArg => result),
+      this.#name,
+    );
+
+    return result;
   }
 }

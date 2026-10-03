@@ -87,7 +87,31 @@ export class TypeTuple extends Type {
     };
   }
 
-  compatible(input: Type): boolean {
+  compatible(input: Type): input is TypeTuple {
     return input instanceof TypeTuple && !this.args.some((a) => !input.args.some((b) => a.compatible(b)));
+  }
+
+  dig(name: string): Entry | undefined {
+    return this.#args.find((a) => a.dig(name));
+  }
+
+  float(name: string): Entry | undefined {
+    return this.dig(name) ?? this.parent?.float(name);
+  }
+
+  consolidate(input: Type, parent: () => Entry | undefined): Type {
+    if (!(input instanceof TypeTuple)) {
+      throw new LinkerError("Invalid type", this.range);
+    }
+
+    const result = new TypeTuple(
+      this.location,
+      this.done,
+      parent,
+      this.#args.map((a) => input.args.find((b) => a.name === b.name)?.consolidate(a, (): Entry => result) ?? a),
+      this.#extending.map((a) => input.#extending.find((b) => a.name === b.name)?.consolidate(a, (): Entry => result) ?? a),
+    );
+
+    return result;
   }
 }

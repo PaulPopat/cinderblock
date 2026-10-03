@@ -74,11 +74,23 @@ export class TypeUnion extends Type {
     return { type: "union", args: this.#parts.map((p) => p.shape()) };
   }
 
+  dig(name: string): Entry | undefined {
+    return this.#parts.find((a) => a.dig(name));
+  }
+
+  float(name: string): Entry | undefined {
+    return this.dig(name) ?? this.parent?.float(name);
+  }
+
   compatible(input: Type): boolean {
     if (input instanceof TypeUnion) {
       return !input.parts.some((a) => !this.#parts.some((b) => b.compatible(a)));
     }
 
     return this.#parts.some((p) => p.compatible(input));
+  }
+
+  consolidate(input: Type): Type {
+    return input;
   }
 }

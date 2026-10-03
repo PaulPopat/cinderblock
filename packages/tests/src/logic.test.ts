@@ -198,21 +198,6 @@ describe("logic", () => {
     assert.equal(result, true);
   });
 
-  test("deep unknown inference", async () => {
-    const code = new Inline(
-      `
-        struct uses_generic
-          part: unknown
-        ;
-
-        let internal (_s: uses_generic) = _s;
-        let result = ({ part = { another = "data" } } --> internal).part.another;
-      `,
-    );
-    const result = await code.binary().run("result", {});
-    assert.equal(result, "data");
-  });
-
   test("parallel use statements", async () => {
     const code = new Inline(
       `

@@ -3,6 +3,7 @@ import type { Location } from "#utils";
 import type { Shape } from "#writer";
 import { EntityStruct } from "./EntityStruct.ts";
 import type { Entry } from "./Entry.ts";
+import { LinkerError } from "./LinkerError.ts";
 import { Type } from "./Type.ts";
 import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
 
@@ -77,6 +78,10 @@ export class TypeReference extends Type {
   }
 
   compatible(input: Type): boolean {
-    return input.flattened().compatible(input);
+    return this.flattened().compatible(input.flattened());
+  }
+
+  consolidate(input: Type, parent: () => Entry | undefined): TypeReference {
+    return new TypeReference(this.location, this.done, parent, this.#name);
   }
 }
