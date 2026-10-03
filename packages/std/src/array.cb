@@ -28,7 +28,7 @@ namespace std_array {
   ;
 
   let where (_s: infer T[], predicate: (_s: T): bool): T[] =
-      let internal (index: int, current: TResult[]): TResult[] =
+      let internal (index: int, current: T[]): T[] =
         _s @ index |
           let (_s: T) =
             {
@@ -54,6 +54,77 @@ namespace std_array {
           }
           -> where,
       expected = [2, 4],
+    }
+  ;
+
+  let first (_s: infer T[], predicate: (_s: T): bool): T | null =
+      let internal (index: int): T | null =
+        _s @ index |
+          let (_s: T) =
+            _s --> predicate
+              ? _s
+              : { index = index + 1 } -> internal
+          ;
+          let (_s: null) = null;
+      ;
+
+    { index = 0 } -> internal
+  ;
+
+  let [test="std_array_first fetches the first item"] =
+    {
+      actual =
+          {
+            _s = [1, 2, 3, 4],
+            predicate = let (_s: int) = (_s == 2) || (_s == 4);,
+          }
+          -> first,
+      expected = 2,
+    }
+  ;
+
+  let [test="std_array_first fetches finds no items"] =
+    {
+      actual =
+          {
+            _s = [1, 2, 3, 4],
+            predicate = let (_s: int) = (_s == 5);,
+          }
+          -> first,
+      expected = null,
+    }
+  ;
+
+  let aggregate (
+    _s: infer T[],
+    initial: infer TResult,
+    action: (_s: T, current: TResult): TResult
+  ): TResult =
+      let internal (index: int, current: TResult): TResult =
+        _s @ index |
+          let (_s: T) =
+            {
+              current = {  _s = _s, current = current } -> action,
+              index = index + 1,
+            }
+            -> internal
+          ;
+          let (_s: null) = current;
+      ;
+
+    { index = 0, current = initial } -> internal
+  ;
+
+  let [test="std_array_aggregate aggregates a total"] =
+    {
+      actual =
+          {
+            _s = [1, 2, 3, 4],
+            initial = 0,
+            action = let (_s: int, current: int) = _s + current;,
+          }
+          -> aggregate,
+      expected = 10,
     }
   ;
 }
