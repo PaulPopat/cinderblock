@@ -478,4 +478,14 @@ describe("syntax", () => {
     const result = await code.binary().run("test_let", {});
     assert.deepEqual(result, "world");
   });
+
+  test("struct args", async () => {
+    const code = new Inline(`
+      struct test (T) entry: T ;
+      let internal_let (_s: test(T: string)) = _s.entry;
+      let test_let = { entry = "world" } --> internal_let;
+    `);
+    const result = await code.binary().run("test_let", {});
+    assert.deepEqual(result, "world");
+  });
 });

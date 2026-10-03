@@ -9,8 +9,8 @@ namespace std {
     _s.done ? { data = null, next = null, done = true } : _s.next
   ;
 
-  let iterator_fromArray (_s: unknown[]) =
-      let internal (index: int) =
+  let iterator_fromArray (_s: infer T[]): struct data: T next: unknown done: bool ; =
+      let internal (index: int): struct data: T next: unknown done: bool ; =
           let data =  _s @ index;
           let done = null == data;
         {

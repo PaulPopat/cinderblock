@@ -17,14 +17,43 @@ export class EntityStruct extends Entity {
     });
   }
 
+  readonly #walker: TokenWalker;
   readonly #name: string;
   readonly #extending: Array<TypeReference>;
+  readonly #expecting: Array<TypeArg>;
   readonly #args: Array<TypeArg>;
 
-  constructor(walker: TokenWalker, parent: () => Entry | undefined) {
-    const [{ name, args, extending }, done] = walker
+  constructor(walker: TokenWalker, parent: () => Entry | undefined);
+  constructor(existing: EntityStruct, args: Array<TypeArg>);
+  constructor(...input: [walker: TokenWalker, parent: () => Entry | undefined] | [existing: EntityStruct, args: Array<TypeArg>]) {
+    let walker: TokenWalker;
+    let parent: () => Entry | undefined;
+    let inputArgs: Array<TypeArg>;
+
+    if (input[0] instanceof TokenWalker && typeof input[1] === "function") {
+      [walker, parent] = input;
+      inputArgs = [];
+    } else {
+      const [existing, i] = input as [existing: EntityStruct, args: Array<TypeArg>];
+      inputArgs = i;
+      walker = existing.#walker;
+      parent = () => existing.parent;
+    }
+
+    const [{ name, args, extending, expecting }, done] = walker
       .expect("struct", TokenTypeName.KeyWord, () => this)
       .text("name", TokenTypeName.StructName, () => this)
+      .if(
+        (s) => s.data === "(",
+        (s) =>
+          s
+            .while(
+              "expecting",
+              (s) => (s.data === "," || s.data === "(") && s.expect([",", "("], TokenTypeName.Punctuation).data !== ")",
+              (s) => TypeArg.Parse(s.expect([",", "("], TokenTypeName.Punctuation), () => this),
+            )
+            .expect(")", TokenTypeName.Punctuation),
+      )
       .if(
         (s) => s.data === ":",
         (w) =>
@@ -42,8 +71,10 @@ export class EntityStruct extends Entity {
       .expect(";", TokenTypeName.Punctuation)
       .finish();
     super(walker.location, done, parent);
+    this.#walker = walker;
     this.#name = name;
     this.#extending = extending ?? [];
+    this.#expecting = [...inputArgs, ...(expecting?.filter((e) => !inputArgs.find((i) => i.name === e.name)) ?? [])];
     this.#args = args;
   }
 
@@ -66,8 +97,10 @@ export class EntityStruct extends Entity {
     return this.#name;
   }
 
-  get type() {
-    return new TypeTuple(this.location, this.done, () => this.parent, this.#args, this.#extending);
+  type(args: Array<TypeArg>) {
+    const subject = new EntityStruct(this, args);
+
+    return new TypeTuple(subject.location, subject.done, () => subject, subject.#args, subject.#extending);
   }
 
   dig(name: string): Entry | undefined {
@@ -77,7 +110,7 @@ export class EntityStruct extends Entity {
   }
 
   float(name: string): Entry | undefined {
-    return this.parent?.float(name);
+    return this.#expecting.find((e) => e.name === name)?.type ?? this.parent?.float(name);
   }
 
   get model(): CreateFunc[] {

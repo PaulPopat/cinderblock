@@ -3,15 +3,28 @@ import type { Location } from "#utils";
 import type { Shape } from "#writer";
 import { EntityStruct } from "./EntityStruct.ts";
 import type { Entry } from "./Entry.ts";
-import { LinkerError } from "./LinkerError.ts";
 import { Type } from "./Type.ts";
+import { TypeArg } from "./TypeArg.ts";
 import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
 
 export class TypeReference extends Type {
   static ParseReference(walker: TokenWalker, parent: () => Entry | undefined, left?: Type) {
-    const [{ value }, done] = walker.text("value", TokenTypeName.StructReference, (): TypeReference => result).finish();
+    const [{ value, args }, done] = walker
+      .text("value", TokenTypeName.StructReference, (): TypeReference => result)
+      .if(
+        (s) => s.data === "(",
+        (s) =>
+          s
+            .while(
+              "args",
+              (s) => (s.data === "," || s.data === "(") && s.expect([",", "("], TokenTypeName.Punctuation).data !== ")",
+              (s) => TypeArg.Parse(s.expect([",", "("], TokenTypeName.Punctuation), (): Entry => result),
+            )
+            .expect(")", TokenTypeName.Punctuation),
+      )
+      .finish();
 
-    const result = new TypeReference(walker.location, done, parent, value);
+    const result = new TypeReference(walker.location, done, parent, value, args ?? []);
     return result;
   }
 
@@ -25,10 +38,12 @@ export class TypeReference extends Type {
   }
 
   readonly #name: string;
+  readonly #args: Array<TypeArg>;
 
-  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined, name: string) {
+  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined, name: string, args: Array<TypeArg>) {
     super(location, done, parent);
     this.#name = name;
+    this.#args = args;
   }
 
   get name() {
@@ -42,7 +57,7 @@ export class TypeReference extends Type {
   flattened(): Type {
     const result = this.float(this.#name);
     if (result instanceof EntityStruct) {
-      return result.type.flattened();
+      return result.type(this.#args).flattened();
     }
 
     if (result instanceof Type) {
@@ -63,7 +78,7 @@ export class TypeReference extends Type {
         return result.name;
       }
 
-      return result.type.representation(depth + 1);
+      return result.type(this.#args).representation(depth + 1);
     }
 
     if (result instanceof Type) {
@@ -82,6 +97,6 @@ export class TypeReference extends Type {
   }
 
   consolidate(input: Type, parent: () => Entry | undefined): TypeReference {
-    return new TypeReference(this.location, this.done, parent, this.#name);
+    return new TypeReference(this.location, this.done, parent, this.#name, this.#args);
   }
 }
