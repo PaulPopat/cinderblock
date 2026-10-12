@@ -1,13 +1,14 @@
 import { Entry } from "./Entry.ts";
 import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
-import type { Shape } from "#writer";
+import type { LinkerContext } from "./LinkerContext.ts";
+import type { LinkedType } from "#linked/LinkedType";
 
 type TypeParseable = {
   priority: number;
   match: RegExp;
   chainable: boolean;
-  factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => Type;
+  factory: (walker: TokenWalker, left?: Type) => Type;
 };
 
 export abstract class Type extends Entry {
@@ -17,7 +18,7 @@ export abstract class Type extends Entry {
     this.#parsers = [...this.#parsers, entry].sort((a, b) => b.priority - a.priority);
   }
 
-  static Parse(walker: TokenWalker, parent: () => Entry | undefined): Type {
+  static Parse(walker: TokenWalker): Type {
     const [{ type }] = walker
       .reduce(
         "type",
@@ -28,7 +29,7 @@ export abstract class Type extends Entry {
             throw new ParserError(`Unexpected symbol of ${w.data}`, w);
           }
 
-          return match.factory(w, parent, p as Type);
+          return match.factory(w, p as Type);
         },
       )
       .finish();
@@ -36,18 +37,5 @@ export abstract class Type extends Entry {
     return type as Type;
   }
 
-  float(name: string): Entry | undefined {
-    return this.parent?.float(name);
-  }
-
-  dig(name: string): Entry | undefined {
-    return undefined;
-  }
-
-  abstract flattened(): Type;
-  abstract matches(input: Type): boolean;
-  abstract representation(depth: number): string;
-  abstract shape(): Shape;
-  abstract compatible(input: Type): boolean;
-  abstract consolidate(input: Type, parent: () => Entry): Type;
+  abstract linked(input: LinkedType | undefined, ctx: LinkerContext): [LinkerContext, LinkedType];
 }

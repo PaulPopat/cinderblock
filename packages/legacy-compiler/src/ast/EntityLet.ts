@@ -2,104 +2,84 @@ import { EntityArg } from "./EntityArg.ts";
 import { Expression } from "./Expression.ts";
 import { Entity } from "./Entity.ts";
 import { Type } from "./Type.ts";
-import { TypePipeable } from "./TypePipeable.ts";
 import { EntryTag } from "./EntryTag.ts";
-import { TokenWalker } from "../tokeniser/TokenWalker.ts";
-import type { Entry } from "./Entry.ts";
 import { TokenTypeName } from "#tokeniser";
 import { EntityNamespace } from "./EntityNamespace.ts";
-import type { CreateFunc } from "#writer";
-import type { TypeArg } from "./TypeArg.ts";
-import { LinkerError } from "./LinkerError.ts";
+import { _context, type EntryContext } from "./EntryContext.ts";
 
 export class EntityLet extends EntityNamespace {
   static {
     Entity.RegisterEntity({
       priority: 100,
       match: /^let$/gm,
-      factory: EntityLet,
+      factory: (walker) => {
+        const [{ name, args, returns, contents, tags, entities, internalName }, done] = walker
+          .expect("let", TokenTypeName.KeyWord)
+          .internal("internalName")
+          .if(
+            (s) => s.data === "[",
+            (s) =>
+              s
+                .while(
+                  "tags",
+                  (s) => s.data === "[" || s.data === ",",
+                  (s) => EntryTag.Parse(s.expect(["[", ","], TokenTypeName.Punctuation)),
+                )
+                .expect("]", TokenTypeName.Punctuation),
+          )
+          .if(
+            (s) => !!s.data.match(/^[a-zA-Z0-9_$#]+$/gm),
+            (s) => s.text("name", TokenTypeName.FunctionName),
+          )
+          .if(
+            (s) => s.data === "(",
+            (walker) =>
+              walker
+                .while(
+                  "args",
+                  (s) => s.data === "," || s.data === "(",
+                  (s) => EntityArg.Parse(s.expect(["(", ","], TokenTypeName.Punctuation)),
+                )
+                .expect(")", TokenTypeName.Punctuation),
+          )
+          .if(
+            (s) => s.data === ":",
+            (walker) => walker.expect(":", TokenTypeName.Punctuation).extract("returns", (s) => Type.Parse(s)),
+          )
+          .expect("=", TokenTypeName.Operator)
+          .while(
+            "entities",
+            (s) => Entity.HasParser(s),
+            (w) => Entity.Parse(w),
+          )
+          .extract("contents", (s) => Expression.Parse(s, [";"]))
+          .expect(";", TokenTypeName.Punctuation)
+          .finish();
+
+        return new EntityLet(_context(walker, done), name ?? internalName, entities, tags ?? [], args ?? [], returns, contents, internalName);
+      },
     });
   }
 
-  readonly #walker: TokenWalker;
   readonly #tags: Array<EntryTag>;
   readonly #args: Array<EntityArg>;
   readonly #returns: Type | undefined;
   readonly #contents: Expression;
   readonly #internalName: string;
 
-  constructor(walker: TokenWalker, parent: () => Entry | undefined);
-  constructor(base: EntityLet, executionArgs: Array<TypeArg>);
-  constructor(...input: [walker: TokenWalker, parent: () => Entry | undefined] | [base: EntityLet, executionArgs: Array<TypeArg>]) {
-    let executionArgs: Array<TypeArg> | undefined = undefined;
-    let existingInternalName: string | undefined = undefined;
-    let walker: TokenWalker;
-    let parent: () => Entry | undefined;
-    if (input[0] instanceof TokenWalker && typeof input[1] === "function") {
-      [walker, parent] = input;
-    } else {
-      const [base, gen] = input as [base: EntityLet, executionArgs: Array<TypeArg>];
-      walker = base.#walker;
-      parent = () => base.parent;
-      executionArgs = gen;
-      existingInternalName = base.#internalName;
-    }
-
-    const [{ name, args, returns, contents, tags, entities, internalName }, done] = walker
-      .expect("let", TokenTypeName.KeyWord, () => this)
-      .internal("internalName", existingInternalName)
-      .if(
-        (s) => s.data === "[",
-        (s) =>
-          s
-            .while(
-              "tags",
-              (s) => s.data === "[" || s.data === ",",
-              (s) => new EntryTag(s.expect(["[", ","], TokenTypeName.Punctuation), () => this),
-            )
-            .expect("]", TokenTypeName.Punctuation),
-      )
-      .if(
-        (s) => !!s.data.match(/^[a-zA-Z0-9_$#]+$/gm),
-        (s) => s.text("name", TokenTypeName.FunctionName, () => this),
-      )
-      .if(
-        (s) => s.data === "(",
-        (walker) =>
-          walker
-            .while(
-              "args",
-              (s) => s.data === "," || s.data === "(",
-              (s) => new EntityArg(s.expect(["(", ","], TokenTypeName.Punctuation), () => this),
-            )
-            .expect(")", TokenTypeName.Punctuation),
-      )
-      .if(
-        (s) => s.data === ":",
-        (walker) => walker.expect(":", TokenTypeName.Punctuation).extract("returns", (s) => Type.Parse(s, () => this)),
-      )
-      .expect("=", TokenTypeName.Operator, () => this)
-      .while(
-        "entities",
-        (s) => Entity.HasParser(s),
-        (w) => Entity.Parse(w, () => this),
-      )
-      .extract("contents", (s) => Expression.Parse(s, () => this, [";"]))
-      .expect(";", TokenTypeName.Punctuation)
-      .finish();
-
-    super(walker.location, done, parent, name ?? internalName, entities);
-    this.#walker = walker;
-    this.#tags = tags ?? [];
-    this.#args = [
-      ...(executionArgs?.map((a) => {
-        const b = args?.find((c) => c.name === a.name);
-        if (!b) return new EntityArg(a);
-
-        return new EntityArg(a.consolidate(b.typeArg, parent));
-      }) ?? []),
-      ...(args?.filter((a) => !executionArgs?.find((e) => e.name === a.name)) ?? []),
-    ];
+  constructor(
+    ctx: EntryContext,
+    name: string,
+    entities: Array<Entity>,
+    tags: Array<EntryTag>,
+    args: Array<EntityArg>,
+    returns: Type | undefined,
+    contents: Expression,
+    internalName: string,
+  ) {
+    super(ctx, name, entities);
+    this.#tags = tags;
+    this.#args = args;
     this.#returns = returns;
     this.#contents = contents;
     this.#internalName = internalName;
@@ -123,53 +103,5 @@ export class EntityLet extends EntityNamespace {
 
   get contents() {
     return this.#contents;
-  }
-
-  get fullName() {
-    return this.namespace;
-  }
-
-  get namespace(): string {
-    return [this.parent?.namespace, this.name].filter((r) => r).join("_");
-  }
-
-  get type() {
-    const result = this.#returns ?? this.#contents.resolution;
-    if (this.#args.length)
-      return new TypePipeable(
-        this.location,
-        this.done,
-        () => this,
-        this.#args.map((a) => a.typeArg),
-        result,
-      );
-
-    return result;
-  }
-
-  dig(name: string): Entry | undefined {
-    if (name === this.name) return this;
-
-    return super.dig(name);
-  }
-
-  float(name: string): Entry | undefined {
-    return this.#args.reduce((result, arg) => result ?? arg.dig(name), undefined as Entry | undefined) ?? super.float(name);
-  }
-
-  get model(): Array<CreateFunc> {
-    if (this.#returns && !this.#returns.compatible(this.#contents.resolution)) {
-      throw new LinkerError("Invalid return type", this.range);
-    }
-
-    return [
-      {
-        name: this.#internalName,
-        vars: [...this.topLevelEntities.flatMap((e) => e.model), ...this.#contents.funcs],
-        returns: this.#contents.instruction,
-        no_args: this.#args.length === 0,
-        tags: Object.fromEntries(this.#tags.map((t) => [t.key, t.value?.toString() ?? ""])),
-      },
-    ];
   }
 }

@@ -1,35 +1,18 @@
-import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
-import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { CreateFunc, Instruction } from "#writer";
-import type { Type } from "./Type.ts";
-import { TypePrimitiveNull } from "./TypePrimitiveNull.ts";
+import { _context } from "./EntryContext.ts";
 
 export class ExpressionLiteralNull extends ExpressionLiteral {
   static {
     Expression.RegisterExpression({
       priority: 150,
       match: /^null$/gm,
-      factory: this,
+      factory: (walker, lookFor, existing) => {
+        const [, done] = walker.expect("null", TokenTypeName.KeyWord).finish();
+
+        return new ExpressionLiteralNull(_context(walker, done));
+      },
     });
-  }
-
-  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
-    const [, done] = walker.expect("null", TokenTypeName.KeyWord).finish();
-    super(walker.location, done, parent);
-  }
-
-  get resolution(): Type {
-    return new TypePrimitiveNull(this.location, this.done, () => this);
-  }
-
-  get instruction(): Instruction {
-    return { type: "literal_null" };
-  }
-
-  get funcs(): Array<CreateFunc> {
-    return [];
   }
 }

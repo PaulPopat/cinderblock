@@ -4,47 +4,26 @@ import { ExpressionOperator } from "./ExpressionOperator.ts";
 import { ParserError } from "./ParserError.ts";
 import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
-import { WriterError } from "./WriterError.ts";
+import { WriterError } from "../linked/WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { Instruction } from "#writer";
 import type { Type } from "./Type.ts";
+import { _context } from "./EntryContext.ts";
 
 export class ExpressionOperatorAnd extends ExpressionOperator {
   static {
     Expression.RegisterExpression({
       priority: 100,
       match: /^&&$/gm,
-      factory: this,
+      factory: (walker, lookFor, existing) => {
+        if (!existing) throw new ParserError("Unexpected &&", walker);
+        const [{ right }, done] = walker
+          .expect("&&", TokenTypeName.Operator)
+          .extract("right", (w) => Expression.ParseOne(w))
+          .finish();
+
+        return new ExpressionOperatorAnd(_context(walker, done), existing, right);
+      },
     });
-  }
-
-  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
-    if (!existing) throw new ParserError("Unexpected &&", walker);
-    const [{ right }, done] = walker
-      .expect("&&", TokenTypeName.Operator)
-      .extract("right", (w) => Expression.ParseOne(w, parent))
-      .finish();
-    super(walker.location, done, parent, existing, right);
-  }
-
-  get resolution(): Type {
-    return new TypePrimitiveBool(this.location, this.done, () => this);
-  }
-
-  get instruction(): Instruction {
-    if (!(this.left.resolution instanceof TypePrimitiveBool)) {
-      throw new WriterError("Boolean required", this.range);
-    }
-
-    if (!(this.right.resolution instanceof TypePrimitiveBool)) {
-      throw new WriterError("Boolean required", this.range);
-    }
-
-    return {
-      type: "operator",
-      operator: "and",
-      left: this.left.instruction,
-      right: this.right.instruction,
-    };
   }
 }

@@ -15,6 +15,7 @@
   "devDependencies": {},
   "imports": {
     "#ast": "./src/ast/index.ts",
+    "#linked/*": "./src/linked/*.ts",
     "#tokeniser": "./src/tokeniser/index.ts",
     "#utils": "./src/utils/index.ts",
     "#struct": "./src/struct/index.ts",

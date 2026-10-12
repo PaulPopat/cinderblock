@@ -1,3 +1,4 @@
+import type { ShapeArg } from "./ShapeArg.ts";
 import type { ShapeArray } from "./ShapeArray.ts";
 import type { ShapeBool } from "./ShapeBool.ts";
 import type { ShapeChar } from "./ShapeChar.ts";
@@ -25,4 +26,5 @@ export type Shape =
   | ShapeString
   | ShapeTuple
   | ShapeUnknown
-  | ShapeUnion;
+  | ShapeUnion
+  | ShapeArg;

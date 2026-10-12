@@ -1,10 +1,11 @@
 import { TypeArg } from "./TypeArg.ts";
 import { Type } from "./Type.ts";
-import type { Entry } from "./Entry.ts";
-import { Location } from "#utils";
 import { TokenTypeName, TokenWalker } from "#tokeniser";
-import type { Shape } from "#writer";
 import { TypeReference } from "./TypeReference.ts";
+import { _context, _empty, type EntryContext } from "./EntryContext.ts";
+import type { LinkedType } from "#linked/LinkedType";
+import type { LinkerContext } from "./LinkerContext.ts";
+import { LinkedTypeTuple } from "#linked/LinkedTypeTuple";
 import { LinkerError } from "./LinkerError.ts";
 
 export class TypeTuple extends Type {
@@ -13,7 +14,7 @@ export class TypeTuple extends Type {
       priority: 100,
       match: /^struct$/gm,
       chainable: false,
-      factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
+      factory: (walker: TokenWalker, left?: Type) => {
         const [{ parts, extending }, done] = walker
           .expect("struct", TokenTypeName.KeyWord)
           .if(
@@ -22,96 +23,50 @@ export class TypeTuple extends Type {
               w.while(
                 "extending",
                 (s) => s.data === ":" || s.data === ",",
-                (s) => TypeReference.ParseReference(s.expect([":", ","], TokenTypeName.Operator), (): Entry => result),
+                (s) => TypeReference.ParseReference(s.expect([":", ","], TokenTypeName.Operator)),
               ),
           )
           .while(
             "parts",
             (s) => s.data !== ";",
-            (s) => TypeArg.Parse(s, (): Entry => result),
+            (s) => TypeArg.Parse(s),
           )
           .expect(";", TokenTypeName.Punctuation)
           .finish();
 
-        const result = new TypeTuple(walker.location, done, parent, parts, extending ?? []);
-        return result;
+        return new TypeTuple(_context(walker, done), parts, extending ?? []);
       },
     });
   }
 
   static get empty() {
-    return new TypeTuple(Location.empty, TokenWalker.empty, () => undefined, [], []);
+    return new TypeTuple(_empty(), [], []);
   }
 
   readonly #args: Array<TypeArg>;
   readonly #extending: Array<TypeReference>;
 
-  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined, args: Array<TypeArg>, extending: Array<TypeReference> = []) {
-    super(location, done, parent);
+  constructor(ctx: EntryContext, args: Array<TypeArg>, extending: Array<TypeReference> = []) {
+    super(ctx);
     this.#args = args;
     this.#extending = extending;
   }
 
-  get args() {
-    return [
-      ...this.#args,
-      ...this.#extending.flatMap((e): Array<TypeArg> => {
-        const found = e.flattened();
-        if (found instanceof TypeTuple) return found.args;
-        throw new LinkerError("Tuple required", e.range);
-      }),
-    ];
-  }
+  linked(input: LinkedType | undefined, ctx: LinkerContext): [LinkerContext, LinkedType] {
+    return ctx
+      .mapWith(this.#extending, "extending", (c, i) => i.linked(undefined, c))
+      .mapWith(this.#args, "args", (c, i) => i.linked(undefined, c))
+      .finish(({ extending, args }) => {
+        return new LinkedTypeTuple(this.range, [
+          ...extending.flatMap((e) => {
+            if (e instanceof LinkedTypeTuple) {
+              return e.args;
+            }
 
-  flattened(): Type {
-    return new TypeTuple(
-      this.location,
-      this.done,
-      () => this.parent,
-      this.args.map((a) => a.flattened()),
-    );
-  }
-
-  matches(input: Type): boolean {
-    return input instanceof TypeTuple && !input.args.some((a) => !this.args.some((b) => a.matches(b)));
-  }
-
-  representation(depth: number): string {
-    return `{ ${this.#args.map((a) => a.representation(depth + 1)).join(", ")} }`;
-  }
-
-  shape(): Shape {
-    return {
-      type: "tuple",
-      args: this.args.map((a) => ({ key: a.name, value: a.type.shape() })),
-    };
-  }
-
-  compatible(input: Type): input is TypeTuple {
-    return input instanceof TypeTuple && !this.args.some((a) => !input.args.some((b) => a.compatible(b)));
-  }
-
-  dig(name: string): Entry | undefined {
-    return this.#args.find((a) => a.dig(name));
-  }
-
-  float(name: string): Entry | undefined {
-    return this.dig(name) ?? this.parent?.float(name);
-  }
-
-  consolidate(input: Type, parent: () => Entry | undefined): Type {
-    if (!(input instanceof TypeTuple)) {
-      throw new LinkerError("Invalid type", this.range);
-    }
-
-    const result = new TypeTuple(
-      this.location,
-      this.done,
-      parent,
-      this.#args.map((a) => input.args.find((b) => a.name === b.name)?.consolidate(a, (): Entry => result) ?? a),
-      this.#extending.map((a) => input.#extending.find((b) => a.name === b.name)?.consolidate(a, (): Entry => result) ?? a),
-    );
-
-    return result;
+            throw new LinkerError("Expected a tuple", this.range);
+          }),
+          ...args,
+        ]);
+      });
   }
 }

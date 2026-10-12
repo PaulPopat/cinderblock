@@ -1,11 +1,11 @@
+import type { LinkedType } from "#linked/LinkedType";
+import { LinkedTypeTuple } from "#linked/LinkedTypeTuple";
 import { TokenTypeName, type TokenWalker } from "#tokeniser";
-import type { Location } from "#utils";
-import type { Shape } from "#writer";
-import type { Entry } from "./Entry.ts";
+import { _context, type EntryContext } from "./EntryContext.ts";
+import type { LinkerContext } from "./LinkerContext.ts";
 import { LinkerError } from "./LinkerError.ts";
 import { ParserError } from "./ParserError.ts";
 import { Type } from "./Type.ts";
-import { TypeTuple } from "./TypeTuple.ts";
 
 export class TypeIntersection extends Type {
   static {
@@ -13,14 +13,14 @@ export class TypeIntersection extends Type {
       priority: 100,
       match: /^\&$/gm,
       chainable: true,
-      factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
+      factory: (walker: TokenWalker, left?: Type) => {
         if (!left) throw new ParserError("Unexpected &", walker);
         const [{ right }, done] = walker
           .expect("&", TokenTypeName.Operator)
-          .extract("right", (w) => Type.Parse(w, (): Entry => result))
+          .extract("right", (w) => Type.Parse(w))
           .finish();
 
-        const result = new TypeIntersection(walker.location, done, parent, [
+        const result = new TypeIntersection(_context(walker, done), [
           ...(left instanceof TypeIntersection ? left.parts : [left]),
           ...(right instanceof TypeIntersection ? right.parts : [right]),
         ]);
@@ -32,8 +32,8 @@ export class TypeIntersection extends Type {
 
   readonly #parts: Array<Type>;
 
-  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined, parts: Array<Type>) {
-    super(location, done, parent);
+  constructor(ctx: EntryContext, parts: Array<Type>) {
+    super(ctx);
     this.#parts = parts;
   }
 
@@ -41,78 +41,25 @@ export class TypeIntersection extends Type {
     return this.#parts;
   }
 
-  flattened(): Type {
-    return new TypeTuple(
-      this.location,
-      this.done,
-      () => this.parent,
-      this.#parts
-        .map((p) => p.flattened())
-        .flatMap((p) => {
-          if (!(p instanceof TypeTuple)) {
-            throw new LinkerError("Tuple required for intersection", this.range);
-          }
+  linked(input: LinkedType | undefined, ctx: LinkerContext) {
+    if (input && !(input instanceof LinkedTypeTuple)) {
+      throw new LinkerError("Invalid type", input?.range ?? this.range);
+    }
 
-          return p.args;
-        }),
-      [],
-    );
-  }
+    return ctx
+      .mapWith(this.#parts, "parts", (c, part) => part.linked(input, c))
+      .finish(
+        ({ parts }) =>
+          new LinkedTypeTuple(
+            this.range,
+            parts.flatMap((part) => {
+              if (!(part instanceof LinkedTypeTuple)) {
+                throw new LinkerError("Intersection parts must be Tuples", input?.range ?? this.range);
+              }
 
-  matches(input: Type): boolean {
-    throw new Error("Not implemented");
-  }
-
-  representation(depth: number): string {
-    return this.#parts
-      .map((p) => p.representation(depth + 1))
-      .filter((value, index, total) => total.indexOf(value) === index)
-      .join(" & ");
-  }
-
-  shape(): Shape {
-    return {
-      type: "tuple",
-      args: this.#parts.flatMap((p) => {
-        const pShape = p.shape();
-        if (pShape.type !== "tuple") {
-          throw new LinkerError("May only intersect on tuples", p.range);
-        }
-
-        return pShape.args;
-      }),
-    };
-  }
-
-  compatible(input: Type): boolean {
-    return this.flattened().compatible(input);
-  }
-
-  dig(name: string): Entry | undefined {
-    return this.#parts.find((p) => p.dig(name));
-  }
-
-  float(name: string): Entry | undefined {
-    return this.dig(name) ?? this.parent?.float(name);
-  }
-
-  consolidate(input: Type, parent: () => Entry): Type {
-    const result = new TypeTuple(
-      this.location,
-      this.done,
-      parent,
-      this.#parts
-        .map((p) => p.flattened())
-        .flatMap((p) => {
-          if (!(p instanceof TypeTuple)) {
-            throw new LinkerError("Tuple required for intersection", this.range);
-          }
-
-          return p.args;
-        }),
-      [],
-    ).consolidate(input, (): Entry => result);
-
-    return result;
+              return part.args;
+            }),
+          ),
+      );
   }
 }

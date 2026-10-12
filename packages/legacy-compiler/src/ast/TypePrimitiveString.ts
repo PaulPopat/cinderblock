@@ -1,7 +1,9 @@
+import type { LinkedType } from "#linked/LinkedType";
+import { LinkedTypePrimitiveString } from "#linked/LinkedTypePrimitiveString";
 import { TokenTypeName, type TokenWalker } from "#tokeniser";
-import type { Location } from "#utils";
-import type { Shape } from "#writer";
-import type { Entry } from "./Entry.ts";
+import { _context } from "./EntryContext.ts";
+import type { LinkerContext } from "./LinkerContext.ts";
+import { LinkerError } from "./LinkerError.ts";
 import { Type } from "./Type.ts";
 import { TypePrimitive } from "./TypePrimitive.ts";
 
@@ -11,25 +13,21 @@ export class TypePrimitiveString extends TypePrimitive {
       priority: 150,
       match: /^string+$/gm,
       chainable: false,
-      factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
-        return new TypePrimitiveString(walker.location, walker.expect("string", TokenTypeName.Primitive), parent);
+      factory: (walker: TokenWalker, left?: Type) => {
+        return new TypePrimitiveString(_context(walker, walker.expect("string", TokenTypeName.KeyWord)));
       },
     });
-  }
-
-  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined) {
-    super(location, done, parent);
   }
 
   get name() {
     return "string";
   }
 
-  shape(): Shape {
-    return { type: "string" };
-  }
+  linked(input: LinkedType | undefined, ctx: LinkerContext): [LinkerContext, LinkedType] {
+    if (input && !(input instanceof LinkedTypePrimitiveString)) {
+      throw new LinkerError("Invalid type", input.range);
+    }
 
-  compatible(input: Type): boolean {
-    return input instanceof TypePrimitiveString;
+    return ctx.finish(() => new LinkedTypePrimitiveString(this.range));
   }
 }

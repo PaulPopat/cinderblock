@@ -1,0 +1,36 @@
+namespace std_dictionary {
+  struct entry (TValue)
+    key: string
+    value: TValue
+  ;
+
+  let start (key: string, value: infer T): entry (TValue: T)[] =
+    [{ key = key, value = value }]
+  ;
+
+  let find (_s: entry (TValue: infer T)[], key: string): T | null =
+    _s
+    --> { predicate = let (_s: entry (TValue: T)) = _s.key == key; }
+    -> array_first
+  ;
+
+  let set (_s: entry (TValue: infer T)[], key: string, value: T): entry (TValue: T)[] =
+    (
+      _s
+      --> { predicate = let (_s: entry (TValue: T)) = _s.key != key; }
+      -> array_where
+    ) ++ { key = key, value = value }
+  ;
+
+  let [test="std_dictionary creates a dictionary with one level"] =
+    {
+      actual =
+        {
+          key = "test",
+          value = "value",
+        }
+        -> start,
+      expected = [{ key = "test", value = "value" }],
+    }
+  ;
+}

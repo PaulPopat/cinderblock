@@ -1,20 +1,15 @@
+import type { LinkedType } from "#linked/LinkedType";
 import { TokenTypeName, type TokenWalker } from "#tokeniser";
-import type { Location } from "#utils";
-import type { Shape } from "#writer";
-import { EntityStruct } from "./EntityStruct.ts";
-import type { Entry } from "./Entry.ts";
+import { _context, type EntryContext } from "./EntryContext.ts";
+import type { LinkerContext } from "./LinkerContext.ts";
+import { LinkerError } from "./LinkerError.ts";
 import { Type } from "./Type.ts";
-import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
 
 export class TypeInfer extends Type {
-  static ParseInfer(walker: TokenWalker, parent: () => Entry | undefined, left?: Type) {
-    const [{ value }, done] = walker
-      .expect("infer", TokenTypeName.KeyWord, (): TypeInfer => result)
-      .text("value", TokenTypeName.StructReference, (): TypeInfer => result)
-      .finish();
+  static ParseInfer(walker: TokenWalker, left?: Type) {
+    const [{ value }, done] = walker.expect("infer", TokenTypeName.KeyWord).text("value", TokenTypeName.StructReference).finish();
 
-    const result = new TypeInfer(walker.location, done, parent, value, new TypePrimitiveUnknown(walker.location, done, parent));
-    return result;
+    return new TypeInfer(_context(walker, done), value);
   }
 
   static {
@@ -27,48 +22,21 @@ export class TypeInfer extends Type {
   }
 
   readonly #name: string;
-  readonly #instance: Type;
 
-  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined, name: string, instance: Type) {
-    super(location, done, parent);
+  constructor(ctx: EntryContext, name: string) {
+    super(ctx);
     this.#name = name;
-    this.#instance = instance;
   }
 
   get name() {
     return this.#name;
   }
 
-  get subject() {
-    return this.float(this.#name);
-  }
+  linked(input: LinkedType | undefined, ctx: LinkerContext) {
+    if (!input) {
+      throw new LinkerError("Invalid infer", this.range);
+    }
 
-  flattened(): Type {
-    return this.#instance;
-  }
-
-  matches(input: Type): boolean {
-    throw new Error("Not implemented");
-  }
-
-  representation(depth: number): string {
-    return `infer ${this.#name}`;
-  }
-
-  shape(): Shape {
-    return this.flattened().shape();
-  }
-
-  compatible(input: Type): boolean {
-    return this.flattened().compatible(input.flattened());
-  }
-
-  dig(name: string): Entry | undefined {
-    if (name === this.#name) return this.#instance;
-    return undefined;
-  }
-
-  consolidate(input: Type, parent: () => Entry | undefined): TypeInfer {
-    return new TypeInfer(this.location, this.done, parent, this.#name, input);
+    return ctx.searchable(this.#name, (c) => [c, input]).finish(() => input);
   }
 }

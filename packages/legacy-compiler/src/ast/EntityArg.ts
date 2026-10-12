@@ -1,37 +1,34 @@
-import type { Entry } from "./Entry.ts";
 import { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { Type } from "./Type.ts";
-import { TypeArg } from "./TypeArg.ts";
 import { TokenTypeName } from "#tokeniser";
 import { Entity } from "./Entity.ts";
-import type { CreateFunc } from "#writer";
 import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
+import { _context, type EntryContext } from "./EntryContext.ts";
 
 export class EntityArg extends Entity {
-  readonly #type: Type;
-  readonly #name: string;
+  static Parse(walker: TokenWalker) {
+    const [{ type, name }, done] = walker
+      .text("name", TokenTypeName.ParameterName)
+      .if(
+        (s) => s.data === ":",
+        (w) => w.expect(":", TokenTypeName.Punctuation).extract("type", (w) => Type.Parse(w)),
+      )
+      .finish();
 
-  constructor(walker: TokenWalker, parent: () => Entry | undefined);
-  constructor(fromType: TypeArg);
-  constructor(...args: [walker: TokenWalker, parent: () => Entry | undefined] | [fromType: TypeArg]) {
-    if (args.length === 2) {
-      const [walker, parent] = args;
-      const [{ type, name }, done] = walker
-        .text("name", TokenTypeName.ParameterName)
-        .if(
-          (s) => s.data === ":",
-          (w) => w.expect(":", TokenTypeName.Punctuation).extract("type", (w) => Type.Parse(w, () => this)),
-        )
-        .finish();
-      super(walker.location, done, parent);
-      this.#type = type ?? new TypePrimitiveUnknown(walker.location, done, () => this);
-      this.#name = name.startsWith('"') ? JSON.parse(name) : name;
-    } else {
-      const [fromType] = args;
-      super(fromType.location, fromType.done, () => fromType.parent);
-      this.#type = fromType.type;
-      this.#name = fromType.name;
-    }
+    return new EntityArg(
+      _context(walker, done),
+      name.startsWith('"') ? JSON.parse(name) : name,
+      type ?? new TypePrimitiveUnknown({ location: walker.location, done }),
+    );
+  }
+
+  readonly #name: string;
+  readonly #type: Type;
+
+  constructor(ctx: EntryContext, name: string, type: Type) {
+    super(ctx);
+    this.#name = name;
+    this.#type = type;
   }
 
   get type() {
@@ -40,23 +37,5 @@ export class EntityArg extends Entity {
 
   get name() {
     return this.#name;
-  }
-
-  get typeArg() {
-    return new TypeArg(this.location, this.done, () => this, this.#type, this.#name);
-  }
-
-  dig(name: string): Entry | undefined {
-    if (name === this.#name) return this;
-
-    return this.#type.dig(name);
-  }
-
-  float(name: string): Entry | undefined {
-    return this.parent?.float(name);
-  }
-
-  get model(): CreateFunc[] {
-    return [];
   }
 }

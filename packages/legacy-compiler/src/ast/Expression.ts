@@ -1,14 +1,12 @@
 import { Entry } from "./Entry.ts";
 import { ParserError } from "./ParserError.ts";
-import { TokenWalker } from "../tokeniser/TokenWalker.ts";
-import type { Type } from "./Type.ts";
-import type { CreateFunc, Instruction } from "#writer";
+import { TokenWalker } from "#tokeniser";
 
 type ExpressionParseable = {
   priority: number;
   match: RegExp;
   inOne?: boolean;
-  factory: new (walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) => Expression;
+  factory: (walker: TokenWalker, lookFor: Array<string>, existing: Expression | undefined) => Expression;
 };
 
 export abstract class Expression extends Entry {
@@ -18,13 +16,13 @@ export abstract class Expression extends Entry {
     this.#parsers = [...this.#parsers, entry].sort((a, b) => b.priority - a.priority);
   }
 
-  static ParseOne(walker: TokenWalker, parent: () => Entry | undefined): Expression {
+  static ParseOne(walker: TokenWalker): Expression {
     const match = this.#parsers.find((p) => walker.data.match(p.match));
     if (!match) {
       throw new ParserError(`Unexpected symbol of ${walker.data}`, walker);
     }
 
-    const left = new match.factory(walker, parent, [";"], undefined);
+    const left = match.factory(walker, [";"], undefined);
 
     const [{ right }] = left.done
       .reduce(
@@ -36,7 +34,7 @@ export abstract class Expression extends Entry {
             throw new ParserError(`Unexpected symbol of ${w.data}`, w);
           }
 
-          return new match.factory(w, parent, [";"], p);
+          return match.factory(w, [";"], p);
         },
         left,
       )
@@ -45,7 +43,7 @@ export abstract class Expression extends Entry {
     return right;
   }
 
-  static Parse(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string> = [";"]): Expression {
+  static Parse(walker: TokenWalker, lookFor: Array<string> = [";"]): Expression {
     const [{ expression }] = walker
       .reduce(
         "expression",
@@ -56,23 +54,11 @@ export abstract class Expression extends Entry {
             throw new ParserError(`Unexpected symbol of ${w.data}`, w);
           }
 
-          return new match.factory(w, parent, lookFor, p);
+          return match.factory(w, lookFor, p);
         },
       )
       .finish();
 
     return expression;
-  }
-
-  abstract get resolution(): Type;
-  abstract get instruction(): Instruction;
-  abstract get funcs(): Array<CreateFunc>;
-
-  float(name: string): Entry | undefined {
-    return this.parent?.float(name);
-  }
-
-  dig(name: string): Entry | undefined {
-    return undefined;
   }
 }

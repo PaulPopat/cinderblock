@@ -227,4 +227,24 @@ describe("logic", () => {
     const result = await code.binary().run("my_test", { input: ["hello", "world"] });
     assert.equal(result, "i exist");
   });
+
+  test("infering struct args", async () => {
+    const code = new Inline(
+      `
+        struct entry (T)
+          key: string
+          value: T
+        ;
+
+        let get_value (_s: entry (T: infer R)): R = _s.value;
+
+        let my_test =
+          ({ key = "test", value = { item = "value" } } --> get_value)
+          .item
+        ;
+      `,
+    );
+    const result = await code.binary().run("my_test", {});
+    assert.equal(result, "value");
+  });
 });

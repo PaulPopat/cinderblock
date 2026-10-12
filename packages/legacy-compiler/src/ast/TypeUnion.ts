@@ -1,7 +1,8 @@
+import type { LinkedType } from "#linked/LinkedType";
+import { LinkedTypeUnion } from "#linked/LinkedTypeUnion";
 import { TokenTypeName, type TokenWalker } from "#tokeniser";
-import type { Location } from "#utils";
-import type { Shape } from "#writer";
-import type { Entry } from "./Entry.ts";
+import { _context, type EntryContext } from "./EntryContext.ts";
+import type { LinkerContext } from "./LinkerContext.ts";
 import { LinkerError } from "./LinkerError.ts";
 import { ParserError } from "./ParserError.ts";
 import { Type } from "./Type.ts";
@@ -12,14 +13,14 @@ export class TypeUnion extends Type {
       priority: 100,
       match: /^\|$/gm,
       chainable: true,
-      factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
+      factory: (walker: TokenWalker, left?: Type) => {
         if (!left) throw new ParserError("Unexpected |", walker);
         const [{ right }, done] = walker
           .expect("|", TokenTypeName.Operator)
-          .extract("right", (w) => Type.Parse(w, (): Entry => result))
+          .extract("right", (w) => Type.Parse(w))
           .finish();
 
-        const result = new TypeUnion(walker.location, done, parent, [
+        const result = new TypeUnion(_context(walker, done), [
           ...(left instanceof TypeUnion ? left.parts : [left]),
           ...(right instanceof TypeUnion ? right.parts : [right]),
         ]);
@@ -31,8 +32,8 @@ export class TypeUnion extends Type {
 
   readonly #parts: Array<Type>;
 
-  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined, parts: Array<Type>) {
-    super(location, done, parent);
+  constructor(ctx: EntryContext, parts: Array<Type>) {
+    super(ctx);
     this.#parts = parts;
   }
 
@@ -40,57 +41,26 @@ export class TypeUnion extends Type {
     return this.#parts;
   }
 
-  flattened(): Type {
-    const flattenedParts = this.#parts.map((p) => p.flattened());
-    const result: Array<Type> = [];
-    for (const part of flattenedParts) {
-      if (result.some((b) => b.matches(part))) continue;
-      result.push(part);
+  linked(input: LinkedType | undefined, ctx: LinkerContext): [LinkerContext, LinkedType] {
+    if (!input) {
+      return ctx
+        .mapWith(this.#parts, "parts", (c, i) => i.linked(undefined, c))
+        .finish(({ parts }) => {
+          return new LinkedTypeUnion(this.range, parts);
+        });
     }
 
-    if (result.length === 1) {
-      return result[0]!;
+    if (input instanceof LinkedTypeUnion) {
+      // This allows any union to replace another. Not safe and should be changed.
+      return [ctx, input];
     }
 
-    if (result.length === 0) {
-      throw new LinkerError("Union bottomed out", this.range);
+    for (const part of this.#parts) {
+      try {
+        return ctx.with("part", (c) => part.linked(input, c)).finish(({ part }) => part);
+      } catch {}
     }
 
-    return new TypeUnion(this.location, this.done, () => this.parent, result);
-  }
-
-  matches(input: Type): boolean {
-    return false;
-  }
-
-  representation(depth: number): string {
-    return this.#parts
-      .map((p) => p.representation(depth + 1))
-      .filter((value, index, total) => total.indexOf(value) === index)
-      .join(" | ");
-  }
-
-  shape(): Shape {
-    return { type: "union", args: this.#parts.map((p) => p.shape()) };
-  }
-
-  dig(name: string): Entry | undefined {
-    return this.#parts.find((a) => a.dig(name));
-  }
-
-  float(name: string): Entry | undefined {
-    return this.dig(name) ?? this.parent?.float(name);
-  }
-
-  compatible(input: Type): boolean {
-    if (input instanceof TypeUnion) {
-      return !input.parts.some((a) => !this.#parts.some((b) => b.compatible(a)));
-    }
-
-    return this.#parts.some((p) => p.compatible(input));
-  }
-
-  consolidate(input: Type): Type {
-    return input;
+    throw new LinkerError("Input did not match any possible union types", input.range);
   }
 }

@@ -1,37 +1,26 @@
-import { Range, type Location } from "#utils";
-import type { TokenWalker } from "#tokeniser";
+import { Range } from "#utils";
+import type { EntryContext } from "./EntryContext.ts";
 
 export abstract class Entry {
-  readonly #location: Location;
-  readonly #done: TokenWalker;
-  readonly #parent: () => Entry | undefined;
+  readonly #ctx: EntryContext;
 
-  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined) {
-    this.#location = location;
-    this.#done = done;
-    this.#parent = parent;
-  }
-
-  get parent() {
-    return this.#parent();
+  constructor(ctx: EntryContext) {
+    this.#ctx = ctx;
   }
 
   get location() {
-    return this.#location;
+    return this.#ctx.location;
   }
 
   get range() {
-    return new Range(this.#location, this.#done.previous.range.to);
+    return new Range(this.#ctx.location, this.#ctx.done.previous.range.to);
   }
 
   get done() {
-    return this.#done;
+    return this.#ctx.done;
   }
 
-  abstract float(name: string): Entry | undefined;
-  abstract dig(name: string): Entry | undefined;
-
-  get namespace(): string {
-    return this.#parent()?.namespace ?? "";
+  get ctx() {
+    return this.#ctx;
   }
 }

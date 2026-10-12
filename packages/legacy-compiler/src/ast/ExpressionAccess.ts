@@ -1,14 +1,7 @@
-import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
-import { LinkerError } from "./LinkerError.ts";
 import { ParserError } from "./ParserError.ts";
-import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
-import { TypeTuple } from "./TypeTuple.ts";
-import { WriterError } from "./WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { CreateFunc, Instruction } from "#writer";
-import type { Type } from "./Type.ts";
-import { TypeReference } from "./TypeReference.ts";
+import { _context, type EntryContext } from "./EntryContext.ts";
 
 export class ExpressionAccess extends Expression {
   static {
@@ -16,22 +9,22 @@ export class ExpressionAccess extends Expression {
       priority: 100,
       match: /^\.$/gm,
       inOne: true,
-      factory: this,
+      factory: (walker, lookFor, existing) => {
+        if (!existing) throw new ParserError("Unexpected .", walker);
+
+        const [{ name }, done] = walker.expect(".", TokenTypeName.Operator).text("name", TokenTypeName.PropertyReference).finish();
+
+        return new ExpressionAccess(_context(walker, done), existing, name);
+      },
     });
   }
 
   readonly #subject: Expression;
   readonly #name: string;
 
-  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
-    if (!existing) throw new ParserError("Unexpected .", walker);
-
-    const [{ name }, done] = walker
-      .expect(".", TokenTypeName.Operator)
-      .text("name", TokenTypeName.PropertyReference, () => this)
-      .finish();
-    super(walker.location, done, parent);
-    this.#subject = existing;
+  constructor(ctx: EntryContext, subject: Expression, name: string) {
+    super(ctx);
+    this.#subject = subject;
     this.#name = name;
   }
 
@@ -41,42 +34,5 @@ export class ExpressionAccess extends Expression {
 
   get name() {
     return this.#name;
-  }
-
-  get resolution(): Type {
-    let subjectType = this.#subject.resolution;
-    if (!(subjectType instanceof TypeTuple)) throw new LinkerError("Subject is not accessible", this.range);
-
-    const property = subjectType.args.find((a) => a.name === this.#name);
-
-    if (!property) throw new LinkerError("Could not find property", this.range);
-
-    return property.type.flattened();
-  }
-
-  get instruction(): Instruction {
-    let subjectType: Entry | undefined = this.#subject.resolution;
-
-    if (subjectType instanceof TypeReference) {
-      subjectType = subjectType.subject;
-    }
-
-    if (!(subjectType instanceof TypeTuple)) {
-      throw new WriterError("Left must be a tuple", this.range);
-    }
-
-    if (!subjectType.args.some((a) => a.name === this.#name)) {
-      throw new WriterError("Could not find property", this.range);
-    }
-
-    return {
-      type: "access",
-      subject: this.#subject.instruction,
-      key: this.#name,
-    };
-  }
-
-  get funcs(): Array<CreateFunc> {
-    return this.#subject.funcs;
   }
 }

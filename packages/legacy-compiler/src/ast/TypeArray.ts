@@ -1,7 +1,8 @@
-import { TokenTypeName, type TokenWalker } from "#tokeniser";
-import type { Location } from "#utils";
-import type { Shape } from "#writer";
-import type { Entry } from "./Entry.ts";
+import type { LinkedType } from "#linked/LinkedType";
+import { LinkedTypeArray } from "#linked/LinkedTypeArray";
+import { TokenTypeName } from "#tokeniser";
+import { _context, type EntryContext } from "./EntryContext.ts";
+import type { LinkerContext } from "./LinkerContext.ts";
 import { LinkerError } from "./LinkerError.ts";
 import { ParserError } from "./ParserError.ts";
 import { Type } from "./Type.ts";
@@ -12,17 +13,17 @@ export class TypeArray extends Type {
       priority: 100,
       match: /^\[\]$/gm,
       chainable: true,
-      factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
+      factory: (walker, left) => {
         if (!left) throw new ParserError("Unexpected []", walker);
-        return new TypeArray(walker.location, walker.expect("[]", TokenTypeName.Operator), parent, left);
+        return new TypeArray(_context(walker, walker.expect("[]", TokenTypeName.Operator)), left);
       },
     });
   }
 
   readonly #contains: Type;
 
-  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined, left: Type) {
-    super(location, done, parent);
+  constructor(ctx: EntryContext, left: Type) {
+    super(ctx);
     this.#contains = left;
   }
 
@@ -30,46 +31,11 @@ export class TypeArray extends Type {
     return this.#contains;
   }
 
-  flattened(): Type {
-    return new TypeArray(this.location, this.done, () => this.parent, this.#contains.flattened());
-  }
-
-  matches(input: Type): boolean {
-    return input instanceof TypeArray && input.contains.matches(this.#contains);
-  }
-
-  representation(depth: number): string {
-    return `${this.#contains.representation(depth + 1)}[]`;
-  }
-
-  shape(): Shape {
-    return { type: "array", value: this.#contains.shape() };
-  }
-
-  compatible(input: Type): input is TypeArray {
-    return input instanceof TypeArray && this.#contains.compatible(input.contains);
-  }
-
-  dig(name: string): Entry | undefined {
-    return this.#contains.dig(name);
-  }
-
-  float(name: string): Entry | undefined {
-    return this.dig(name) ?? this.parent?.float(name);
-  }
-
-  consolidate(input: Type, parent: () => Entry): Type {
-    if (!(input instanceof TypeArray)) {
-      throw new LinkerError("Invalid type", input.range);
+  linked(input: LinkedType | undefined, ctx: LinkerContext) {
+    if (input && !(input instanceof LinkedTypeArray)) {
+      throw new LinkerError("Bad type", input?.range ?? this.range);
     }
 
-    const result = new TypeArray(
-      this.location,
-      this.done,
-      parent,
-      this.#contains.consolidate(input.contains, (): TypeArray => result),
-    );
-
-    return result;
+    return ctx.with("contains", (c) => this.#contains.linked(input?.contains, c)).finish(({ contains }) => new LinkedTypeArray(this.range, contains));
   }
 }

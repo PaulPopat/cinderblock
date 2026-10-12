@@ -1,34 +1,31 @@
-import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
-import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { CreateFunc, Instruction } from "#writer";
-import { TypeArray } from "./TypeArray.ts";
-import { WriterError } from "./WriterError.ts";
-import type { Type } from "./Type.ts";
-import type { TypeTuple } from "./TypeTuple.ts";
+import { _context, type EntryContext } from "./EntryContext.ts";
 
 export class ExpressionArrayAdd extends Expression {
   static {
     Expression.RegisterExpression({
       priority: 100,
       match: /^\+\+$/gm,
-      factory: this,
+      factory: (walker, lookFor, existing) => {
+        if (!existing) throw new ParserError("Unexpected ++", walker);
+        const [{ addition }, done] = walker
+          .expect("++", TokenTypeName.Operator)
+          .extract("addition", (w) => Expression.Parse(w, lookFor))
+          .finish();
+
+        return new ExpressionArrayAdd(_context(walker, done), existing, addition);
+      },
     });
   }
 
   readonly #subject: Expression;
   readonly #addition: Expression;
 
-  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
-    if (!existing) throw new ParserError("Unexpected ++", walker);
-    const [{ addition }, done] = walker
-      .expect("++", TokenTypeName.Operator)
-      .extract("addition", (w) => Expression.Parse(w, () => this, lookFor))
-      .finish();
-    super(walker.location, done, parent);
-    this.#subject = existing;
+  constructor(ctx: EntryContext, subject: Expression, addition: Expression) {
+    super(ctx);
+    this.#subject = subject;
     this.#addition = addition;
   }
 
@@ -38,25 +35,5 @@ export class ExpressionArrayAdd extends Expression {
 
   get addition() {
     return this.#addition;
-  }
-
-  get resolution(): Type {
-    return this.#subject.resolution;
-  }
-
-  get instruction(): Instruction {
-    if (!(this.#subject.resolution instanceof TypeArray)) {
-      throw new WriterError("Left must be array", this.range);
-    }
-
-    return {
-      type: "array_add",
-      left: this.#subject.instruction,
-      right: this.#addition.instruction,
-    };
-  }
-
-  get funcs(): Array<CreateFunc> {
-    return [...this.#subject.funcs, ...this.#addition.funcs];
   }
 }

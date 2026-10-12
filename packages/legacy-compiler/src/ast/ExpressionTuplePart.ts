@@ -1,24 +1,24 @@
-import { TypeArg } from "./TypeArg.ts";
 import { Expression } from "./Expression.ts";
-import { TypeTuple } from "./TypeTuple.ts";
-import type { Entry } from "./Entry.ts";
-import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
-import { TokenTypeName } from "#tokeniser";
-import type { CreateFunc, Instruction } from "#writer";
-import type { Type } from "./Type.ts";
+import { TokenTypeName, TokenWalker } from "#tokeniser";
+import { _context, type EntryContext } from "./EntryContext.ts";
 
 export class ExpressionTuplePart extends Expression {
+  static Parse(walker: TokenWalker, lookFor: Array<string>) {
+    const [{ name, value }, done] = walker
+      .text("name", TokenTypeName.PropertyName)
+      .expect("=", TokenTypeName.Operator)
+      .extract("value", (s) => Expression.Parse(s, lookFor))
+      .finish();
+
+    return new ExpressionTuplePart(_context(walker, done), name.startsWith('"') ? JSON.parse(name) : name, value);
+  }
+
   readonly #name: string;
   readonly #value: Expression;
 
-  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
-    const [{ name, value }, done] = walker
-      .text("name", TokenTypeName.PropertyName, () => this)
-      .expect("=", TokenTypeName.Operator)
-      .extract("value", (s) => Expression.Parse(s, () => this, lookFor))
-      .finish();
-    super(walker.location, done, parent);
-    this.#name = name.startsWith('"') ? JSON.parse(name) : name;
+  constructor(ctx: EntryContext, name: string, value: Expression) {
+    super(ctx);
+    this.#name = name;
     this.#value = value;
   }
 
@@ -28,19 +28,5 @@ export class ExpressionTuplePart extends Expression {
 
   get value() {
     return this.#value;
-  }
-
-  get resolution(): Type {
-    return new TypeTuple(this.location, this.done, () => this, [
-      new TypeArg(this.location, this.done, () => this, this.#value.resolution, this.#name),
-    ]).flattened();
-  }
-
-  get instruction(): Instruction {
-    return this.#value.instruction;
-  }
-
-  get funcs(): Array<CreateFunc> {
-    return this.#value.funcs;
   }
 }

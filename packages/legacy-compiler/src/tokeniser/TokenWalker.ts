@@ -51,6 +51,10 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
     return new TokenWalker(this.#data, this.#tokens, this.#types, this.#index - 1, this.#namer);
   }
 
+  get #next() {
+    return new TokenWalker(this.#data, this.#tokens, this.#types, this.#index + 1, this.#namer);
+  }
+
   get range() {
     const current = this.#tokens[this.#index];
     if (!current) return new Range(Location.empty, Location.empty);
@@ -61,13 +65,18 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
     return this.range.from;
   }
 
-  expect(expected: Array<string> | string, typeName: TokenTypeName, self?: () => unknown) {
+  nextIs(expect: Array<string> | string) {
+    if (typeof expect === "string") expect = [expect];
+    return expect.includes(this.#next.data);
+  }
+
+  expect(expected: Array<string> | string, typeName: TokenTypeName) {
     if (typeof expected === "string") expected = [expected];
     if (!expected.includes(this.data)) {
       throw new ParserError(`Expected ${expected.join(", ")} but found ${this.data}`, this);
     }
 
-    return new TokenWalker(this.#data, this.#tokens, [...this.#types, new TokenType(this.range, self, typeName)], this.#index + 1, this.#namer);
+    return new TokenWalker(this.#data, this.#tokens, [...this.#types, new TokenType(this.range, undefined, typeName)], this.#index + 1, this.#namer);
   }
 
   extract<TKey extends string, TResult extends Entry>(name: TKey, extractor: (walker: TokenWalker, soFar: TContext) => TResult) {
@@ -93,7 +102,7 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
     return extractor(this);
   }
 
-  text<TKey extends string>(name: TKey, typeName: TokenTypeName, self?: () => unknown) {
+  text<TKey extends string>(name: TKey, typeName: TokenTypeName) {
     type NewContext = TContext & {
       [key in TKey]: string;
     };
@@ -103,7 +112,7 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
         [name]: this.data,
       } as NewContext,
       this.#tokens,
-      [...this.#types, new TokenType(this.range, self, typeName)],
+      [...this.#types, new TokenType(this.range, undefined, typeName)],
       this.#index + 1,
       this.#namer,
     );

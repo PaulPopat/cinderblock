@@ -1,6 +1,10 @@
-import type { Location } from "./Location.ts";
+import { Location } from "./Location.ts";
 
 export class Range {
+  static get empty() {
+    return new Range(Location.empty, Location.empty);
+  }
+
   readonly #from: Location;
   readonly #to: Location;
 

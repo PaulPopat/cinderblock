@@ -1,7 +1,8 @@
+import type { LinkedType } from "#linked/LinkedType";
+import { LinkedTypePrimitiveUnknown } from "#linked/LinkedTypePrimitiveUnknown";
 import { TokenTypeName, type TokenWalker } from "#tokeniser";
-import type { Location } from "#utils";
-import type { Shape } from "#writer";
-import type { Entry } from "./Entry.ts";
+import { _context } from "./EntryContext.ts";
+import type { LinkerContext } from "./LinkerContext.ts";
 import { Type } from "./Type.ts";
 import { TypePrimitive } from "./TypePrimitive.ts";
 
@@ -11,29 +12,17 @@ export class TypePrimitiveUnknown extends TypePrimitive {
       priority: 150,
       match: /^unknown+$/gm,
       chainable: false,
-      factory: (walker: TokenWalker, parent: () => Entry | undefined, left?: Type) => {
-        return new TypePrimitiveUnknown(walker.location, walker.expect("unknown", TokenTypeName.Primitive), parent);
+      factory: (walker: TokenWalker, left?: Type) => {
+        return new TypePrimitiveUnknown(_context(walker, walker.expect("unknown", TokenTypeName.KeyWord)));
       },
     });
-  }
-
-  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined) {
-    super(location, done, parent);
   }
 
   get name() {
     return "unknown";
   }
 
-  shape(): Shape {
-    return { type: "unknown" };
-  }
-
-  compatible(input: Type): boolean {
-    return true;
-  }
-
-  consolidate(input: Type): Type {
-    return input;
+  linked(input: LinkedType | undefined, ctx: LinkerContext): [LinkerContext, LinkedType] {
+    return ctx.finish(() => input ?? new LinkedTypePrimitiveUnknown(this.range));
   }
 }

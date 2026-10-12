@@ -1,11 +1,6 @@
-import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
-import { LinkerError } from "./LinkerError.ts";
-import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
-import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { CreateFunc, Instruction } from "#writer";
-import type { Type } from "./Type.ts";
+import { _context, type EntryContext } from "./EntryContext.ts";
 
 export class ExpressionNot extends Expression {
   static {
@@ -13,43 +8,25 @@ export class ExpressionNot extends Expression {
       priority: 100,
       match: /^\!$/gm,
       inOne: false,
-      factory: this,
+      factory: (walker, lookFor, existing) => {
+        const [{ subject }, done] = walker
+          .expect("!", TokenTypeName.Operator)
+          .extract("subject", (w) => Expression.ParseOne(w))
+          .finish();
+
+        return new ExpressionNot(_context(walker, done), subject);
+      },
     });
   }
 
   readonly #subject: Expression;
 
-  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
-    const [{ subject }, done] = walker
-      .expect("!", TokenTypeName.Operator)
-      .extract("subject", (w) => Expression.ParseOne(w, () => this))
-      .finish();
-    super(walker.location, done, parent);
+  constructor(ctx: EntryContext, subject: Expression) {
+    super(ctx);
     this.#subject = subject;
   }
 
   get subject() {
     return this.#subject;
-  }
-
-  get resolution(): Type {
-    let subjectType = this.#subject.resolution;
-    if (!(subjectType instanceof TypePrimitiveBool)) {
-      throw new LinkerError("Boolean required", this.range);
-    }
-
-    return new TypePrimitiveBool(this.location, this.done, () => this);
-  }
-
-  get instruction(): Instruction {
-    if (!(this.#subject.resolution instanceof TypePrimitiveBool)) {
-      throw new LinkerError("Boolean required", this.range);
-    }
-
-    return { type: "not", subject: this.#subject.instruction };
-  }
-
-  get funcs(): Array<CreateFunc> {
-    return [...this.#subject.funcs];
   }
 }

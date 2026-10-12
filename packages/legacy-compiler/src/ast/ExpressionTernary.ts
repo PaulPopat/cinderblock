@@ -1,20 +1,23 @@
-import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
-import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
-import { TypeUnion } from "./TypeUnion.ts";
-import { WriterError } from "./WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { CreateFunc, Instruction } from "#writer";
-import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
-import type { Type } from "./Type.ts";
+import { _context, type EntryContext } from "./EntryContext.ts";
 
 export class ExpressionTernary extends Expression {
   static {
     Expression.RegisterExpression({
       priority: 1,
       match: /^\?$/gm,
-      factory: this,
+      factory: (walker, lookFor, existing) => {
+        if (!existing) throw new ParserError("Unexpected ?", walker);
+        const [{ positive, negative }, done] = walker
+          .expect("?", TokenTypeName.Operator)
+          .extract("positive", (w) => Expression.Parse(w, [":"]))
+          .extract("negative", (w) => Expression.Parse(w, lookFor))
+          .finish();
+
+        return new ExpressionTernary(_context(walker, done), existing, positive, negative);
+      },
     });
   }
 
@@ -22,15 +25,9 @@ export class ExpressionTernary extends Expression {
   readonly #positive: Expression;
   readonly #negative: Expression;
 
-  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
-    if (!existing) throw new ParserError("Unexpected ?", walker);
-    const [{ positive, negative }, done] = walker
-      .expect("?", TokenTypeName.Operator)
-      .extract("positive", (w) => Expression.Parse(w, () => this, [":"]))
-      .extract("negative", (w) => Expression.Parse(w, () => this, lookFor))
-      .finish();
-    super(walker.location, done, parent);
-    this.#predicate = existing;
+  constructor(ctx: EntryContext, predicate: Expression, positive: Expression, negative: Expression) {
+    super(ctx);
+    this.#predicate = predicate;
     this.#positive = positive;
     this.#negative = negative;
   }
@@ -45,26 +42,5 @@ export class ExpressionTernary extends Expression {
 
   get negative() {
     return this.#negative;
-  }
-
-  get resolution(): Type {
-    return new TypeUnion(this.location, this.done, () => this, [this.#positive.resolution, this.#negative.resolution]).flattened();
-  }
-
-  get instruction(): Instruction {
-    if (!(this.#predicate.resolution instanceof TypePrimitiveBool)) {
-      throw new WriterError("Boolean required", this.range);
-    }
-
-    return {
-      type: "ternary",
-      predicate: this.#predicate.instruction,
-      positive: this.#positive.instruction,
-      negative: this.#negative.instruction,
-    };
-  }
-
-  get funcs(): Array<CreateFunc> {
-    return [...this.#predicate.funcs, ...this.#positive.funcs, ...this.#negative.funcs];
   }
 }

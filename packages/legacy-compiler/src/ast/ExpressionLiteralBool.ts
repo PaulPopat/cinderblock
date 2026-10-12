@@ -6,37 +6,28 @@ import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 import { TokenTypeName } from "#tokeniser";
 import type { CreateFunc, Instruction } from "#writer";
 import type { Type } from "./Type.ts";
+import { _context, type EntryContext } from "./EntryContext.ts";
 
 export class ExpressionLiteralBool extends ExpressionLiteral {
   static {
     Expression.RegisterExpression({
       priority: 150,
       match: /^(true|false)$/gm,
-      factory: this,
+      factory: (walker, lookFor, existing) => {
+        const [{ value }, done] = walker.text("value", TokenTypeName.KeyWord).finish();
+        return new ExpressionLiteralBool(_context(walker, done), value === "true");
+      },
     });
   }
 
   readonly #value: boolean;
 
-  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
-    const [{ value }, done] = walker.text("value", TokenTypeName.KeyWord).finish();
-    super(walker.location, done, parent);
-    this.#value = value === "true";
+  constructor(ctx: EntryContext, value: boolean) {
+    super(ctx);
+    this.#value = value;
   }
 
   get value() {
     return this.#value;
-  }
-
-  get resolution(): Type {
-    return new TypePrimitiveBool(this.location, this.done, () => this);
-  }
-
-  get instruction(): Instruction {
-    return { type: "literal_bool", value: this.#value };
-  }
-
-  get funcs(): Array<CreateFunc> {
-    return [];
   }
 }

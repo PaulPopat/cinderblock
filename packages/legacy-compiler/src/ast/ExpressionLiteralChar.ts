@@ -1,44 +1,28 @@
-import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
-import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
-import { TypePrimitiveChar } from "./TypePrimitiveChar.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { CreateFunc, Instruction } from "#writer";
-import type { Type } from "./Type.ts";
+import { _context, type EntryContext } from "./EntryContext.ts";
 
 export class ExpressionLiteralChar extends ExpressionLiteral {
   static {
     Expression.RegisterExpression({
       priority: 150,
       match: /^'([^']|\\.)'$/gm,
-      factory: this,
+      factory: (walker, lookFor, existing) => {
+        const [{ value }, done] = walker.text("value", TokenTypeName.String).finish();
+        return new ExpressionLiteralChar(_context(walker, done), new Function("return " + value)());
+      },
     });
   }
 
   readonly #value: string;
 
-  constructor(walker: TokenWalker, parent: () => Entry | undefined, lookFor: Array<string>, existing: Expression | undefined) {
-    const [{ value }, done] = walker.text("value", TokenTypeName.String).finish();
-    super(walker.location, done, parent);
-    this.#value = value.slice(1, value.length - 1);
+  constructor(ctx: EntryContext, value: string) {
+    super(ctx);
+    this.#value = value;
   }
 
   get value() {
     return this.#value;
-  }
-
-  get resolution(): Type {
-    return new TypePrimitiveChar(this.location, this.done, () => this);
-  }
-
-  get instruction(): Instruction {
-    const value: string = JSON.parse(`"${this.#value.slice(1, this.#value.length - 1)}"`);
-
-    return { type: "literal_char", value: value.charCodeAt(0) };
-  }
-
-  get funcs(): Array<CreateFunc> {
-    return [];
   }
 }

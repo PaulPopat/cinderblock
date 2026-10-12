@@ -1,16 +1,18 @@
+import { LinkedType } from "#linked/LinkedType";
+import { LinkedTypeTuple } from "#linked/LinkedTypeTuple";
 import { TokenTypeName, type TokenWalker } from "#tokeniser";
-import type { Location } from "#utils";
-import type { Shape } from "#writer";
+import { BoundEntry } from "./BoundEntry.ts";
 import { EntityStruct } from "./EntityStruct.ts";
-import type { Entry } from "./Entry.ts";
+import { _context, type EntryContext } from "./EntryContext.ts";
+import type { LinkerContext } from "./LinkerContext.ts";
+import { LinkerError } from "./LinkerError.ts";
 import { Type } from "./Type.ts";
 import { TypeArg } from "./TypeArg.ts";
-import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
 
 export class TypeReference extends Type {
-  static ParseReference(walker: TokenWalker, parent: () => Entry | undefined, left?: Type) {
+  static ParseReference(walker: TokenWalker) {
     const [{ value, args }, done] = walker
-      .text("value", TokenTypeName.StructReference, (): TypeReference => result)
+      .text("value", TokenTypeName.StructReference)
       .if(
         (s) => s.data === "(",
         (s) =>
@@ -18,14 +20,13 @@ export class TypeReference extends Type {
             .while(
               "args",
               (s) => (s.data === "," || s.data === "(") && s.expect([",", "("], TokenTypeName.Punctuation).data !== ")",
-              (s) => TypeArg.Parse(s.expect([",", "("], TokenTypeName.Punctuation), (): Entry => result),
+              (s) => TypeArg.Parse(s.expect([",", "("], TokenTypeName.Punctuation)),
             )
             .expect(")", TokenTypeName.Punctuation),
       )
       .finish();
 
-    const result = new TypeReference(walker.location, done, parent, value, args ?? []);
-    return result;
+    return new TypeReference(_context(walker, done), value, args ?? []);
   }
 
   static {
@@ -40,8 +41,8 @@ export class TypeReference extends Type {
   readonly #name: string;
   readonly #args: Array<TypeArg>;
 
-  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined, name: string, args: Array<TypeArg>) {
-    super(location, done, parent);
+  constructor(ctx: EntryContext, name: string, args: Array<TypeArg>) {
+    super(ctx);
     this.#name = name;
     this.#args = args;
   }
@@ -50,53 +51,26 @@ export class TypeReference extends Type {
     return this.#name;
   }
 
-  get subject() {
-    return this.float(this.#name);
-  }
-
-  flattened(): Type {
-    const result = this.float(this.#name);
-    if (result instanceof EntityStruct) {
-      return result.type(this.#args).flattened();
+  linked(input: LinkedType | undefined, ctx: LinkerContext): [LinkerContext, LinkedType] {
+    const found = ctx.search(this.#name);
+    if (found instanceof LinkedType) {
+      return ctx.finish(() => found);
     }
 
-    if (result instanceof Type) {
-      return result.flattened();
-    }
-
-    return new TypePrimitiveUnknown(this.location, this.done, () => this);
-  }
-
-  matches(input: Type): boolean {
-    throw new Error("Not implemented");
-  }
-
-  representation(depth: number): string {
-    const result = this.float(this.#name);
-    if (result instanceof EntityStruct) {
-      if (depth > 1) {
-        return result.name;
+    if (found instanceof BoundEntry) {
+      if (!found.is(EntityStruct)) {
+        throw new LinkerError("Expected a struct", this.range);
       }
 
-      return result.type(this.#args).representation(depth + 1);
+      if (input && !(input instanceof LinkedTypeTuple)) {
+        throw new LinkerError("Expected a tuple", input.range);
+      }
+
+      const [, result] = found.subject.build(found.context, input);
+
+      return ctx.finish(() => result);
     }
 
-    if (result instanceof Type) {
-      return result.representation(depth + 1);
-    }
-
-    return this.#name;
-  }
-
-  shape(): Shape {
-    return this.flattened().shape();
-  }
-
-  compatible(input: Type): boolean {
-    return this.flattened().compatible(input.flattened());
-  }
-
-  consolidate(input: Type, parent: () => Entry | undefined): TypeReference {
-    return new TypeReference(this.location, this.done, parent, this.#name, this.#args);
+    throw new LinkerError("Reference not found", this.range);
   }
 }

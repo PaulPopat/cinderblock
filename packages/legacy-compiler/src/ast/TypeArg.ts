@@ -1,91 +1,49 @@
+import type { LinkedType } from "#linked/LinkedType";
+import { LinkedTypeArg } from "#linked/LinkedTypeArg";
 import { TokenTypeName, type TokenWalker } from "#tokeniser";
-import type { Location } from "#utils";
-import type { Shape } from "#writer";
-import type { Entry } from "./Entry.ts";
+import { _context, type EntryContext } from "./EntryContext.ts";
+import type { LinkerContext } from "./LinkerContext.ts";
 import { LinkerError } from "./LinkerError.ts";
 import { Type } from "./Type.ts";
 import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
 
 export class TypeArg extends Type {
-  static Parse(walker: TokenWalker, parent: () => Entry | undefined) {
+  static Parse(walker: TokenWalker) {
     const [{ name, type }, done] = walker
       .text("name", TokenTypeName.PropertyName)
       .if(
         (s) => s.data === ":",
-        (w) => w.expect(":", TokenTypeName.Punctuation).extract("type", (w) => Type.Parse(w, (): Entry => result)),
+        (w) => w.expect(":", TokenTypeName.Punctuation).extract("type", (w) => Type.Parse(w)),
       )
       .finish();
 
     const result = new TypeArg(
-      walker.location,
-      done,
-      parent,
-      type ?? new TypePrimitiveUnknown(walker.location, done, (): Entry => result),
+      _context(walker, done),
       name.startsWith('"') ? JSON.parse(name) : name,
+      type ?? new TypePrimitiveUnknown(_context(walker, done)),
     );
 
     return result;
   }
 
-  readonly #type: Type;
   readonly #name: string;
+  readonly #type: Type;
 
-  constructor(location: Location, done: TokenWalker, parent: () => Entry | undefined, type: Type, name: string) {
-    super(location, done, parent);
+  constructor(ctx: EntryContext, name: string, type: Type) {
+    super(ctx);
+    this.#name = name;
     this.#type = type;
-    this.#name = name.startsWith('"') ? JSON.parse(name) : name;
-  }
-
-  get type() {
-    return this.#type;
   }
 
   get name() {
     return this.#name;
   }
 
-  flattened(): TypeArg {
-    return new TypeArg(this.location, this.done, () => this.parent, this.#type.flattened(), this.#name);
-  }
-
-  matches(input: Type): boolean {
-    return input instanceof TypeArg && input.name === this.#name && input.type.matches(this.#type);
-  }
-
-  representation(depth: number): string {
-    return `${this.#name}: ${this.#type.representation(depth + 1)}`;
-  }
-
-  shape(): Shape {
-    return { type: "null" };
-  }
-
-  compatible(input: Type): boolean {
-    return input instanceof TypeArg && input.name === this.name && this.type.compatible(input.type);
-  }
-
-  dig(name: string) {
-    if (name === this.#name) return this.type.flattened();
-    return this.#type.dig(name);
-  }
-
-  float(name: string): Entry | undefined {
-    return this.dig(name) ?? this.parent?.float(name);
-  }
-
-  consolidate(input: Type, parent: () => Entry | undefined): TypeArg {
-    if (!(input instanceof TypeArg)) {
-      throw new LinkerError("Invalid type", input.range);
+  linked(input: LinkedType | undefined, ctx: LinkerContext) {
+    if (input && !(input instanceof LinkedTypeArg)) {
+      throw new LinkerError("Bad type", input?.range ?? this.range);
     }
 
-    const result = new TypeArg(
-      this.location,
-      this.done,
-      parent,
-      input.type.consolidate(this.#type, (): TypeArg => result),
-      this.#name,
-    );
-
-    return result;
+    return ctx.with("type", (c) => this.#type.linked(input?.type, c)).finish(({ type }) => new LinkedTypeArg(this.range, type, this.#name));
   }
 }
