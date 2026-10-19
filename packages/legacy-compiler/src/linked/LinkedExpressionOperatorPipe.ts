@@ -4,7 +4,7 @@ import { LinkedTypePipeable } from "./LinkedTypePipeable.ts";
 import { LinkedTypeTuple } from "./LinkedTypeTuple.ts";
 import { WriterError } from "./WriterError.ts";
 
-export abstract class LinkedExpressionOperatorPipeBase extends LinkedExpressionOperator {
+export class LinkedExpressionOperatorPipe extends LinkedExpressionOperator {
   get resolution() {
     const input = this.left.resolution;
     if (!(input instanceof LinkedTypeTuple)) {

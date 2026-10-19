@@ -39,6 +39,10 @@ export class TypeArg extends Type {
     return this.#name;
   }
 
+  get type() {
+    return this.#type;
+  }
+
   linked(input: LinkedType | undefined, ctx: LinkerContext) {
     if (input && !(input instanceof LinkedTypeArg)) {
       throw new LinkerError("Bad type", input?.range ?? this.range);

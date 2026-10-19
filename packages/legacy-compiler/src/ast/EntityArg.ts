@@ -4,6 +4,10 @@ import { TokenTypeName } from "#tokeniser";
 import { Entity } from "./Entity.ts";
 import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
 import { _context, type EntryContext } from "./EntryContext.ts";
+import type { LinkedEntry } from "#linked/LinkedEntry";
+import type { LinkerContext } from "./LinkerContext.ts";
+import { LinkedTypeArg } from "#linked/LinkedTypeArg";
+import { LinkerError } from "./LinkerError.ts";
 
 export class EntityArg extends Entity {
   static Parse(walker: TokenWalker) {
@@ -37,5 +41,23 @@ export class EntityArg extends Entity {
 
   get name() {
     return this.#name;
+  }
+
+  linked(left: LinkedEntry | undefined, ctx: LinkerContext): [LinkerContext, LinkedTypeArg] {
+    if (left && !(left instanceof LinkedTypeArg)) {
+      throw new LinkerError("Invalid type", left.range);
+    }
+
+    return ctx
+      .with("type", (c) => this.#type.linked(left?.type, c))
+      .finishSearchable(this.#name, ({ type }) => new LinkedTypeArg(this.range, type, this.#name));
+  }
+
+  load(ctx: LinkerContext): LinkerContext {
+    return ctx;
+  }
+
+  search(name: string): Array<Entity> {
+    return [];
   }
 }

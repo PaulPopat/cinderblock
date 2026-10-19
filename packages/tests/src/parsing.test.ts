@@ -5,14 +5,14 @@ import test, { describe } from "node:test";
 describe("parsing", () => {
   test("parses multiple arguements", () => {
     new Inline(`
-      let services_Password_Matches (original: string, _s: string) = original;
+      export let services_Password_Matches (original: string, _s: string) = original;
     `);
   });
 
   test("resolves left to right", async () => {
     const app = new Inline(`
       struct test email: string;
-      let main_export (data: test) = "email" in data ? "present" : "not present";
+      export let main_export (data: test) = "email" in data ? "present" : "not present";
     `);
 
     const result = await app.binary().run("main_export", { data: { email: "hello" } });
@@ -23,7 +23,7 @@ describe("parsing", () => {
   test("resolves access in maths", async () => {
     const app = new Inline(`
       struct test email: string;
-      let main_export (data: test) = "hello" == data.email ? "present" : "not present";
+      export let main_export (data: test) = "hello" == data.email ? "present" : "not present";
     `);
 
     const result = await app.binary().run("main_export", { data: { email: "hello" } });

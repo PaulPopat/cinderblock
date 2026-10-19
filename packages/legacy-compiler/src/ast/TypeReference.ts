@@ -52,12 +52,18 @@ export class TypeReference extends Type {
   }
 
   linked(input: LinkedType | undefined, ctx: LinkerContext): [LinkerContext, LinkedType] {
-    const found = ctx.search(this.#name);
+    const found = ctx.search(this.#name, this.range);
     if (found instanceof LinkedType) {
       return ctx.finish(() => found);
     }
 
     if (found instanceof BoundEntry) {
+      if (found.is(Type)) {
+        const [, result] = found.subject.linked(input, found.context);
+
+        return ctx.finish(() => result);
+      }
+
       if (!found.is(EntityStruct)) {
         throw new LinkerError("Expected a struct", this.range);
       }
@@ -66,7 +72,11 @@ export class TypeReference extends Type {
         throw new LinkerError("Expected a tuple", input.range);
       }
 
-      const [, result] = found.subject.build(found.context, input);
+      const inputCtx = this.#args.reduce(
+        (found, arg) => found.searchable(arg.name, (found) => [found, new BoundEntry(ctx, arg.type)]),
+        found.context,
+      );
+      const [, result] = found.subject.linked(input, inputCtx);
 
       return ctx.finish(() => result);
     }

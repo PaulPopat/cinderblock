@@ -1,6 +1,8 @@
 import { Entry } from "./Entry.ts";
 import { ParserError } from "./ParserError.ts";
 import { TokenWalker } from "#tokeniser";
+import type { LinkedExpression } from "#linked/LinkedExpression";
+import type { LinkerContext } from "./LinkerContext.ts";
 
 type ExpressionParseable = {
   priority: number;
@@ -61,4 +63,6 @@ export abstract class Expression extends Entry {
 
     return expression;
   }
+
+  abstract linked(left: LinkedExpression | undefined, ctx: LinkerContext): [LinkerContext, LinkedExpression];
 }

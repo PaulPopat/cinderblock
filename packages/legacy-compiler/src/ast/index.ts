@@ -45,6 +45,7 @@ export * from "./ExpressionReference.ts";
 export * from "./ExpressionTernary.ts";
 export * from "./ExpressionTuple.ts";
 export * from "./ExpressionTuplePart.ts";
+export * from "./LinkerContext.ts";
 export * from "./ParserError.ts";
 export * from "./Type.ts";
 export * from "./TypeArg.ts";

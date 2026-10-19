@@ -3,6 +3,10 @@ import { ExpressionTuplePart } from "./ExpressionTuplePart.ts";
 import { TokenTypeName } from "#tokeniser";
 import { ExpressionTupleSpread } from "./ExpressionTupleSpread.ts";
 import { _context, type EntryContext } from "./EntryContext.ts";
+import type { LinkedExpression } from "#linked/LinkedExpression";
+import type { LinkerContext } from "./LinkerContext.ts";
+import { LinkedExpressionTuple } from "#linked/LinkedExpressionTuple";
+import { LinkerError } from "./LinkerError.ts";
 
 export class ExpressionTuple extends Expression {
   static {
@@ -48,5 +52,23 @@ export class ExpressionTuple extends Expression {
 
   get parts() {
     return this.#parts;
+  }
+
+  linked(left: LinkedExpression | undefined, ctx: LinkerContext): [LinkerContext, LinkedExpression] {
+    return ctx
+      .mapWith(this.#parts, "parts", (c, i) => i.linked(left, c))
+      .finish(
+        ({ parts }) =>
+          new LinkedExpressionTuple(
+            this.range,
+            parts.flatMap((p) => {
+              if (!(p instanceof LinkedExpressionTuple)) {
+                throw new LinkerError("Tuple parts required", p.range);
+              }
+
+              return p.parts;
+            }),
+          ),
+      );
   }
 }

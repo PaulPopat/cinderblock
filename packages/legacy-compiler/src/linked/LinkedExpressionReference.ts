@@ -7,15 +7,15 @@ import { LinkedTypeArg } from "./LinkedTypeArg.ts";
 import { WriterError } from "./WriterError.ts";
 
 export class LinkedExpressionReference extends LinkedExpression {
-  readonly #subject: LinkedExpression;
+  readonly #subject: LinkedExpression | LinkedTypeArg;
 
-  constructor(range: Range, subject: LinkedExpression) {
+  constructor(range: Range, subject: LinkedExpression | LinkedTypeArg) {
     super(range);
     this.#subject = subject;
   }
 
   get resolution() {
-    return this.#subject.resolution;
+    return this.#subject instanceof LinkedExpression ? this.#subject.resolution : this.#subject.type;
   }
 
   get instruction(): Instruction {
@@ -31,6 +31,6 @@ export class LinkedExpressionReference extends LinkedExpression {
   }
 
   get funcs(): Array<CreateFunc> {
-    return [];
+    return this.#subject instanceof LinkedExpression ? this.#subject.funcs : [];
   }
 }

@@ -66,6 +66,7 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
   }
 
   nextIs(expect: Array<string> | string) {
+    if (this.#next.done) return false;
     if (typeof expect === "string") expect = [expect];
     return expect.includes(this.#next.data);
   }
@@ -137,7 +138,7 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
   while<TKey extends string, TResult extends Entry, TWhile>(
     name: TKey,
     predicate: (store: TokenWalker) => TWhile,
-    extractor: (store: TokenWalker, whileResult: TWhile) => TResult,
+    extractor: (store: TokenWalker, whileResult: TWhile, existing: TContext) => TResult,
   ) {
     type NewContext = TContext & { [key in TKey]: Array<TResult> };
     let result: Array<TResult> = [];
@@ -145,7 +146,11 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
     let newStore: TokenWalker = this;
 
     while (!newStore.done && (whileResult = predicate(newStore))) {
-      const baseExtract = extractor(new TokenWalker({}, newStore.#tokens, newStore.#types, newStore.#index, newStore.#namer), whileResult);
+      const baseExtract = extractor(
+        new TokenWalker({}, newStore.#tokens, newStore.#types, newStore.#index, newStore.#namer),
+        whileResult,
+        this.#data,
+      );
       result = [...result, baseExtract];
       newStore = baseExtract.done;
     }

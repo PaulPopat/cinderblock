@@ -2,6 +2,9 @@ import { Expression } from "./Expression.ts";
 import { ParserError } from "./ParserError.ts";
 import { TokenTypeName } from "#tokeniser";
 import { _context, type EntryContext } from "./EntryContext.ts";
+import type { LinkedExpression } from "#linked/LinkedExpression";
+import type { LinkerContext } from "./LinkerContext.ts";
+import { LinkedExpressionTernary } from "#linked/LinkedExpressionTernary";
 
 export class ExpressionTernary extends Expression {
   static {
@@ -42,5 +45,13 @@ export class ExpressionTernary extends Expression {
 
   get negative() {
     return this.#negative;
+  }
+
+  linked(left: LinkedExpression | undefined, ctx: LinkerContext): [LinkerContext, LinkedExpression] {
+    return ctx
+      .with("predicate", (c) => this.#predicate.linked(left, c))
+      .with("positive", (c, { predicate }) => this.#positive.linked(predicate, c))
+      .with("negative", (c, { positive }) => this.#negative.linked(positive, c))
+      .finish(({ predicate, positive, negative }) => new LinkedExpressionTernary(this.range, predicate, positive, negative));
   }
 }

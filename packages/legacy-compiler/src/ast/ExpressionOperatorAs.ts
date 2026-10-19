@@ -3,6 +3,9 @@ import { ParserError } from "./ParserError.ts";
 import { Type } from "./Type.ts";
 import { TokenTypeName } from "#tokeniser";
 import { _context, type EntryContext } from "./EntryContext.ts";
+import { LinkedExpressionOperatorAs } from "#linked/LinkedExpressionOperatorAs";
+import type { LinkedExpression } from "#linked/LinkedExpression";
+import type { LinkerContext } from "./LinkerContext.ts";
 
 export class ExpressionOperatorAs extends Expression {
   static {
@@ -29,5 +32,12 @@ export class ExpressionOperatorAs extends Expression {
 
     this.#left = left;
     this.#right = right;
+  }
+
+  linked(left: LinkedExpression | undefined, ctx: LinkerContext): [LinkerContext, LinkedExpression] {
+    return ctx
+      .with("left", (c) => this.#left.linked(left, c))
+      .with("right", (c, { left }) => this.#right.linked(left.resolution, c))
+      .finish(({ left, right }) => new LinkedExpressionOperatorAs(this.range, left, right));
   }
 }

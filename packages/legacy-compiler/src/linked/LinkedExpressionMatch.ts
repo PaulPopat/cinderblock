@@ -1,7 +1,9 @@
 import type { Range } from "#utils";
 import type { CreateFunc, Instruction } from "#writer";
+import { LinkerError } from "../ast/LinkerError.ts";
 import { LinkedExpression } from "./LinkedExpression.ts";
 import type { LinkedExpressionLet } from "./LinkedExpressionLet.ts";
+import { LinkedTypePipeable } from "./LinkedTypePipeable.ts";
 import { LinkedTypeUnion } from "./LinkedTypeUnion.ts";
 import { WriterError } from "./WriterError.ts";
 
@@ -18,7 +20,14 @@ export class LinkedExpressionMatch extends LinkedExpression {
   get resolution() {
     return new LinkedTypeUnion(
       this.range,
-      this.#matchers.map((m) => m.resolution.returns),
+      this.#matchers.map((m) => {
+        const result = m.resolution;
+        if (!(result instanceof LinkedTypePipeable)) {
+          throw new LinkerError("Pipeable expected", this.range);
+        }
+
+        return result.returns;
+      }),
     );
   }
 

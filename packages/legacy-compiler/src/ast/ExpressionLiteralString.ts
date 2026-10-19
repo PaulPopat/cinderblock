@@ -2,6 +2,9 @@ import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
 import { TokenTypeName } from "#tokeniser";
 import { _context, type EntryContext } from "./EntryContext.ts";
+import { LinkedExpressionLiteralString } from "#linked/LinkedExpressionLiteralString";
+import type { LinkedExpression } from "#linked/LinkedExpression";
+import type { LinkerContext } from "./LinkerContext.ts";
 
 export class ExpressionLiteralString extends ExpressionLiteral {
   static {
@@ -24,5 +27,9 @@ export class ExpressionLiteralString extends ExpressionLiteral {
 
   get value() {
     return this.#value;
+  }
+
+  linked(left: LinkedExpression | undefined, ctx: LinkerContext): [LinkerContext, LinkedExpression] {
+    return ctx.finish(() => new LinkedExpressionLiteralString(this.range, this.#value));
   }
 }

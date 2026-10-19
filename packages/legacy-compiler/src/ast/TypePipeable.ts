@@ -53,7 +53,7 @@ export class TypePipeable extends Type {
 
   linked(input: LinkedType | undefined, ctx: LinkerContext) {
     if (input && !(input instanceof LinkedTypePipeable)) {
-      throw new LinkerError("Invalidstype", input.range);
+      throw new LinkerError("Invalid type", input.range);
     }
 
     return ctx

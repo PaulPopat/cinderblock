@@ -3,35 +3,26 @@ import fs from "node:fs";
 import esbuild from "esbuild";
 import crypto from "node:crypto";
 import { loadConfig, type CinderblockConfig } from "./loadConfig.ts";
-import { TokenType, TokenWalker, Tokeniser, Entity, App } from "@cinderblock-lang/legacy-compiler";
+import { compileCinderblock, type BinaryData } from "@cinderblock-lang/legacy-compiler";
 
-export class Project extends App {
+export class Project {
+  readonly #data: BinaryData;
   readonly #root: string;
   readonly #config: CinderblockConfig;
-  readonly #types: Array<TokenType>;
 
   constructor(baseDir: string) {
     const config = loadConfig(baseDir);
-    const [{ entities }, done] = TokenWalker.start(
+
+    this.#data = compileCinderblock(
       [baseDir, ...(config.lib_dirs?.map((l) => path.resolve(baseDir, l)) ?? [])].flatMap((root) =>
         fs
           .readdirSync(root, { recursive: true, encoding: "utf-8" })
           .filter((f) => f.endsWith(".cb"))
-          .map((f) => [f, fs.readFileSync(path.resolve(root, f), "utf8")] as const)
-          .flatMap(([key, value]) => new Tokeniser(key, value).tokens),
+          .map((f) => [f, fs.readFileSync(path.resolve(root, f), "utf8")] as [string, string]),
       ),
-    )
-      .while(
-        "entities",
-        (s) => Entity.HasParser(s),
-        (w) => Entity.Parse(w, () => this),
-      )
-      .finish();
-
-    super(entities);
+    );
     this.#root = baseDir;
     this.#config = config;
-    this.#types = done.types;
   }
 
   async compile() {
@@ -39,7 +30,7 @@ export class Project extends App {
       fs.mkdirSync(path.resolve(this.root, ".cinder"), { recursive: true });
     } catch {}
 
-    const { data, metadata } = this.binaryData;
+    const { data, metadata } = this.#data;
     fs.writeFileSync(path.resolve(this.root, ".cinder/app.block"), data);
     fs.writeFileSync(path.resolve(this.root, ".cinder/metadata.json"), JSON.stringify(metadata));
 
@@ -82,6 +73,6 @@ export class Project extends App {
   }
 
   get types() {
-    return this.#types;
+    return this.#data.types;
   }
 }

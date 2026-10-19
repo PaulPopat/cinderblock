@@ -1,6 +1,10 @@
 import { Expression } from "./Expression.ts";
 import { TokenTypeName, TokenWalker } from "#tokeniser";
 import { _context, type EntryContext } from "./EntryContext.ts";
+import type { LinkedExpression } from "#linked/LinkedExpression";
+import type { LinkerContext } from "./LinkerContext.ts";
+import { LinkedExpressionLet } from "#linked/LinkedExpressionLet";
+import { LinkedExpressionTuple } from "#linked/LinkedExpressionTuple";
 
 export class ExpressionTuplePart extends Expression {
   static Parse(walker: TokenWalker, lookFor: Array<string>) {
@@ -28,5 +32,9 @@ export class ExpressionTuplePart extends Expression {
 
   get value() {
     return this.#value;
+  }
+
+  linked(left: LinkedExpression | undefined, ctx: LinkerContext): [LinkerContext, LinkedExpression] {
+    return ctx.with("value", (c) => this.#value.linked(left, c)).finish(({ value }) => new LinkedExpressionTuple(this.range, [[this.#name, value]]));
   }
 }

@@ -4,7 +4,7 @@ import { LinkedTypePrimitive } from "./LinkedTypePrimitive.ts";
 import { LinkedTypePrimitiveBool } from "./LinkedTypePrimitiveBool.ts";
 import { WriterError } from "./WriterError.ts";
 
-export class ExpressionOperatorNotEquals extends LinkedExpressionOperator {
+export class LinkedExpressionOperatorNotEquals extends LinkedExpressionOperator {
   get resolution() {
     return new LinkedTypePrimitiveBool(this.range);
   }

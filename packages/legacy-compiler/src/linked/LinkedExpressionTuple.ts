@@ -4,7 +4,7 @@ import { LinkedExpression } from "./LinkedExpression.ts";
 import { LinkedTypeArg } from "./LinkedTypeArg.ts";
 import { LinkedTypeTuple } from "./LinkedTypeTuple.ts";
 
-export class ExpressionTuple extends LinkedExpression {
+export class LinkedExpressionTuple extends LinkedExpression {
   readonly #parts: Array<[string, LinkedExpression]>;
 
   constructor(range: Range, parts: Array<[string, LinkedExpression]>) {

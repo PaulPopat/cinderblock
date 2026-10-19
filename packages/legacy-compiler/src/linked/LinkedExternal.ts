@@ -1,9 +1,9 @@
-import type { CreateFunc } from "#writer";
+import type { CreateFunc, Instruction } from "#writer";
 import { Range } from "#utils";
-import { LinkedEntry } from "./LinkedEntry.ts";
 import type { LinkedType } from "./LinkedType.ts";
+import { LinkedExpression } from "./LinkedExpression.ts";
 
-export class LinkedExternal extends LinkedEntry {
+export class LinkedExternal extends LinkedExpression {
   readonly #name: string;
   readonly #type: LinkedType;
 
@@ -21,7 +21,15 @@ export class LinkedExternal extends LinkedEntry {
     return this.#type;
   }
 
-  get model(): CreateFunc[] {
+  get resolution(): LinkedType {
+    return this.#type;
+  }
+
+  get instruction(): Instruction {
+    throw new Error("Method not implemented.");
+  }
+
+  get funcs(): CreateFunc[] {
     return [];
   }
 }

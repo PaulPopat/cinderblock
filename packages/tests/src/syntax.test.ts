@@ -4,19 +4,19 @@ import assert from "node:assert";
 
 describe("syntax", () => {
   test("it resolves a let", async () => {
-    const code = new Inline('let test_let = "hello";');
+    const code = new Inline('export let test_let = "hello";');
     const result = await code.binary().run("test_let", {});
     assert.equal(result, "hello");
   });
 
   test("uses a namespace", async () => {
-    const code = new Inline('namespace test { let name = "hello"; }');
+    const code = new Inline('namespace test { export let name = "hello"; }');
     const result = await code.binary().run("test_name", {});
     assert.equal(result, "hello");
   });
 
   test("tags a let", async () => {
-    const code = new Inline('let [key="test value"] test_let = "hello";');
+    const code = new Inline('export let [key="test value"] test_let = "hello";');
     const found = code.binary().withTag("key");
     assert.equal(found.length, 1);
   });
@@ -24,7 +24,7 @@ describe("syntax", () => {
   test("it references another let", async () => {
     const code = new Inline(`
       let internal_test = "hello";
-      let test_let = internal_test;
+      export let test_let = internal_test;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, "hello");
@@ -32,7 +32,7 @@ describe("syntax", () => {
 
   test("inline let", async () => {
     const code = new Inline(`
-      let test_let = "hello " + ("world" --> (let (_s: string) = _s;));
+      export let test_let = "hello " + ("world" --> (let (_s: string) = _s));
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, "hello world");
@@ -40,7 +40,7 @@ describe("syntax", () => {
 
   test("inline let with internal lets", async () => {
     const code = new Inline(`
-      let test_let = "hello " + ("world" --> (let (_s: string) = let result = _s; result;));
+      export let test_let = "hello " + ("world" --> (let (_s: string) = let result = _s; result));
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, "hello world");
@@ -48,7 +48,7 @@ describe("syntax", () => {
 
   test("returns an array", async () => {
     const code = new Inline(`
-      let test_let = ["hello", "world"];
+      export let test_let = ["hello", "world"];
     `);
     const result = await code.binary().run("test_let", {});
     assert.deepStrictEqual(result, ["hello", "world"]);
@@ -56,7 +56,7 @@ describe("syntax", () => {
 
   test("returns an array with a trailing comma", async () => {
     const code = new Inline(`
-      let test_let = ["hello", "world",];
+      export let test_let = ["hello", "world",];
     `);
     const result = await code.binary().run("test_let", {});
     assert.deepStrictEqual(result, ["hello", "world"]);
@@ -64,7 +64,7 @@ describe("syntax", () => {
 
   test("returns an empty array", async () => {
     const code = new Inline(`
-      let test_let = [];
+      export let test_let = [];
     `);
     const result = await code.binary().run("test_let", {});
     assert.deepStrictEqual(result, []);
@@ -72,7 +72,7 @@ describe("syntax", () => {
 
   test("returns an empty array with a gap", async () => {
     const code = new Inline(`
-      let test_let = [ ];
+      export let test_let = [ ];
     `);
     const result = await code.binary().run("test_let", {});
     assert.deepStrictEqual(result, []);
@@ -80,7 +80,7 @@ describe("syntax", () => {
 
   test("returns a tuple", async () => {
     const code = new Inline(`
-      let test_let = {test="hello", world=123};
+      export let test_let = {test="hello", world=123};
     `);
     const result = await code.binary().run("test_let", {});
     assert.deepStrictEqual(result, { test: "hello", world: 123 });
@@ -90,7 +90,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let part_one = {test="hello"};
       let part_two = {world=123};
-      let test_let = {...part_one, ...part_two};
+      export let test_let = {...part_one, ...part_two};
     `);
     const result = await code.binary().run("test_let", {});
     assert.deepStrictEqual(result, { test: "hello", world: 123 });
@@ -103,7 +103,7 @@ describe("syntax", () => {
       ;
       let part_one = {test="hello"};
       let part_two: part_two_data = {world=123};
-      let test_let = {...part_one, ...part_two};
+      export let test_let = {...part_one, ...part_two};
     `);
     const result = await code.binary().run("test_let", {});
     assert.deepStrictEqual(result, { test: "hello", world: 123 });
@@ -111,7 +111,7 @@ describe("syntax", () => {
 
   test("returns a tuple with a trailing comma", async () => {
     const code = new Inline(`
-      let test_let = {test="hello", world=123,};
+      export let test_let = {test="hello", world=123,};
     `);
     const result = await code.binary().run("test_let", {});
     assert.deepStrictEqual(result, { test: "hello", world: 123 });
@@ -119,7 +119,7 @@ describe("syntax", () => {
 
   test("returns a tuple with string property names", async () => {
     const code = new Inline(`
-      let test_let = {"test-name"="hello", world=123};
+      export let test_let = {"test-name"="hello", world=123};
     `);
     const result = await code.binary().run("test_let", {});
     assert.deepStrictEqual(result, { "test-name": "hello", world: 123 });
@@ -127,7 +127,7 @@ describe("syntax", () => {
 
   test("returns an empty tuple", async () => {
     const code = new Inline(`
-      let test_let = {};
+      export let test_let = {};
     `);
     const result = await code.binary().run("test_let", {});
     assert.deepStrictEqual(result, {});
@@ -136,7 +136,7 @@ describe("syntax", () => {
   test("accesses a tuple", async () => {
     const code = new Inline(`
       let internal_item = {test="hello", world=123};
-      let test_let = internal_item.test;
+      export let test_let = internal_item.test;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, "hello");
@@ -144,7 +144,7 @@ describe("syntax", () => {
 
   test("adds to an array", async () => {
     const code = new Inline(`
-      let test_let (input: string[]) = input ++ "hello";
+      export let test_let (input: string[]) = input ++ "hello";
     `);
     const result = await code.binary().run("test_let", { input: ["something"] });
     assert.deepStrictEqual(result, ["something", "hello"]);
@@ -152,7 +152,7 @@ describe("syntax", () => {
 
   test("resolves a bool false", async () => {
     const code = new Inline(`
-      let test_let = false;
+      export let test_let = false;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, false);
@@ -160,7 +160,7 @@ describe("syntax", () => {
 
   test("resolves a bool true", async () => {
     const code = new Inline(`
-      let test_let = true;
+      export let test_let = true;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, true);
@@ -168,7 +168,7 @@ describe("syntax", () => {
 
   test("resolves a float", async () => {
     const code = new Inline(`
-      let test_let = 123.123;
+      export let test_let = 123.123;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal((result as number).toFixed(3), "123.123");
@@ -176,7 +176,7 @@ describe("syntax", () => {
 
   test("resolves a float indicated", async () => {
     const code = new Inline(`
-      let test_let = 123.123f;
+      export let test_let = 123.123f;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal((result as number).toFixed(3), "123.123");
@@ -184,7 +184,7 @@ describe("syntax", () => {
 
   test("resolves a int", async () => {
     const code = new Inline(`
-      let test_let = 123;
+      export let test_let = 123;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, 123);
@@ -192,7 +192,7 @@ describe("syntax", () => {
 
   test("resolves a int indicated", async () => {
     const code = new Inline(`
-      let test_let = 123i;
+      export let test_let = 123i;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, 123);
@@ -200,7 +200,7 @@ describe("syntax", () => {
 
   test("resolves a string", async () => {
     const code = new Inline(`
-      let test_let = "hello world";
+      export let test_let = "hello world";
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, "hello world");
@@ -208,7 +208,7 @@ describe("syntax", () => {
 
   test("strings with escaped characters", async () => {
     const code = new Inline(`
-      let test_let = "^\\"[^\\"]*\\"?$";
+      export let test_let = "^\\"[^\\"]*\\"?$";
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, '^"[^"]*"?$');
@@ -216,7 +216,7 @@ describe("syntax", () => {
 
   test("empty string", async () => {
     const code = new Inline(`
-      let test_let = "";
+      export let test_let = "";
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, "");
@@ -224,7 +224,7 @@ describe("syntax", () => {
 
   test("performs an addition", async () => {
     const code = new Inline(`
-      let test_let = 1 + 2;
+      export let test_let = 1 + 2;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, 3);
@@ -232,7 +232,7 @@ describe("syntax", () => {
 
   test("performs a divide", async () => {
     const code = new Inline(`
-      let test_let = 4 / 2;
+      export let test_let = 4 / 2;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, 2);
@@ -240,7 +240,7 @@ describe("syntax", () => {
 
   test("performs an equality check", async () => {
     const code = new Inline(`
-      let test_let = 4 == 2;
+      export let test_let = 4 == 2;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, false);
@@ -248,7 +248,7 @@ describe("syntax", () => {
 
   test("performs an greater than", async () => {
     const code = new Inline(`
-      let test_let = 4 > 2;
+      export let test_let = 4 > 2;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, true);
@@ -256,7 +256,7 @@ describe("syntax", () => {
 
   test("performs an greater than or equal to", async () => {
     const code = new Inline(`
-      let test_let = 4 >= 4;
+      export let test_let = 4 >= 4;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, true);
@@ -265,7 +265,7 @@ describe("syntax", () => {
   test("performs an in operation", async () => {
     const code = new Inline(`
       let something = {hello = "world"};
-      let test_let = "hello" in something;
+      export let test_let = "hello" in something;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, true);
@@ -274,7 +274,7 @@ describe("syntax", () => {
   test("performs an in operation that is false", async () => {
     const code = new Inline(`
       let something = {hello = "world"};
-      let test_let = "test" in something;
+      export let test_let = "test" in something;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, false);
@@ -282,7 +282,7 @@ describe("syntax", () => {
 
   test("performs an less than", async () => {
     const code = new Inline(`
-      let test_let = 4 < 2;
+      export let test_let = 4 < 2;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, false);
@@ -290,7 +290,7 @@ describe("syntax", () => {
 
   test("performs an less than or equal to", async () => {
     const code = new Inline(`
-      let test_let = 4 <= 4;
+      export let test_let = 4 <= 4;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, true);
@@ -298,7 +298,7 @@ describe("syntax", () => {
 
   test("performs a multiplication", async () => {
     const code = new Inline(`
-      let test_let = 4 * 4;
+      export let test_let = 4 * 4;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, 16);
@@ -306,7 +306,7 @@ describe("syntax", () => {
 
   test("performs a not equal", async () => {
     const code = new Inline(`
-      let test_let = 4 != 4;
+      export let test_let = 4 != 4;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, false);
@@ -314,7 +314,7 @@ describe("syntax", () => {
 
   test("performs an or", async () => {
     const code = new Inline(`
-      let test_let = false || true;
+      export let test_let = false || true;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, true);
@@ -322,7 +322,7 @@ describe("syntax", () => {
 
   test("performs a subtract", async () => {
     const code = new Inline(`
-      let test_let = 4 - 2;
+      export let test_let = 4 - 2;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, 2);
@@ -331,7 +331,7 @@ describe("syntax", () => {
   test("performs a pipe", async () => {
     const code = new Inline(`
       let pipeable (test: int) = test + 2;
-      let test_let = {test = 2} -> pipeable;
+      export let test_let = {test = 2} -> pipeable;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, 4);
@@ -340,7 +340,7 @@ describe("syntax", () => {
   test("performs a pipe of a basic", async () => {
     const code = new Inline(`
       let pipeable (_s: int) = _s + 2;
-      let test_let = 2 --> pipeable;
+      export let test_let = 2 --> pipeable;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, 4);
@@ -348,7 +348,7 @@ describe("syntax", () => {
 
   test("performs a ternary operation", async () => {
     const code = new Inline(`
-      let test_let = true ? "hello" : "world";
+      export let test_let = true ? "hello" : "world";
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, "hello");
@@ -358,7 +358,7 @@ describe("syntax", () => {
     const code = new Inline(`
       struct mystruct value: int;
       let pipeable (test: mystruct) = test.value + 2;
-      let test_let = {test = {value = 2}} -> pipeable;
+      export let test_let = {test = {value = 2}} -> pipeable;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, 4);
@@ -369,7 +369,7 @@ describe("syntax", () => {
       struct otherstruct  value: int;
       struct mystruct : otherstruct;
       let pipeable (test: mystruct) = test.value + 2;
-      let test_let = {test = {value = 2}} -> pipeable;
+      export let test_let = {test = {value = 2}} -> pipeable;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, 4);
@@ -377,9 +377,9 @@ describe("syntax", () => {
 
   test("unknown arg", async () => {
     const code = new Inline(`
-      struct data value: string ;
+      struct data value: int ;
       let pipeable (test) = (test as data).value + 2;
-      let test_let = {test = {value = 2}} -> pipeable;
+      export let test_let = {test = {value = 2}} -> pipeable;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, 4);
@@ -388,7 +388,7 @@ describe("syntax", () => {
   test("tuple arg", async () => {
     const code = new Inline(`
       let pipeable (test: struct value: int ;) = test.value + 2;
-      let test_let = {test = {value = 2}} -> pipeable;
+      export let test_let = {test = {value = 2}} -> pipeable;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, 4);
@@ -397,7 +397,7 @@ describe("syntax", () => {
   test("tuple direct pipe", async () => {
     const code = new Inline(`
       let pipeable (_s: struct value: int ;) = _s.value + 2;
-      let test_let = {value = 2} --> pipeable;
+      export let test_let = {value = 2} --> pipeable;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, 4);
@@ -407,7 +407,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let final (test: struct value: int ;) = test.value + 2;
       let pipeable (test: struct value: int ; | struct value: float ;) = {test = test as struct value: int ;} -> final;
-      let test_let = {test = {value = 2}} -> pipeable;
+      export let test_let = {test = {value = 2}} -> pipeable;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, 4);
@@ -417,7 +417,7 @@ describe("syntax", () => {
     const code = new Inline(`
       let final (test: struct value: int ;) = test.value + 2;
       let pipeable (test: struct value: int ; & struct another: float ;) = {test = test} -> final;
-      let test_let = {test = {value = 2, another = 2}} -> pipeable;
+      export let test_let = {test = {value = 2, another = 2}} -> pipeable;
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, 4);
@@ -429,9 +429,9 @@ describe("syntax", () => {
         value: string
       ;
 
-      let test_let (arg: unknown) = arg |
-        let (_s: int) = _s;
-        let (_s: test) = _s.value;
+      export let test_let (arg: unknown) = arg |
+        let (_s: int) = _s,
+        let (_s: test) = _s.value
       ;
     `);
     const result = await code.binary().run("test_let", { arg: { value: "hello world" } });
@@ -440,7 +440,7 @@ describe("syntax", () => {
 
   test("array index", async () => {
     const code = new Inline(`
-      let test_let (arg: unknown[]) = arg@2;
+      export let test_let (arg: unknown[]) = arg@2;
     `);
     const result = await code.binary().run("test_let", { arg: [0, 1, 2, 3, 4] });
     assert.equal(result, 2);
@@ -448,7 +448,7 @@ describe("syntax", () => {
 
   test("array index out of range", async () => {
     const code = new Inline(`
-      let test_let (arg: unknown[]) = arg@2;
+      export let test_let (arg: unknown[]) = arg@2;
     `);
     const result = await code.binary().run("test_let", { arg: [] });
     assert.equal(result, null);
@@ -456,7 +456,7 @@ describe("syntax", () => {
 
   test("piping one tuple into another", async () => {
     const code = new Inline(`
-      let test_let = { hello = "world" } -> { test = "data" };
+      export let test_let = { hello = "world" } -> { test = "data" };
     `);
     const result = await code.binary().run("test_let", {});
     assert.deepEqual(result, { hello: "world", test: "data" });
@@ -464,7 +464,7 @@ describe("syntax", () => {
 
   test("direct piping one tuple into another", async () => {
     const code = new Inline(`
-      let test_let = { hello = "world" } --> { test = "data" };
+      export let test_let = { hello = "world" } --> { test = "data" };
     `);
     const result = await code.binary().run("test_let", {});
     assert.deepEqual(result, { _s: { hello: "world" }, test: "data" });
@@ -473,7 +473,7 @@ describe("syntax", () => {
   test("infer type", async () => {
     const code = new Inline(`
       let internal_let (_s: infer T): T = _s;
-      let test_let = ({ hello = "world" } --> internal_let).hello;
+      export let test_let = ({ hello = "world" } --> internal_let).hello;
     `);
     const result = await code.binary().run("test_let", {});
     assert.deepEqual(result, "world");
@@ -483,7 +483,7 @@ describe("syntax", () => {
     const code = new Inline(`
       struct test (T) entry: T ;
       let internal_let (_s: test(T: string)) = _s.entry;
-      let test_let = { entry = "world" } --> internal_let;
+      export let test_let = { entry = "world" } --> internal_let;
     `);
     const result = await code.binary().run("test_let", {});
     assert.deepEqual(result, "world");

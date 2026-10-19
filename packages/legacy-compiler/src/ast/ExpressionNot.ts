@@ -1,6 +1,9 @@
 import { Expression } from "./Expression.ts";
 import { TokenTypeName } from "#tokeniser";
 import { _context, type EntryContext } from "./EntryContext.ts";
+import type { LinkedExpression } from "#linked/LinkedExpression";
+import type { LinkerContext } from "./LinkerContext.ts";
+import { LinkedExpressionNot } from "#linked/LinkedExpressionNot";
 
 export class ExpressionNot extends Expression {
   static {
@@ -28,5 +31,9 @@ export class ExpressionNot extends Expression {
 
   get subject() {
     return this.#subject;
+  }
+
+  linked(left: LinkedExpression | undefined, ctx: LinkerContext): [LinkerContext, LinkedExpression] {
+    return ctx.with("subject", (c) => this.#subject.linked(left, c)).finish(({ subject }) => new LinkedExpressionNot(this.range, subject));
   }
 }

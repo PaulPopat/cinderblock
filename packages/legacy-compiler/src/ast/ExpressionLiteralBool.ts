@@ -1,12 +1,10 @@
-import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
-import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
-import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { CreateFunc, Instruction } from "#writer";
-import type { Type } from "./Type.ts";
 import { _context, type EntryContext } from "./EntryContext.ts";
+import type { LinkedExpression } from "#linked/LinkedExpression";
+import type { LinkerContext } from "./LinkerContext.ts";
+import { LinkedExpressionLiteralBool } from "#linked/LinkedExpressionLiteralBool";
 
 export class ExpressionLiteralBool extends ExpressionLiteral {
   static {
@@ -29,5 +27,9 @@ export class ExpressionLiteralBool extends ExpressionLiteral {
 
   get value() {
     return this.#value;
+  }
+
+  linked(left: LinkedExpression | undefined, ctx: LinkerContext): [LinkerContext, LinkedExpression] {
+    return ctx.finish(() => new LinkedExpressionLiteralBool(this.range, this.#value));
   }
 }

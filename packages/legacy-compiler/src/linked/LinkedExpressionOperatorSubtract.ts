@@ -3,7 +3,7 @@ import { LinkedExpressionOperator } from "./LinkedExpressionOperator.ts";
 import { LinkedTypePrimitiveMaths } from "./LinkedTypePrimitiveMaths.ts";
 import { WriterError } from "./WriterError.ts";
 
-export class ExpressionOperatorSubtract extends LinkedExpressionOperator {
+export class LinkedExpressionOperatorSubtract extends LinkedExpressionOperator {
   get resolution() {
     return this.left.resolution;
   }

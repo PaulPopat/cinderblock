@@ -150,7 +150,7 @@ function serialiseShape(data: Shape): Buffer {
     case "null":
       return Buffer.from(new Uint8Array([7]));
     case "pipeable":
-      return Buffer.from(new Uint8Array([8]));
+      return Buffer.concat([new Uint8Array([8]), makeArray(data.args, (a) => serialiseShape(a)), serialiseShape(data.returns)]);
     case "string":
       return Buffer.from(new Uint8Array([9]));
     case "tuple":
@@ -159,6 +159,8 @@ function serialiseShape(data: Shape): Buffer {
       return Buffer.from(new Uint8Array([11]));
     case "union":
       return Buffer.concat([new Uint8Array([12]), makeArray(data.args, (value) => serialiseShape(value))]);
+    case "arg":
+      return Buffer.concat([makeString(data.name), serialiseShape(data.value)]);
   }
 }
 

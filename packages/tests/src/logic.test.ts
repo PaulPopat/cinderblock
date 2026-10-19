@@ -5,7 +5,7 @@ import assert from "node:assert";
 describe("logic", () => {
   test("it accesses lets from before", async () => {
     const code = new Inline(`
-      let test_let = internal_let;
+      export let test_let = internal_let;
       let internal_let = "hello";
     `);
     const result = await code.binary().run("test_let", {});
@@ -14,7 +14,7 @@ describe("logic", () => {
 
   test("empty string comparison", async () => {
     const code = new Inline(`
-      let test_let = "test" != "";
+      export let test_let = "test" != "";
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, true);
@@ -22,7 +22,7 @@ describe("logic", () => {
 
   test("empty string to empty string comparison", async () => {
     const code = new Inline(`
-      let test_let = "" != "";
+      export let test_let = "" != "";
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, false);
@@ -33,7 +33,7 @@ describe("logic", () => {
     const code = new Inline(
       `
         extern get_total (): int;
-        let test_let =
+        export let test_let =
             let internal_let = {} -> get_total;
           internal_let + internal_let;
       `,
@@ -48,7 +48,7 @@ describe("logic", () => {
 
   test("adds strings in the correct order", async () => {
     const code = new Inline(`
-      let test_let = "hello" + "." + "world";
+      export let test_let = "hello" + "." + "world";
     `);
     const result = await code.binary().run("test_let", {});
     assert.equal(result, "hello.world");
@@ -57,7 +57,7 @@ describe("logic", () => {
   test("only parses the right of an && when needed", async () => {
     const code = new Inline(`
       struct Input value: bool;
-      let test_let (input: Input) = false && input.value;
+      export let test_let (input: Input) = false && input.value;
     `);
     const result = await code.binary().run("test_let", { input: { value: "I am not a boolean" } });
     assert.equal(result, false);
@@ -65,7 +65,7 @@ describe("logic", () => {
 
   test("can see the args of a parent let", async () => {
     const code = new Inline(`
-      let test_let (value: string) =
+      export let test_let (value: string) =
           let internal = value;
         internal;
     `);
@@ -80,7 +80,7 @@ describe("logic", () => {
         namespace test {
           use internal;
 
-          let test = item + item;
+          export let test = item + item;
         }
       `,
     );
@@ -98,7 +98,7 @@ describe("logic", () => {
         namespace test {
           use internal;
 
-          let test = item + item;
+          export let test = item + item;
         }
       `,
     );
@@ -114,7 +114,7 @@ describe("logic", () => {
         }
 
         namespace thing_test {
-          let test = internal_item + internal_item;
+          export let test = internal_item + internal_item;
         }
       `,
     );
@@ -127,7 +127,7 @@ describe("logic", () => {
       `
         let multiple (left: string, right: string) = left + " " + right;
 
-        let result_entry =
+        export let result_entry =
             let partial = { left = "hello" } -> multiple;
           { right = "world" } -> partial;
       `,
@@ -139,7 +139,7 @@ describe("logic", () => {
   test("maths between two types", async () => {
     const code = new Inline(
       `
-        let result = 2 + 2.0f;
+        export let result = 2 + 2.0f;
       `,
     );
     const result = await code.binary().run("result", {});
@@ -163,7 +163,7 @@ describe("logic", () => {
             to: Location
           ;
 
-          let range_within (_s: Range, potential: Location) =
+          export let range_within (_s: Range, potential: Location) =
             (potential.file != _s.from.file) || (potential.line < _s.from.line) || (potential.line > _s.to.line)
               ? false
               : _s.from.line == _s.to.line
@@ -206,7 +206,7 @@ describe("logic", () => {
           use internal;
           use other;
 
-          let result = test;
+          export let result = test;
         }
       `,
     );
@@ -217,7 +217,7 @@ describe("logic", () => {
   test("pattern match on an array index", async () => {
     const code = new Inline(
       `
-        let my_test (input: string[]) =
+        export let my_test (input: string[]) =
           input @ 1 |
             let (_s: string) = "i exist";
             let (_s: null) = "i do not exist";
@@ -238,7 +238,7 @@ describe("logic", () => {
 
         let get_value (_s: entry (T: infer R)): R = _s.value;
 
-        let my_test =
+        export let my_test =
           ({ key = "test", value = { item = "value" } } --> get_value)
           .item
         ;

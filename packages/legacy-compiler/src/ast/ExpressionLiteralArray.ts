@@ -2,6 +2,11 @@ import { Expression } from "./Expression.ts";
 import { ExpressionLiteral } from "./ExpressionLiteral.ts";
 import { TokenTypeName } from "#tokeniser";
 import { _context, type EntryContext } from "./EntryContext.ts";
+import type { LinkedExpression } from "#linked/LinkedExpression";
+import type { LinkerContext } from "./LinkerContext.ts";
+import { LinkedExpressionLiteralArray } from "#linked/LinkedExpressionLiteralArray";
+import { LinkedTypeUnion } from "#linked/LinkedTypeUnion";
+import { LinkedTypePrimitiveUnknown } from "#linked/LinkedTypePrimitiveUnknown";
 
 export class ExpressionLiteralArray extends ExpressionLiteral {
   static {
@@ -51,5 +56,23 @@ export class ExpressionLiteralArray extends ExpressionLiteral {
 
   get value() {
     return this.#value;
+  }
+
+  linked(left: LinkedExpression | undefined, ctx: LinkerContext): [LinkerContext, LinkedExpression] {
+    return ctx
+      .mapWith(this.#value, "value", (c, i) => i.linked(left, c))
+      .finish(
+        ({ value }) =>
+          new LinkedExpressionLiteralArray(
+            this.range,
+            value,
+            value.length
+              ? new LinkedTypeUnion(
+                  this.range,
+                  value.map((v) => v.resolution),
+                )
+              : new LinkedTypePrimitiveUnknown(this.range),
+          ),
+      );
   }
 }

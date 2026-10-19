@@ -37,6 +37,10 @@ export class LinkedExpressionLet extends LinkedExpression {
   }
 
   get resolution() {
+    if (this.#args.length === 0) {
+      return this.#returns;
+    }
+
     return new LinkedTypePipeable(this.range, this.#args, this.#returns);
   }
 
@@ -50,9 +54,19 @@ export class LinkedExpressionLet extends LinkedExpression {
         name: this.#name,
         vars: [...this.#children.flatMap((e) => e.funcs), ...this.#contents.funcs],
         returns: this.#contents.instruction,
-        no_args: false,
+        no_args: this.#args.length === 0,
         tags: {},
       },
     ];
+  }
+
+  get func(): CreateFunc {
+    return {
+      name: this.#name,
+      vars: [...this.#children.flatMap((e) => e.funcs), ...this.#contents.funcs],
+      returns: this.#contents.instruction,
+      no_args: false,
+      tags: {},
+    };
   }
 }

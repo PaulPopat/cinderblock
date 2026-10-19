@@ -3,6 +3,10 @@ import { TokenTypeName } from "#tokeniser";
 import { ParserError } from "./ParserError.ts";
 import { ExpressionLet } from "./ExpressionLet.ts";
 import { _context, type EntryContext } from "./EntryContext.ts";
+import type { LinkedExpression } from "#linked/LinkedExpression";
+import type { LinkerContext } from "./LinkerContext.ts";
+import { LinkedExpressionMatch } from "#linked/LinkedExpressionMatch";
+import { LinkedExpressionTuple } from "#linked/LinkedExpressionTuple";
 
 export class ExpressionMatch extends Expression {
   static {
@@ -15,11 +19,10 @@ export class ExpressionMatch extends Expression {
         }
 
         const [{ matchers }, done] = walker
-          .expect("|", TokenTypeName.Punctuation)
           .while(
             "matchers",
             (w) => w.nextIs("let"),
-            (s) => ExpressionLet.Parse(s.expect([...lookFor, ","], TokenTypeName.Punctuation), [...lookFor, ","]),
+            (s) => ExpressionLet.Parse(s.expect([...lookFor, "|", ","], TokenTypeName.Punctuation), [...lookFor, ","]),
           )
           .finish();
 
@@ -35,5 +38,12 @@ export class ExpressionMatch extends Expression {
     super(ctx);
     this.#subject = subject;
     this.#matchers = matchers;
+  }
+
+  linked(left: LinkedExpression | undefined, ctx: LinkerContext): [LinkerContext, LinkedExpression] {
+    return ctx
+      .with("subject", (c) => this.#subject.linked(left, c))
+      .mapWith(this.#matchers, "matchers", (c, m) => m.linked(undefined, c))
+      .finish(({ subject, matchers }) => new LinkedExpressionMatch(this.range, subject, matchers));
   }
 }

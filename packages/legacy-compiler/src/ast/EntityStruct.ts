@@ -6,13 +6,14 @@ import { _context, type EntryContext } from "./EntryContext.ts";
 import type { LinkerContext } from "./LinkerContext.ts";
 import { LinkerError } from "./LinkerError.ts";
 import { LinkedTypeTuple } from "#linked/LinkedTypeTuple";
+import type { LinkedEntry } from "#linked/LinkedEntry";
 
 export class EntityStruct extends Entity {
   static {
     Entity.RegisterEntity({
       priority: 100,
       match: /^struct$/gm,
-      factory: (walker) => {
+      factory: (walker, namespace) => {
         const [{ name, args, extending, expecting }, done] = walker
           .expect("struct", TokenTypeName.KeyWord)
           .text("name", TokenTypeName.StructName)
@@ -44,7 +45,7 @@ export class EntityStruct extends Entity {
           .expect(";", TokenTypeName.Punctuation)
           .finish();
 
-        return new EntityStruct(_context(walker, done), name, extending ?? [], expecting ?? [], args);
+        return new EntityStruct(_context(walker, done), namespace, name, extending ?? [], expecting ?? [], args);
       },
     });
   }
@@ -54,9 +55,9 @@ export class EntityStruct extends Entity {
   readonly #expecting: Array<TypeArg>;
   readonly #args: Array<TypeArg>;
 
-  constructor(ctx: EntryContext, name: string, extending: Array<TypeReference>, expecting: Array<TypeArg>, args: Array<TypeArg>) {
+  constructor(ctx: EntryContext, namespace: string, name: string, extending: Array<TypeReference>, expecting: Array<TypeArg>, args: Array<TypeArg>) {
     super(ctx);
-    this.#name = name;
+    this.#name = [namespace, name].filter((c) => c).join("_");
     this.#extending = extending;
     this.#expecting = expecting;
     this.#args = args;
@@ -66,16 +67,9 @@ export class EntityStruct extends Entity {
     return this.#name;
   }
 
-  build(ctx: LinkerContext, input: LinkedTypeTuple | undefined) {
-    if (input) {
-      for (const expecting of this.#expecting) {
-        const arg = input.args.find((a) => a.name === expecting.name);
-        if (!arg) {
-          throw new LinkerError("Could not find arg", input.range);
-        }
-
-        ctx = ctx.searchable(expecting.name, (c) => expecting.linked(arg, c));
-      }
+  linked(input: LinkedEntry | undefined, ctx: LinkerContext) {
+    if (input && !(input instanceof LinkedTypeTuple)) {
+      throw new LinkerError("Invalid input", this.range);
     }
 
     return ctx
@@ -93,5 +87,9 @@ export class EntityStruct extends Entity {
           ...args,
         ]);
       });
+  }
+
+  search(name: string): Array<Entity> {
+    return name === this.name ? [this] : [];
   }
 }

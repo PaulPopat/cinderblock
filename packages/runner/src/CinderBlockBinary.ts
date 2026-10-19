@@ -69,7 +69,7 @@ export class CinderBlockBinary {
 
   async run(letName: string | AppFunc, args: Record<string, unknown>) {
     const module = await this.#module;
-    const target = typeof letName === "object" ? letName.id : this.#metadata.funcs[["App", letName].join("_")]?.id;
+    const target = typeof letName === "object" ? letName.id : this.#metadata.funcs[letName]?.id;
     if (!target) {
       throw new Error(`Could not find name ${letName}`);
     }
@@ -86,7 +86,7 @@ export class CinderBlockBinary {
       .filter(([, funcMetadata]) => funcMetadata.tags.find((t) => t.key === key))
       .map(([funcName, funcMetadata]) => ({
         ...funcMetadata,
-        name: funcName.replace("App_", ""),
+        name: funcName,
         tags: Object.fromEntries(funcMetadata.tags.map((t) => [t.key, t.value])),
       }));
   }
@@ -96,7 +96,7 @@ export class CinderBlockBinary {
       .filter(([, funcMetadata]) => funcMetadata.tags.find((t) => t.key === key && t.value === value))
       .map(([funcName, funcMetadata]) => ({
         ...funcMetadata,
-        name: funcName.replace("App_", ""),
+        name: funcName,
         tags: Object.fromEntries(funcMetadata.tags.map((t) => [t.key, t.value])),
       }));
   }

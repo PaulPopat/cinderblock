@@ -1,14 +1,11 @@
-import type { Entry } from "./Entry.ts";
 import { Expression } from "./Expression.ts";
 import { ExpressionOperator } from "./ExpressionOperator.ts";
 import { ParserError } from "./ParserError.ts";
-import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
-import { TypePrimitiveBool } from "./TypePrimitiveBool.ts";
-import { WriterError } from "../linked/WriterError.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { Instruction } from "#writer";
-import type { Type } from "./Type.ts";
 import { _context } from "./EntryContext.ts";
+import { LinkedExpressionOperatorAnd } from "#linked/LinkedExpressionOperatorAnd";
+import type { LinkedExpression } from "#linked/LinkedExpression";
+import type { LinkerContext } from "./LinkerContext.ts";
 
 export class ExpressionOperatorAnd extends ExpressionOperator {
   static {
@@ -25,5 +22,12 @@ export class ExpressionOperatorAnd extends ExpressionOperator {
         return new ExpressionOperatorAnd(_context(walker, done), existing, right);
       },
     });
+  }
+
+  linked(left: LinkedExpression | undefined, ctx: LinkerContext): [LinkerContext, LinkedExpression] {
+    return ctx
+      .with("left", (c) => this.left.linked(left, c))
+      .with("right", (c, { left }) => this.right.linked(left, c))
+      .finish(({ left, right }) => new LinkedExpressionOperatorAnd(this.range, left, right));
   }
 }

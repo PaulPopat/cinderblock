@@ -2,6 +2,7 @@
 
 #include "Instruction.h"
 #include "Shape.h"
+#include "ShapeArg.h"
 #include <vector>
 
 namespace Binary {
@@ -15,6 +16,8 @@ class ShapePipeable : public Shape {
   const bool matches(const Variable* subject) const;
 
   private:
+  std::vector<const ShapeArg*> args;
+  const Shape* returns;
   int end;
 };
 }

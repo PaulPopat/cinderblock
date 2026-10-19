@@ -1,4 +1,3 @@
-import type { CreateFunc } from "#writer";
 import type { EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
 

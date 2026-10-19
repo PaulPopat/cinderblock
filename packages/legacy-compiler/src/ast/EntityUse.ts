@@ -1,9 +1,7 @@
 import { Entity } from "./Entity.ts";
-import type { Entry } from "./Entry.ts";
-import type { TokenWalker } from "../tokeniser/TokenWalker.ts";
 import { TokenTypeName } from "#tokeniser";
-import type { CreateFunc } from "#writer";
 import { _context, type EntryContext } from "./EntryContext.ts";
+import type { LinkerContext } from "./LinkerContext.ts";
 
 export class EntityUse extends Entity {
   static {
@@ -30,6 +28,11 @@ export class EntityUse extends Entity {
   }
 
   get name(): string {
-    throw this.#namespace;
+    return this.#namespace;
+  }
+
+  search(name: string, ctx: LinkerContext): Array<Entity> {
+    if (name.startsWith(this.#namespace + "_")) return [];
+    return ctx.base.search([this.#namespace, name].join("_"), ctx);
   }
 }

@@ -3,7 +3,7 @@ import type { CreateFunc, Instruction } from "#writer";
 import { LinkedExpression } from "./LinkedExpression.ts";
 import { LinkedTypePrimitiveChar } from "./LinkedTypePrimitiveChar.ts";
 
-export class ExpressionLiteralChar extends LinkedExpression {
+export class LinkedExpressionLiteralChar extends LinkedExpression {
   readonly #value: string;
 
   constructor(range: Range, value: string) {

@@ -1,8 +1,14 @@
+import { LinkedExpression } from "#linked/LinkedExpression";
+import { LinkedExpressionLet } from "#linked/LinkedExpressionLet";
+import { LinkedTypeTuple } from "#linked/LinkedTypeTuple";
 import { TokenTypeName, TokenWalker } from "#tokeniser";
 import { Entity } from "./Entity.ts";
 import { EntityArg } from "./EntityArg.ts";
+import { EntityLet } from "./EntityLet.ts";
 import { _context, type EntryContext } from "./EntryContext.ts";
 import { Expression } from "./Expression.ts";
+import type { LinkerContext } from "./LinkerContext.ts";
+import { LinkerError } from "./LinkerError.ts";
 import { Type } from "./Type.ts";
 
 export class ExpressionLet extends Expression {
@@ -29,7 +35,7 @@ export class ExpressionLet extends Expression {
       .while(
         "entities",
         (s) => Entity.HasParser(s),
-        (w) => Entity.Parse(w),
+        (w) => Entity.Parse(w, ""),
       )
       .extract("contents", (s) => Expression.Parse(s, lookFor))
       .finish();
@@ -69,5 +75,30 @@ export class ExpressionLet extends Expression {
 
   get args() {
     return this.#args;
+  }
+
+  linked(input: LinkedExpression | undefined, ctx: LinkerContext): [LinkerContext, LinkedExpressionLet] {
+    const inputType = input?.resolution ?? LinkedTypeTuple.empty;
+    if (!(inputType instanceof LinkedTypeTuple)) {
+      throw new LinkerError("Tuple required", inputType.range);
+    }
+
+    return ctx
+      .mapWith(this.#args, "args", (c, i) =>
+        i.linked(
+          inputType.args.find((a) => a.name === i.name),
+          c,
+        ),
+      )
+      .mapWith(
+        this.#entities.filter((e) => e instanceof EntityLet),
+        "children",
+        (c, e) => e.linked(undefined, c),
+      )
+      .with("contents", (c) => this.#contents.linked(undefined, c))
+      .with("returns", (c, { contents }) => this.#returns?.linked(undefined, c) ?? [ctx, contents.resolution])
+      .finish(({ args, contents, returns, children }) => {
+        return new LinkedExpressionLet(this.range, this.#internalName, args, returns, children, contents);
+      });
   }
 }
