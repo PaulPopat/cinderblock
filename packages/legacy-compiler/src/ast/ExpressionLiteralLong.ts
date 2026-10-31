@@ -11,9 +11,9 @@ export class ExpressionLiteralLong extends ExpressionLiteral {
     Expression.RegisterExpression({
       priority: 150,
       match: /^[0-9]+l$/gm,
-      factory: (walker, lookFor, existing) => {
+      factory: (walker, namespace, lookFor, existing) => {
         const [{ value }, done] = walker.text("value", TokenTypeName.Number).finish();
-        return new ExpressionLiteralLong(_context(walker, done), value.replace("l", ""));
+        return new ExpressionLiteralLong(_context(walker, done, namespace), value.replace("l", ""));
       },
     });
   }

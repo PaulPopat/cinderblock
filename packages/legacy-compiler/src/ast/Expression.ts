@@ -8,7 +8,7 @@ type ExpressionParseable = {
   priority: number;
   match: RegExp;
   inOne?: boolean;
-  factory: (walker: TokenWalker, lookFor: Array<string>, existing: Expression | undefined) => Expression;
+  factory: (walker: TokenWalker, namespace: string, lookFor: Array<string>, existing: Expression | undefined) => Expression;
 };
 
 export abstract class Expression extends Entry {
@@ -18,13 +18,13 @@ export abstract class Expression extends Entry {
     this.#parsers = [...this.#parsers, entry].sort((a, b) => b.priority - a.priority);
   }
 
-  static ParseOne(walker: TokenWalker): Expression {
+  static ParseOne(walker: TokenWalker, namespace: string): Expression {
     const match = this.#parsers.find((p) => walker.data.match(p.match));
     if (!match) {
       throw new ParserError(`Unexpected symbol of ${walker.data}`, walker);
     }
 
-    const left = match.factory(walker, [";"], undefined);
+    const left = match.factory(walker, namespace, [";"], undefined);
 
     const [{ right }] = left.done
       .reduce(
@@ -36,7 +36,7 @@ export abstract class Expression extends Entry {
             throw new ParserError(`Unexpected symbol of ${w.data}`, w);
           }
 
-          return match.factory(w, [";"], p);
+          return match.factory(w, namespace, [";"], p);
         },
         left,
       )
@@ -45,7 +45,7 @@ export abstract class Expression extends Entry {
     return right;
   }
 
-  static Parse(walker: TokenWalker, lookFor: Array<string> = [";"]): Expression {
+  static Parse(walker: TokenWalker, namespace: string, lookFor: Array<string> = [";"]): Expression {
     const [{ expression }] = walker
       .reduce(
         "expression",
@@ -56,7 +56,7 @@ export abstract class Expression extends Entry {
             throw new ParserError(`Unexpected symbol of ${w.data}`, w);
           }
 
-          return match.factory(w, lookFor, p);
+          return match.factory(w, namespace, lookFor, p);
         },
       )
       .finish();

@@ -12,8 +12,8 @@ export class TypePrimitiveUnknown extends TypePrimitive {
       priority: 150,
       match: /^unknown+$/gm,
       chainable: false,
-      factory: (walker: TokenWalker, left?: Type) => {
-        return new TypePrimitiveUnknown(_context(walker, walker.expect("unknown", TokenTypeName.KeyWord)));
+      factory: (walker: TokenWalker, namespace, left?: Type) => {
+        return new TypePrimitiveUnknown(_context(walker, walker.expect("unknown", TokenTypeName.KeyWord), namespace));
       },
     });
   }

@@ -14,8 +14,8 @@ export class TypePrimitiveFloat extends TypePrimitive {
       priority: 150,
       match: /^float+$/gm,
       chainable: false,
-      factory: (walker: TokenWalker, left?: Type) => {
-        return new TypePrimitiveFloat(_context(walker, walker.expect("float", TokenTypeName.KeyWord)));
+      factory: (walker: TokenWalker, namespace, left?: Type) => {
+        return new TypePrimitiveFloat(_context(walker, walker.expect("float", TokenTypeName.KeyWord), namespace));
       },
     });
   }

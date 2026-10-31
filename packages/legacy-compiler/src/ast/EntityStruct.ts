@@ -24,7 +24,7 @@ export class EntityStruct extends Entity {
                 .while(
                   "expecting",
                   (s) => (s.data === "," || s.data === "(") && s.expect([",", "("], TokenTypeName.Punctuation).data !== ")",
-                  (s) => TypeArg.Parse(s.expect([",", "("], TokenTypeName.Punctuation)),
+                  (s, _, { name }) => TypeArg.Parse(s.expect([",", "("], TokenTypeName.Punctuation), [namespace, name].filter((c) => c).join("_")),
                 )
                 .expect(")", TokenTypeName.Punctuation),
           )
@@ -34,18 +34,18 @@ export class EntityStruct extends Entity {
               w.while(
                 "extending",
                 (s) => s.data === ":" || s.data === ",",
-                (s) => TypeReference.ParseReference(s.expect([":", ","], TokenTypeName.Operator)),
+                (s) => TypeReference.ParseReference(s.expect([":", ","], TokenTypeName.Operator), namespace),
               ),
           )
           .while(
             "args",
             (s) => s.data !== ";",
-            (s) => TypeArg.Parse(s),
+            (s, _, { name }) => TypeArg.Parse(s, [namespace, name].filter((c) => c).join("_")),
           )
           .expect(";", TokenTypeName.Punctuation)
           .finish();
 
-        return new EntityStruct(_context(walker, done), namespace, name, extending ?? [], expecting ?? [], args);
+        return new EntityStruct(_context(walker, done, namespace), namespace, name, extending ?? [], expecting ?? [], args);
       },
     });
   }

@@ -13,8 +13,8 @@ export class TypePrimitiveBool extends TypePrimitive {
       priority: 150,
       match: /^bool+$/gm,
       chainable: false,
-      factory: (walker: TokenWalker, left?: Type) => {
-        return new TypePrimitiveBool(_context(walker, walker.expect("bool", TokenTypeName.KeyWord)));
+      factory: (walker: TokenWalker, namespace, left?: Type) => {
+        return new TypePrimitiveBool(_context(walker, walker.expect("bool", TokenTypeName.KeyWord), namespace));
       },
     });
   }

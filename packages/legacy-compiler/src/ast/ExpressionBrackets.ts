@@ -9,14 +9,14 @@ export class ExpressionBrackets extends Expression {
     Expression.RegisterExpression({
       priority: 100,
       match: /^\($/gm,
-      factory: (walker, lookFor, existing) => {
+      factory: (walker, namespace, lookFor, existing) => {
         const [{ subject }, done] = walker
           .expect("(", TokenTypeName.Operator)
-          .extract("subject", (w) => Expression.Parse(w, [...lookFor, ")"]))
+          .extract("subject", (w) => Expression.Parse(w, namespace, [...lookFor, ")"]))
           .expect(")", TokenTypeName.Operator)
           .finish();
 
-        return new ExpressionBrackets(_context(walker, done), subject);
+        return new ExpressionBrackets(_context(walker, done, namespace), subject);
       },
     });
   }

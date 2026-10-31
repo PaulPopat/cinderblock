@@ -14,8 +14,8 @@ export class TypePrimitiveLong extends TypePrimitive {
       priority: 150,
       match: /^long+$/gm,
       chainable: false,
-      factory: (walker: TokenWalker, left?: Type) => {
-        return new TypePrimitiveLong(_context(walker, walker.expect("long", TokenTypeName.KeyWord)));
+      factory: (walker: TokenWalker, namespace, left?: Type) => {
+        return new TypePrimitiveLong(_context(walker, walker.expect("long", TokenTypeName.KeyWord), namespace));
       },
     });
   }

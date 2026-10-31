@@ -11,13 +11,13 @@ export class ExpressionNot extends Expression {
       priority: 100,
       match: /^\!$/gm,
       inOne: false,
-      factory: (walker, lookFor, existing) => {
+      factory: (walker, namespace, lookFor, existing) => {
         const [{ subject }, done] = walker
           .expect("!", TokenTypeName.Operator)
-          .extract("subject", (w) => Expression.ParseOne(w))
+          .extract("subject", (w) => Expression.ParseOne(w, namespace))
           .finish();
 
-        return new ExpressionNot(_context(walker, done), subject);
+        return new ExpressionNot(_context(walker, done, namespace), subject);
       },
     });
   }

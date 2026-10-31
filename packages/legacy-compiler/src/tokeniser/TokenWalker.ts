@@ -97,10 +97,10 @@ export class TokenWalker<TContext extends Record<never, never> = Record<never, n
 
   if<TResult extends Record<never, never>>(
     predicate: (store: TokenWalker) => boolean,
-    extractor: (walker: TokenWalker<TContext>) => TokenWalker<TContext & TResult>,
+    extractor: (walker: TokenWalker<TContext>, current: TContext) => TokenWalker<TContext & TResult>,
   ): TokenWalker<TContext & Partial<TResult>> {
     if (!predicate(this)) return this;
-    return extractor(this);
+    return extractor(this, this.#data);
   }
 
   text<TKey extends string>(name: TKey, typeName: TokenTypeName) {

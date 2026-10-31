@@ -8,14 +8,14 @@ export class EntityUse extends Entity {
     Entity.RegisterEntity({
       priority: 100,
       match: /^use$/gm,
-      factory: (walker) => {
+      factory: (walker, existing) => {
         const [{ namespace }, done] = walker
           .expect("use", TokenTypeName.KeyWord)
           .text("namespace", TokenTypeName.Namespace)
           .expect(";", TokenTypeName.Punctuation)
           .finish();
 
-        return new EntityUse(_context(walker, done), namespace);
+        return new EntityUse(_context(walker, done, existing), namespace);
       },
     });
   }

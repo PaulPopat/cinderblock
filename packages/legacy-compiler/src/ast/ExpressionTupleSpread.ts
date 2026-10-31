@@ -11,14 +11,14 @@ import { LinkedExpressionAccess } from "#linked/LinkedExpressionAccess";
 import { LinkedExpressionReference } from "#linked/LinkedExpressionReference";
 
 export class ExpressionTupleSpread extends Expression {
-  static Parse(walker: TokenWalker, lookFor: Array<string>) {
+  static Parse(walker: TokenWalker, namespace: string, lookFor: Array<string>) {
     const [{ name, value }, done] = walker
       .expect("...", TokenTypeName.Operator)
       .internal("name")
-      .extract("value", (s) => Expression.Parse(s, lookFor))
+      .extract("value", (s) => Expression.Parse(s, namespace, lookFor))
       .finish();
 
-    return new ExpressionTupleSpread(_context(walker, done), name, value);
+    return new ExpressionTupleSpread(_context(walker, done, namespace), name, value);
   }
 
   readonly #name: string;

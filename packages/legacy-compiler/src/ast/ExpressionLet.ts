@@ -12,7 +12,7 @@ import { LinkerError } from "./LinkerError.ts";
 import { Type } from "./Type.ts";
 
 export class ExpressionLet extends Expression {
-  static Parse(walker: TokenWalker, lookFor: Array<string>) {
+  static Parse(walker: TokenWalker, namespace: string, lookFor: Array<string>) {
     const [{ args, returns, contents, entities, internalName }, done] = walker
       .expect("let", TokenTypeName.KeyWord)
       .internal("internalName")
@@ -23,13 +23,13 @@ export class ExpressionLet extends Expression {
             .while(
               "args",
               (s) => s.data === "," || s.data === "(",
-              (s) => EntityArg.Parse(s.expect(["(", ","], TokenTypeName.Punctuation)),
+              (s) => EntityArg.Parse(s.expect(["(", ","], TokenTypeName.Punctuation), namespace),
             )
             .expect(")", TokenTypeName.Punctuation),
       )
       .if(
         (s) => s.data === ":",
-        (walker) => walker.expect(":", TokenTypeName.Punctuation).extract("returns", (s) => Type.Parse(s)),
+        (walker) => walker.expect(":", TokenTypeName.Punctuation).extract("returns", (s) => Type.Parse(s, namespace)),
       )
       .expect("=", TokenTypeName.Operator)
       .while(
@@ -37,10 +37,10 @@ export class ExpressionLet extends Expression {
         (s) => Entity.HasParser(s),
         (w) => Entity.Parse(w, ""),
       )
-      .extract("contents", (s) => Expression.Parse(s, lookFor))
+      .extract("contents", (s) => Expression.Parse(s, namespace, lookFor))
       .finish();
 
-    return new ExpressionLet(_context(walker, done), args ?? [], returns, entities, contents, internalName);
+    return new ExpressionLet(_context(walker, done, namespace), args ?? [], returns, entities, contents, internalName);
   }
 
   static {

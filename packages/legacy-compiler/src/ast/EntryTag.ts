@@ -4,14 +4,14 @@ import { TokenTypeName } from "#tokeniser";
 import { _context, type EntryContext } from "./EntryContext.ts";
 
 export class EntryTag extends Entry {
-  static Parse(walker: TokenWalker) {
+  static Parse(walker: TokenWalker, namespace: string) {
     const [{ key, value }, done] = walker
       .text("key", TokenTypeName.PropertyName)
       .expect("=", TokenTypeName.Punctuation)
       .text("value", TokenTypeName.String)
       .finish();
 
-    return new EntryTag(_context(walker, done), key, JSON.parse(value));
+    return new EntryTag(_context(walker, done, namespace), key, JSON.parse(value));
   }
 
   readonly #key: string;

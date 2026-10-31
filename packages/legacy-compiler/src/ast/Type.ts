@@ -8,7 +8,7 @@ type TypeParseable = {
   priority: number;
   match: RegExp;
   chainable: boolean;
-  factory: (walker: TokenWalker, left?: Type) => Type;
+  factory: (walker: TokenWalker, namespace: string, left?: Type) => Type;
 };
 
 export abstract class Type extends Entry {
@@ -18,7 +18,7 @@ export abstract class Type extends Entry {
     this.#parsers = [...this.#parsers, entry].sort((a, b) => b.priority - a.priority);
   }
 
-  static Parse(walker: TokenWalker): Type {
+  static Parse(walker: TokenWalker, namespace: string): Type {
     const [{ type }] = walker
       .reduce(
         "type",
@@ -29,7 +29,7 @@ export abstract class Type extends Entry {
             throw new ParserError(`Unexpected symbol of ${w.data}`, w);
           }
 
-          return match.factory(w, p as Type);
+          return match.factory(w, namespace, p as Type);
         },
       )
       .finish();

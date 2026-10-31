@@ -22,7 +22,7 @@ export class EntityNamespace extends Entity {
           .expect("}", TokenTypeName.Punctuation)
           .finish();
 
-        return new EntityNamespace(_context(walker, done), [namespace, name].filter((c) => c).join("_"), entities);
+        return new EntityNamespace(_context(walker, done, namespace), [namespace, name].filter((c) => c).join("_"), entities);
       },
     });
   }
@@ -50,8 +50,7 @@ export class EntityNamespace extends Entity {
 
   get public(): Array<EntityLet> {
     return this.#entities.reduce(
-      (result, entity) =>
-        entity instanceof EntityLet && entity.exported ? [...result, entity] : entity instanceof EntityNamespace ? [...result, ...entity.public] : [],
+      (result, entity) => (entity instanceof EntityLet || entity instanceof EntityNamespace ? [...result, ...entity.public] : result),
       [] as Array<EntityLet>,
     );
   }

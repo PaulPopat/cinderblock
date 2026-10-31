@@ -17,11 +17,11 @@ export class EntityExternal extends Entity {
         const [{ name, type }, done] = walker
           .expect("extern", TokenTypeName.KeyWord)
           .text("name", TokenTypeName.FunctionName)
-          .extract("type", (w) => Type.Parse(w))
+          .extract("type", (w) => Type.Parse(w, namespace))
           .expect(";", TokenTypeName.Punctuation)
           .finish();
 
-        return new EntityExternal(_context(walker, done), namespace, name, type);
+        return new EntityExternal(_context(walker, done, namespace), namespace, name, type);
       },
     });
   }

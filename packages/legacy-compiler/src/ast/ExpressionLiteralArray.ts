@@ -13,7 +13,7 @@ export class ExpressionLiteralArray extends ExpressionLiteral {
     Expression.RegisterExpression({
       priority: 150,
       match: /^(\[)|(\[\])$/gm,
-      factory: (walker, lookFor, existing) => {
+      factory: (walker, namespace, lookFor, existing) => {
         const [{ value }, done] = walker
           .if(
             (s) => s.data !== "[]",
@@ -21,7 +21,7 @@ export class ExpressionLiteralArray extends ExpressionLiteral {
               w.while(
                 "value",
                 (w) => (w.data === "[" || w.data === ",") && w.expect(["[", ","], TokenTypeName.Punctuation).data !== "]",
-                (s) => Expression.Parse(s.expect(["[", ","], TokenTypeName.Punctuation), [...lookFor, ",", "]"]),
+                (s) => Expression.Parse(s.expect(["[", ","], TokenTypeName.Punctuation), namespace, [...lookFor, ",", "]"]),
               ),
           )
           .if(
@@ -42,7 +42,7 @@ export class ExpressionLiteralArray extends ExpressionLiteral {
           )
           .finish();
 
-        return new ExpressionLiteralArray(_context(walker, done), value ?? []);
+        return new ExpressionLiteralArray(_context(walker, done, namespace), value ?? []);
       },
     });
   }

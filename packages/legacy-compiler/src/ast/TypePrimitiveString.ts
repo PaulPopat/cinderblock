@@ -13,8 +13,8 @@ export class TypePrimitiveString extends TypePrimitive {
       priority: 150,
       match: /^string+$/gm,
       chainable: false,
-      factory: (walker: TokenWalker, left?: Type) => {
-        return new TypePrimitiveString(_context(walker, walker.expect("string", TokenTypeName.KeyWord)));
+      factory: (walker: TokenWalker, namespace, left?: Type) => {
+        return new TypePrimitiveString(_context(walker, walker.expect("string", TokenTypeName.KeyWord), namespace));
       },
     });
   }

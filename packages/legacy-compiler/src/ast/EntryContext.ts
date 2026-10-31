@@ -4,15 +4,17 @@ import { Location } from "#utils";
 export type EntryContext = {
   location: Location;
   done: TokenWalker;
+  namespace: string;
 };
 
-export function _context(start: TokenWalker, done: TokenWalker): EntryContext {
+export function _context(start: TokenWalker, done: TokenWalker, namespace: string): EntryContext {
   return {
     location: start.location,
     done,
+    namespace,
   };
 }
 
 export function _empty(): EntryContext {
-  return { location: Location.empty, done: TokenWalker.empty };
+  return { location: Location.empty, done: TokenWalker.empty, namespace: "" };
 }

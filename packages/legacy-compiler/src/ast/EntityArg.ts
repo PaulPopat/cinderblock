@@ -10,19 +10,19 @@ import { LinkedTypeArg } from "#linked/LinkedTypeArg";
 import { LinkerError } from "./LinkerError.ts";
 
 export class EntityArg extends Entity {
-  static Parse(walker: TokenWalker) {
+  static Parse(walker: TokenWalker, namespace: string) {
     const [{ type, name }, done] = walker
       .text("name", TokenTypeName.ParameterName)
       .if(
         (s) => s.data === ":",
-        (w) => w.expect(":", TokenTypeName.Punctuation).extract("type", (w) => Type.Parse(w)),
+        (w) => w.expect(":", TokenTypeName.Punctuation).extract("type", (w) => Type.Parse(w, namespace)),
       )
       .finish();
 
     return new EntityArg(
-      _context(walker, done),
+      _context(walker, done, namespace),
       name.startsWith('"') ? JSON.parse(name) : name,
-      type ?? new TypePrimitiveUnknown({ location: walker.location, done }),
+      type ?? new TypePrimitiveUnknown(_context(walker, done, namespace)),
     );
   }
 

@@ -14,8 +14,8 @@ export class TypePrimitiveChar extends TypePrimitive {
       priority: 150,
       match: /^char+$/gm,
       chainable: false,
-      factory: (walker: TokenWalker, left?: Type) => {
-        return new TypePrimitiveChar(_context(walker, walker.expect("char", TokenTypeName.KeyWord)));
+      factory: (walker: TokenWalker, namespace, left?: Type) => {
+        return new TypePrimitiveChar(_context(walker, walker.expect("char", TokenTypeName.KeyWord), namespace));
       },
     });
   }

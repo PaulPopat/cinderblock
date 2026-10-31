@@ -14,8 +14,8 @@ export class TypePrimitiveDouble extends TypePrimitive {
       priority: 150,
       match: /^double+$/gm,
       chainable: false,
-      factory: (walker: TokenWalker, left?: Type) => {
-        return new TypePrimitiveDouble(_context(walker, walker.expect("double", TokenTypeName.KeyWord)));
+      factory: (walker: TokenWalker, namespace, left?: Type) => {
+        return new TypePrimitiveDouble(_context(walker, walker.expect("double", TokenTypeName.KeyWord), namespace));
       },
     });
   }

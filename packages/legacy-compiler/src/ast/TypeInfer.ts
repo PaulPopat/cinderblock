@@ -6,10 +6,10 @@ import { LinkerError } from "./LinkerError.ts";
 import { Type } from "./Type.ts";
 
 export class TypeInfer extends Type {
-  static ParseInfer(walker: TokenWalker, left?: Type) {
+  static ParseInfer(walker: TokenWalker, namespace: string, left?: Type) {
     const [{ value }, done] = walker.expect("infer", TokenTypeName.KeyWord).text("value", TokenTypeName.StructReference).finish();
 
-    return new TypeInfer(_context(walker, done), value);
+    return new TypeInfer(_context(walker, done, namespace), value);
   }
 
   static {

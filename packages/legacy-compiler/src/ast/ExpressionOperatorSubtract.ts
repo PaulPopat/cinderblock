@@ -12,14 +12,14 @@ export class ExpressionOperatorSubtract extends ExpressionOperator {
     Expression.RegisterExpression({
       priority: 100,
       match: /^-$/gm,
-      factory: (walker, lookFor, existing) => {
+      factory: (walker, namespace, lookFor, existing) => {
         if (!existing) throw new ParserError("Unexpected -", walker);
         const [{ right }, done] = walker
           .expect("-", TokenTypeName.Operator)
-          .extract("right", (w) => Expression.ParseOne(w))
+          .extract("right", (w) => Expression.ParseOne(w, namespace))
           .finish();
 
-        return new ExpressionOperatorSubtract(_context(walker, done), existing, right);
+        return new ExpressionOperatorSubtract(_context(walker, done, namespace), existing, right);
       },
     });
   }

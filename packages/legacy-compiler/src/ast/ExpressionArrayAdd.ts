@@ -11,14 +11,14 @@ export class ExpressionArrayAdd extends Expression {
     Expression.RegisterExpression({
       priority: 100,
       match: /^\+\+$/gm,
-      factory: (walker, lookFor, existing) => {
+      factory: (walker, namespace, lookFor, existing) => {
         if (!existing) throw new ParserError("Unexpected ++", walker);
         const [{ addition }, done] = walker
           .expect("++", TokenTypeName.Operator)
-          .extract("addition", (w) => Expression.Parse(w, lookFor))
+          .extract("addition", (w) => Expression.Parse(w, namespace, lookFor))
           .finish();
 
-        return new ExpressionArrayAdd(_context(walker, done), existing, addition);
+        return new ExpressionArrayAdd(_context(walker, done, namespace), existing, addition);
       },
     });
   }

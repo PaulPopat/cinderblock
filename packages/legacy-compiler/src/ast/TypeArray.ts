@@ -13,9 +13,9 @@ export class TypeArray extends Type {
       priority: 100,
       match: /^\[\]$/gm,
       chainable: true,
-      factory: (walker, left) => {
+      factory: (walker, namespace, left) => {
         if (!left) throw new ParserError("Unexpected []", walker);
-        return new TypeArray(_context(walker, walker.expect("[]", TokenTypeName.Operator)), left);
+        return new TypeArray(_context(walker, walker.expect("[]", TokenTypeName.Operator), namespace), left);
       },
     });
   }

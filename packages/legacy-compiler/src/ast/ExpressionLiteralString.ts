@@ -11,9 +11,9 @@ export class ExpressionLiteralString extends ExpressionLiteral {
     Expression.RegisterExpression({
       priority: 150,
       match: /^("([^"]|\\.)+"|"")$/gm,
-      factory: (walker, lookFor, existing) => {
+      factory: (walker, namespace, lookFor, existing) => {
         const [{ value }, done] = walker.text("value", TokenTypeName.String).finish();
-        return new ExpressionLiteralString(_context(walker, done), new Function("return " + value)());
+        return new ExpressionLiteralString(_context(walker, done, namespace), new Function("return " + value)());
       },
     });
   }

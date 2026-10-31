@@ -29,7 +29,7 @@ export function compileCinderblock(data: Array<[string, string]>): BinaryData {
         exported
           .filter((e) => e instanceof EntityLet)
           .map((e) => [
-            e.name,
+            e.fullname,
             {
               id: e.internalName,
               tags: e.tags.map((t) => ({ key: t.key, value: t.value?.toString() ?? "" })),

@@ -8,19 +8,19 @@ import { Type } from "./Type.ts";
 import { TypePrimitiveUnknown } from "./TypePrimitiveUnknown.ts";
 
 export class TypeArg extends Type {
-  static Parse(walker: TokenWalker) {
+  static Parse(walker: TokenWalker, namespace: string) {
     const [{ name, type }, done] = walker
       .text("name", TokenTypeName.PropertyName)
       .if(
         (s) => s.data === ":",
-        (w) => w.expect(":", TokenTypeName.Punctuation).extract("type", (w) => Type.Parse(w)),
+        (w) => w.expect(":", TokenTypeName.Punctuation).extract("type", (w) => Type.Parse(w, namespace)),
       )
       .finish();
 
     const result = new TypeArg(
-      _context(walker, done),
+      _context(walker, done, namespace),
       name.startsWith('"') ? JSON.parse(name) : name,
-      type ?? new TypePrimitiveUnknown(_context(walker, done)),
+      type ?? new TypePrimitiveUnknown(_context(walker, done, namespace)),
     );
 
     return result;

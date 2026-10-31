@@ -12,15 +12,15 @@ export class ExpressionIndex extends Expression {
       priority: 100,
       match: /^@$/gm,
       inOne: true,
-      factory: (walker, lookFor, existing) => {
+      factory: (walker, namespace, lookFor, existing) => {
         if (!existing) throw new ParserError("Unexpected @", walker);
 
         const [{ key }, done] = walker
           .expect("@", TokenTypeName.Operator)
-          .extract("key", (w) => Expression.ParseOne(w))
+          .extract("key", (w) => Expression.ParseOne(w, namespace))
           .finish();
 
-        return new ExpressionIndex(_context(walker, done), existing, key);
+        return new ExpressionIndex(_context(walker, done, namespace), existing, key);
       },
     });
   }

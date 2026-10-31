@@ -16,9 +16,9 @@ export class ExpressionReference extends Expression {
     Expression.RegisterExpression({
       priority: 1,
       match: /^[a-zA-Z_@$#:][a-zA-Z0-9_@$#:]*$/gm,
-      factory: (walker, lookFor, existing) => {
+      factory: (walker, namespace, lookFor, existing) => {
         const [{ value }, done] = walker.text("value", TokenTypeName.VariableName).finish();
-        return new ExpressionReference(_context(walker, done), value);
+        return new ExpressionReference(_context(walker, done, namespace), value);
       },
     });
   }

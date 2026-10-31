@@ -12,12 +12,12 @@ export class ExpressionAccess extends Expression {
       priority: 100,
       match: /^\.$/gm,
       inOne: true,
-      factory: (walker, lookFor, existing) => {
+      factory: (walker, namespace, lookFor, existing) => {
         if (!existing) throw new ParserError("Unexpected .", walker);
 
         const [{ name }, done] = walker.expect(".", TokenTypeName.Operator).text("name", TokenTypeName.PropertyReference).finish();
 
-        return new ExpressionAccess(_context(walker, done), existing, name);
+        return new ExpressionAccess(_context(walker, done, namespace), existing, name);
       },
     });
   }

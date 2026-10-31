@@ -11,9 +11,9 @@ export class ExpressionLiteralBool extends ExpressionLiteral {
     Expression.RegisterExpression({
       priority: 150,
       match: /^(true|false)$/gm,
-      factory: (walker, lookFor, existing) => {
+      factory: (walker, namespace, lookFor, existing) => {
         const [{ value }, done] = walker.text("value", TokenTypeName.KeyWord).finish();
-        return new ExpressionLiteralBool(_context(walker, done), value === "true");
+        return new ExpressionLiteralBool(_context(walker, done, namespace), value === "true");
       },
     });
   }

@@ -12,14 +12,14 @@ export class ExpressionOperatorAs extends Expression {
     Expression.RegisterExpression({
       priority: 100,
       match: /^as$/gm,
-      factory: (walker, lookFor, existing) => {
+      factory: (walker, namespace, lookFor, existing) => {
         if (!existing) throw new ParserError("Unexpected as", walker);
         const [{ right }, done] = walker
           .expect("as", TokenTypeName.Operator)
-          .extract("right", (w) => Type.Parse(w))
+          .extract("right", (w) => Type.Parse(w, namespace))
           .finish();
 
-        return new ExpressionOperatorAs(_context(walker, done), existing, right);
+        return new ExpressionOperatorAs(_context(walker, done, namespace), existing, right);
       },
     });
   }

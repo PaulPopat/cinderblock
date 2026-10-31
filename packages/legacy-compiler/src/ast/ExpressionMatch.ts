@@ -6,14 +6,13 @@ import { _context, type EntryContext } from "./EntryContext.ts";
 import type { LinkedExpression } from "#linked/LinkedExpression";
 import type { LinkerContext } from "./LinkerContext.ts";
 import { LinkedExpressionMatch } from "#linked/LinkedExpressionMatch";
-import { LinkedExpressionTuple } from "#linked/LinkedExpressionTuple";
 
 export class ExpressionMatch extends Expression {
   static {
     Expression.RegisterExpression({
       priority: 100,
       match: /^\|$/gm,
-      factory: (walker, lookFor, existing) => {
+      factory: (walker, namespace, lookFor, existing) => {
         if (!existing) {
           throw new ParserError("Unexpected |", walker);
         }
@@ -22,11 +21,11 @@ export class ExpressionMatch extends Expression {
           .while(
             "matchers",
             (w) => w.nextIs("let"),
-            (s) => ExpressionLet.Parse(s.expect([...lookFor, "|", ","], TokenTypeName.Punctuation), [...lookFor, ","]),
+            (s) => ExpressionLet.Parse(s.expect([...lookFor, "|", ","], TokenTypeName.Punctuation), namespace, [...lookFor, ","]),
           )
           .finish();
 
-        return new ExpressionMatch(_context(walker, done), existing, matchers);
+        return new ExpressionMatch(_context(walker, done, namespace), existing, matchers);
       },
     });
   }

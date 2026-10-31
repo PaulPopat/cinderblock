@@ -13,14 +13,14 @@ export class TypeUnion extends Type {
       priority: 100,
       match: /^\|$/gm,
       chainable: true,
-      factory: (walker: TokenWalker, left?: Type) => {
+      factory: (walker: TokenWalker, namespace, left?: Type) => {
         if (!left) throw new ParserError("Unexpected |", walker);
         const [{ right }, done] = walker
           .expect("|", TokenTypeName.Operator)
-          .extract("right", (w) => Type.Parse(w))
+          .extract("right", (w) => Type.Parse(w, namespace))
           .finish();
 
-        const result = new TypeUnion(_context(walker, done), [
+        const result = new TypeUnion(_context(walker, done, namespace), [
           ...(left instanceof TypeUnion ? left.parts : [left]),
           ...(right instanceof TypeUnion ? right.parts : [right]),
         ]);

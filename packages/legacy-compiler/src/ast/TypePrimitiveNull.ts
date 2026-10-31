@@ -13,8 +13,8 @@ export class TypePrimitiveNull extends TypePrimitive {
       priority: 150,
       match: /^null+$/gm,
       chainable: false,
-      factory: (walker: TokenWalker, left?: Type) => {
-        return new TypePrimitiveNull(_context(walker, walker.expect("null", TokenTypeName.KeyWord)));
+      factory: (walker: TokenWalker, namespace, left?: Type) => {
+        return new TypePrimitiveNull(_context(walker, walker.expect("null", TokenTypeName.KeyWord), namespace));
       },
     });
   }

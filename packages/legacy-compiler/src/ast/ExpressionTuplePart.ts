@@ -3,18 +3,17 @@ import { TokenTypeName, TokenWalker } from "#tokeniser";
 import { _context, type EntryContext } from "./EntryContext.ts";
 import type { LinkedExpression } from "#linked/LinkedExpression";
 import type { LinkerContext } from "./LinkerContext.ts";
-import { LinkedExpressionLet } from "#linked/LinkedExpressionLet";
 import { LinkedExpressionTuple } from "#linked/LinkedExpressionTuple";
 
 export class ExpressionTuplePart extends Expression {
-  static Parse(walker: TokenWalker, lookFor: Array<string>) {
+  static Parse(walker: TokenWalker, namespace: string, lookFor: Array<string>) {
     const [{ name, value }, done] = walker
       .text("name", TokenTypeName.PropertyName)
       .expect("=", TokenTypeName.Operator)
-      .extract("value", (s) => Expression.Parse(s, lookFor))
+      .extract("value", (s) => Expression.Parse(s, namespace, lookFor))
       .finish();
 
-    return new ExpressionTuplePart(_context(walker, done), name.startsWith('"') ? JSON.parse(name) : name, value);
+    return new ExpressionTuplePart(_context(walker, done, namespace), name.startsWith('"') ? JSON.parse(name) : name, value);
   }
 
   readonly #name: string;

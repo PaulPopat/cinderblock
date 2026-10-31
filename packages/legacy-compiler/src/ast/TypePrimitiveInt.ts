@@ -14,8 +14,8 @@ export class TypePrimitiveInt extends TypePrimitive {
       priority: 150,
       match: /^int+$/gm,
       chainable: false,
-      factory: (walker: TokenWalker, left?: Type) => {
-        return new TypePrimitiveInt(_context(walker, walker.expect("int", TokenTypeName.KeyWord)));
+      factory: (walker: TokenWalker, namespace, left?: Type) => {
+        return new TypePrimitiveInt(_context(walker, walker.expect("int", TokenTypeName.KeyWord), namespace));
       },
     });
   }

@@ -10,7 +10,7 @@ import { Type } from "./Type.ts";
 import { TypeArg } from "./TypeArg.ts";
 
 export class TypeReference extends Type {
-  static ParseReference(walker: TokenWalker) {
+  static ParseReference(walker: TokenWalker, namespace: string) {
     const [{ value, args }, done] = walker
       .text("value", TokenTypeName.StructReference)
       .if(
@@ -20,13 +20,13 @@ export class TypeReference extends Type {
             .while(
               "args",
               (s) => (s.data === "," || s.data === "(") && s.expect([",", "("], TokenTypeName.Punctuation).data !== ")",
-              (s) => TypeArg.Parse(s.expect([",", "("], TokenTypeName.Punctuation)),
+              (s) => TypeArg.Parse(s.expect([",", "("], TokenTypeName.Punctuation), namespace),
             )
             .expect(")", TokenTypeName.Punctuation),
       )
       .finish();
 
-    return new TypeReference(_context(walker, done), value, args ?? []);
+    return new TypeReference(_context(walker, done, namespace), value, args ?? []);
   }
 
   static {

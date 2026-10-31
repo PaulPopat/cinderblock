@@ -4,7 +4,6 @@ import { Entity } from "./Entity.ts";
 import { Type } from "./Type.ts";
 import { EntryTag } from "./EntryTag.ts";
 import { TokenTypeName } from "#tokeniser";
-import { EntityNamespace } from "./EntityNamespace.ts";
 import { _context, type EntryContext } from "./EntryContext.ts";
 import type { LinkedEntry } from "#linked/LinkedEntry";
 import type { LinkerContext } from "./LinkerContext.ts";
@@ -13,7 +12,7 @@ import { LinkerError } from "./LinkerError.ts";
 import { LinkedTypeTuple } from "#linked/LinkedTypeTuple";
 import { LinkedExpressionLet } from "#linked/LinkedExpressionLet";
 
-export class EntityLet extends EntityNamespace {
+export class EntityLet extends Entity {
   static {
     Entity.RegisterEntity({
       priority: 100,
@@ -33,7 +32,7 @@ export class EntityLet extends EntityNamespace {
                 .while(
                   "tags",
                   (s) => s.data === "[" || s.data === ",",
-                  (s) => EntryTag.Parse(s.expect(["[", ","], TokenTypeName.Punctuation)),
+                  (s) => EntryTag.Parse(s.expect(["[", ","], TokenTypeName.Punctuation), namespace),
                 )
                 .expect("]", TokenTypeName.Punctuation),
           )
@@ -43,18 +42,19 @@ export class EntityLet extends EntityNamespace {
           )
           .if(
             (s) => s.data === "(",
-            (walker) =>
+            (walker, { name }) =>
               walker
                 .while(
                   "args",
                   (s) => s.data === "," || s.data === "(",
-                  (s) => EntityArg.Parse(s.expect(["(", ","], TokenTypeName.Punctuation)),
+                  (s) => EntityArg.Parse(s.expect(["(", ","], TokenTypeName.Punctuation), [namespace, name].filter((n) => n).join("_")),
                 )
                 .expect(")", TokenTypeName.Punctuation),
           )
           .if(
             (s) => s.data === ":",
-            (walker) => walker.expect(":", TokenTypeName.Punctuation).extract("returns", (s) => Type.Parse(s)),
+            (walker, { name }) =>
+              walker.expect(":", TokenTypeName.Punctuation).extract("returns", (s) => Type.Parse(s, [namespace, name].filter((n) => n).join("_"))),
           )
           .expect("=", TokenTypeName.Operator)
           .while(
@@ -62,14 +62,14 @@ export class EntityLet extends EntityNamespace {
             (s) => Entity.HasParser(s),
             (w, _, { name, internalName }) => Entity.Parse(w, [namespace, name ?? internalName].join("_")),
           )
-          .extract("contents", (s) => Expression.Parse(s, [";"]))
+          .extract("contents", (s, { name }) => Expression.Parse(s, [namespace, name].filter((n) => n).join("_"), [";"]))
           .expect(";", TokenTypeName.Punctuation)
           .finish();
 
         return new EntityLet(
-          _context(walker, done),
-          namespace,
+          _context(walker, done, namespace),
           name ?? internalName,
+          namespace,
           entities,
           walker.data === "export",
           tags ?? [],
@@ -82,6 +82,9 @@ export class EntityLet extends EntityNamespace {
     });
   }
 
+  readonly #name: string;
+  readonly #namespace: string;
+  readonly #entities: Array<Entity>;
   readonly #exported: boolean;
   readonly #tags: Array<EntryTag>;
   readonly #args: Array<EntityArg>;
@@ -91,8 +94,8 @@ export class EntityLet extends EntityNamespace {
 
   constructor(
     ctx: EntryContext,
-    namespace: string,
     name: string,
+    namespace: string,
     entities: Array<Entity>,
     exported: boolean,
     tags: Array<EntryTag>,
@@ -101,13 +104,24 @@ export class EntityLet extends EntityNamespace {
     contents: Expression,
     internalName: string,
   ) {
-    super(ctx, [namespace, name].filter((c) => c).join("_"), entities);
+    super(ctx);
+    this.#name = name;
+    this.#namespace = namespace;
+    this.#entities = entities;
     this.#exported = exported;
     this.#tags = tags;
     this.#args = args;
     this.#returns = returns;
     this.#contents = contents;
     this.#internalName = internalName;
+  }
+
+  get name(): string {
+    return this.#name;
+  }
+
+  get fullname(): string {
+    return [this.#namespace, this.#name].filter((c) => c).join("_");
   }
 
   get exported() {
@@ -149,7 +163,7 @@ export class EntityLet extends EntityNamespace {
         i.linked(inputType instanceof LinkedTypeTuple ? inputType.args.find((a) => a.name === i.name) : undefined, c),
       )
       .mapWith(
-        this.entities.filter((e) => e instanceof EntityLet),
+        this.#entities.filter((e) => e instanceof EntityLet),
         "children",
         (c, e) => e.linked(undefined, c),
       )
@@ -162,5 +176,9 @@ export class EntityLet extends EntityNamespace {
 
   search(name: string): Array<Entity> {
     return name === this.name ? [this] : [];
+  }
+
+  get public(): Array<EntityLet> {
+    return this.#exported ? [this] : [];
   }
 }

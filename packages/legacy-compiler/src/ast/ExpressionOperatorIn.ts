@@ -12,14 +12,14 @@ export class ExpressionOperatorIn extends ExpressionOperator {
     Expression.RegisterExpression({
       priority: 100,
       match: /^in$/gm,
-      factory: (walker, lookFor, existing) => {
+      factory: (walker, namespace, lookFor, existing) => {
         if (!existing) throw new ParserError("Unexpected in", walker);
         const [{ right }, done] = walker
           .expect("in", TokenTypeName.Operator)
-          .extract("right", (w) => Expression.ParseOne(w))
+          .extract("right", (w) => Expression.ParseOne(w, namespace))
           .finish();
 
-        return new ExpressionOperatorIn(_context(walker, done), existing, right);
+        return new ExpressionOperatorIn(_context(walker, done, namespace), existing, right);
       },
     });
   }

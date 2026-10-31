@@ -11,10 +11,10 @@ export class ExpressionLiteralNull extends ExpressionLiteral {
     Expression.RegisterExpression({
       priority: 150,
       match: /^null$/gm,
-      factory: (walker, lookFor, existing) => {
+      factory: (walker, namespace, lookFor, existing) => {
         const [, done] = walker.expect("null", TokenTypeName.KeyWord).finish();
 
-        return new ExpressionLiteralNull(_context(walker, done));
+        return new ExpressionLiteralNull(_context(walker, done, namespace));
       },
     });
   }

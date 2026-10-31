@@ -11,9 +11,9 @@ export class ExpressionLiteralDouble extends ExpressionLiteral {
     Expression.RegisterExpression({
       priority: 150,
       match: /^[0-9]+\.[0-9]+d$/gm,
-      factory: (walker, lookFor, existing) => {
+      factory: (walker, namespace, lookFor, existing) => {
         const [{ value }, done] = walker.text("value", TokenTypeName.Number).finish();
-        return new ExpressionLiteralDouble(_context(walker, done), value.replace("d", ""));
+        return new ExpressionLiteralDouble(_context(walker, done, namespace), value.replace("d", ""));
       },
     });
   }

@@ -6,6 +6,7 @@ import type { LinkedType } from "#linked/LinkedType";
 import type { LinkerContext } from "./LinkerContext.ts";
 import { LinkedTypePipeable } from "#linked/LinkedTypePipeable";
 import { LinkerError } from "./LinkerError.ts";
+import { LinkedTypeTuple } from "#linked/LinkedTypeTuple";
 
 export class TypePipeable extends Type {
   static {
@@ -13,12 +14,12 @@ export class TypePipeable extends Type {
       priority: 100,
       match: /^\($/gm,
       chainable: false,
-      factory: (walker: TokenWalker, left?: Type) => {
+      factory: (walker: TokenWalker, namespace, left?: Type) => {
         const [{ args, returns }, done] = walker
           .while(
             "args",
             (s) => (s.data === "," || s.data === "(") && s.expect([",", "("], TokenTypeName.Punctuation).data !== ")",
-            (s) => TypeArg.Parse(s.expect([",", "("], TokenTypeName.Punctuation)),
+            (s) => TypeArg.Parse(s.expect([",", "("], TokenTypeName.Punctuation), namespace),
           )
           .if(
             (s) => s.data === "(",
@@ -26,10 +27,10 @@ export class TypePipeable extends Type {
           )
           .expect(")", TokenTypeName.Punctuation)
           .expect(":", TokenTypeName.Punctuation)
-          .extract("returns", (w) => Type.Parse(w))
+          .extract("returns", (w) => Type.Parse(w, namespace))
           .finish();
 
-        return new TypePipeable(_context(walker, done), args, returns);
+        return new TypePipeable(_context(walker, done, namespace), args, returns);
       },
     });
   }
@@ -52,7 +53,7 @@ export class TypePipeable extends Type {
   }
 
   linked(input: LinkedType | undefined, ctx: LinkerContext) {
-    if (input && !(input instanceof LinkedTypePipeable)) {
+    if (input && !(input instanceof LinkedTypeTuple)) {
       throw new LinkerError("Invalid type", input.range);
     }
 
@@ -63,7 +64,7 @@ export class TypePipeable extends Type {
           c,
         ),
       )
-      .with("returns", (c) => this.#returns.linked(input?.returns, c))
+      .with("returns", (c) => this.#returns.linked(undefined, c))
       .finish(({ args, returns }) => new LinkedTypePipeable(this.range, args, returns));
   }
 }

@@ -13,7 +13,7 @@ export class ExpressionTuple extends Expression {
     Expression.RegisterExpression({
       priority: 100,
       match: /^{$/gm,
-      factory: (walker, lookFor, existing) => {
+      factory: (walker, namespace, lookFor, existing) => {
         const [{ value }, done] = walker
           .while(
             "value",
@@ -21,10 +21,10 @@ export class ExpressionTuple extends Expression {
             (s) => {
               const next = s.expect(["{", ","], TokenTypeName.Punctuation);
               if (next.data === "...") {
-                return ExpressionTupleSpread.Parse(next, [...lookFor, ",", "}"]);
+                return ExpressionTupleSpread.Parse(next, namespace, [...lookFor, ",", "}"]);
               }
 
-              return ExpressionTuplePart.Parse(next, [...lookFor, ",", "}"]);
+              return ExpressionTuplePart.Parse(next, namespace, [...lookFor, ",", "}"]);
             },
           )
           .if(
@@ -38,7 +38,7 @@ export class ExpressionTuple extends Expression {
           .expect("}", TokenTypeName.Punctuation)
           .finish();
 
-        return new ExpressionTuple(_context(walker, done), value ?? []);
+        return new ExpressionTuple(_context(walker, done, namespace), value ?? []);
       },
     });
   }

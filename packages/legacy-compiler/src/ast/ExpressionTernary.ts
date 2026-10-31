@@ -11,15 +11,15 @@ export class ExpressionTernary extends Expression {
     Expression.RegisterExpression({
       priority: 1,
       match: /^\?$/gm,
-      factory: (walker, lookFor, existing) => {
+      factory: (walker, namespace, lookFor, existing) => {
         if (!existing) throw new ParserError("Unexpected ?", walker);
         const [{ positive, negative }, done] = walker
           .expect("?", TokenTypeName.Operator)
-          .extract("positive", (w) => Expression.Parse(w, [":"]))
-          .extract("negative", (w) => Expression.Parse(w, lookFor))
+          .extract("positive", (w) => Expression.Parse(w, namespace, [":"]))
+          .extract("negative", (w) => Expression.Parse(w, namespace, lookFor))
           .finish();
 
-        return new ExpressionTernary(_context(walker, done), existing, positive, negative);
+        return new ExpressionTernary(_context(walker, done, namespace), existing, positive, negative);
       },
     });
   }

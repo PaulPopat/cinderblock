@@ -11,9 +11,9 @@ export class ExpressionLiteralFloat extends ExpressionLiteral {
     Expression.RegisterExpression({
       priority: 150,
       match: /[0-9]+\.[0-9]+f?$/gm,
-      factory: (walker, lookFor, existing) => {
+      factory: (walker, namespace, lookFor, existing) => {
         const [{ value }, done] = walker.text("value", TokenTypeName.Number).finish();
-        return new ExpressionLiteralFloat(_context(walker, done), value.replace("f", ""));
+        return new ExpressionLiteralFloat(_context(walker, done, namespace), value.replace("f", ""));
       },
     });
   }

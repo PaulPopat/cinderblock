@@ -14,7 +14,7 @@ export class TypeTuple extends Type {
       priority: 100,
       match: /^struct$/gm,
       chainable: false,
-      factory: (walker: TokenWalker, left?: Type) => {
+      factory: (walker: TokenWalker, namespace, left?: Type) => {
         const [{ parts, extending }, done] = walker
           .expect("struct", TokenTypeName.KeyWord)
           .if(
@@ -23,18 +23,18 @@ export class TypeTuple extends Type {
               w.while(
                 "extending",
                 (s) => s.data === ":" || s.data === ",",
-                (s) => TypeReference.ParseReference(s.expect([":", ","], TokenTypeName.Operator)),
+                (s) => TypeReference.ParseReference(s.expect([":", ","], TokenTypeName.Operator), namespace),
               ),
           )
           .while(
             "parts",
             (s) => s.data !== ";",
-            (s) => TypeArg.Parse(s),
+            (s) => TypeArg.Parse(s, namespace),
           )
           .expect(";", TokenTypeName.Punctuation)
           .finish();
 
-        return new TypeTuple(_context(walker, done), parts, extending ?? []);
+        return new TypeTuple(_context(walker, done, namespace), parts, extending ?? []);
       },
     });
   }
