@@ -175,7 +175,7 @@ export class EntityLet extends Entity {
   }
 
   search(name: string): Array<Entity> {
-    return name === this.name ? [this] : [];
+    return name === this.fullname ? [this] : [];
   }
 
   get public(): Array<EntityLet> {

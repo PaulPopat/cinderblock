@@ -44,8 +44,8 @@ export class EntityNamespace extends Entity {
     return this.#entities;
   }
 
-  search(name: string, ctx: LinkerContext): Array<Entity> {
-    return this.#entities.flatMap((e) => e.search(name, ctx));
+  search(name: string, ctx: LinkerContext, skip_usings: boolean): Array<Entity> {
+    return this.#entities.flatMap((e) => e.search(name, ctx, skip_usings));
   }
 
   get public(): Array<EntityLet> {

@@ -1,8 +1,8 @@
 import { LinkedType } from "#linked/LinkedType";
 import { LinkedTypeTuple } from "#linked/LinkedTypeTuple";
 import { TokenTypeName, type TokenWalker } from "#tokeniser";
-import { BoundEntry } from "./BoundEntry.ts";
 import { EntityStruct } from "./EntityStruct.ts";
+import { Entry } from "./Entry.ts";
 import { _context, type EntryContext } from "./EntryContext.ts";
 import type { LinkerContext } from "./LinkerContext.ts";
 import { LinkerError } from "./LinkerError.ts";
@@ -52,19 +52,21 @@ export class TypeReference extends Type {
   }
 
   linked(input: LinkedType | undefined, ctx: LinkerContext): [LinkerContext, LinkedType] {
-    const found = ctx.search(this.#name, this.range);
+    const found = [...this.namespaces, ""].reduce(
+      (f, namespace) => f ?? ctx.search([namespace, this.#name].filter((a) => a).join("_"), this.range),
+      undefined as unknown,
+    );
+
     if (found instanceof LinkedType) {
       return ctx.finish(() => found);
     }
 
-    if (found instanceof BoundEntry) {
-      if (found.is(Type)) {
-        const [, result] = found.subject.linked(input, found.context);
-
-        return ctx.finish(() => result);
+    if (found instanceof Entry) {
+      if (found instanceof Type) {
+        return found.linked(input, ctx);
       }
 
-      if (!found.is(EntityStruct)) {
+      if (!(found instanceof EntityStruct)) {
         throw new LinkerError("Expected a struct", this.range);
       }
 
@@ -72,13 +74,10 @@ export class TypeReference extends Type {
         throw new LinkerError("Expected a tuple", input.range);
       }
 
-      const inputCtx = this.#args.reduce(
-        (found, arg) => found.searchable(arg.name, (found) => [found, new BoundEntry(ctx, arg.type)]),
-        found.context,
+      return found.linked(
+        input,
+        this.#args.reduce((found, arg) => found.searchable(arg.name, (found) => [found, arg.type]), ctx),
       );
-      const [, result] = found.subject.linked(input, inputCtx);
-
-      return ctx.finish(() => result);
     }
 
     throw new LinkerError("Reference not found", this.range);

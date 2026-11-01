@@ -67,14 +67,27 @@ export class EntityStruct extends Entity {
     return this.#name;
   }
 
+  get extending() {
+    return this.#extending;
+  }
+
+  get args() {
+    return this.#args;
+  }
+
   linked(input: LinkedEntry | undefined, ctx: LinkerContext) {
     if (input && !(input instanceof LinkedTypeTuple)) {
       throw new LinkerError("Invalid input", this.range);
     }
 
     return ctx
-      .mapWith(this.#extending, "extending", (c, i) => i.linked(undefined, c))
-      .mapWith(this.#args, "args", (c, i) => i.linked(undefined, c))
+      .mapWith(this.#extending, "extending", (c, i) => i.linked(input, c))
+      .mapWith(this.#args, "args", (c, i) =>
+        i.linked(
+          input?.args.find((a) => a.name === i.name),
+          c,
+        ),
+      )
       .finish(({ extending, args }) => {
         return new LinkedTypeTuple(this.range, [
           ...extending.flatMap((e) => {

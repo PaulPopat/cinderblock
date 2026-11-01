@@ -23,4 +23,8 @@ export abstract class Entry {
   get ctx() {
     return this.#ctx;
   }
+
+  get namespaces() {
+    return this.#ctx.namespace.split("_").reduce((result, name) => [[result[0], name].filter((a) => a).join("_"), ...result], [] as Array<string>);
+  }
 }

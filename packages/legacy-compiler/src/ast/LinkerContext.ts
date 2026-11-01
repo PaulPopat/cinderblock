@@ -1,5 +1,4 @@
 import type { Range } from "#utils";
-import { BoundEntry } from "./BoundEntry.ts";
 import type { EntityNamespace } from "./EntityNamespace.ts";
 import { LinkerError } from "./LinkerError.ts";
 
@@ -33,17 +32,17 @@ export class LinkerContext<TResult extends Record<string, unknown> = Record<neve
       return this.#searchable[name];
     }
 
-    const found = this.#base.search(name, this);
+    const found = this.#base.search(name, this, false);
     if (found.length > 1) {
       throw new LinkerError("Ambiguous reference", from);
     }
 
     const item = found[0];
     if (!item) {
-      throw new LinkerError("Reference not found", from);
+      return undefined;
     }
 
-    return new BoundEntry(new LinkerContext(this.#base, this.#base.name, {}, {}), item);
+    return item;
   }
 
   searchable(name: string, result: (ctx: this) => [LinkerContext, unknown]) {

@@ -31,8 +31,8 @@ export class EntityUse extends Entity {
     return this.#namespace;
   }
 
-  search(name: string, ctx: LinkerContext): Array<Entity> {
-    if (name.startsWith(this.#namespace + "_")) return [];
-    return ctx.base.search([this.#namespace, name].join("_"), ctx);
+  search(name: string, ctx: LinkerContext, skip_usings: boolean): Array<Entity> {
+    if (skip_usings) return [];
+    return ctx.base.search([this.#namespace, name].join("_"), ctx, true);
   }
 }

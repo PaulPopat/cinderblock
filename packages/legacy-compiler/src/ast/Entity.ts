@@ -28,5 +28,5 @@ export abstract class Entity extends Entry {
   }
 
   abstract get name(): string;
-  abstract search(name: string, ctx: LinkerContext): Array<Entity>;
+  abstract search(name: string, ctx: LinkerContext, skip_usings: boolean): Array<Entity>;
 }
