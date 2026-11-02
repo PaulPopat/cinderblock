@@ -1,4 +1,4 @@
-import type { CinderBlockBinary } from "@cinderblock-lang/runner";
+import type { CinderBlockBinary } from "@cinderblock-lang/sosso-runtime";
 
 type AppTaggedProps = {
   key: string;

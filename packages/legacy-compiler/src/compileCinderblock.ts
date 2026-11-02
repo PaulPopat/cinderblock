@@ -1,7 +1,7 @@
 import { Entity, EntityLet, EntityNamespace, LinkerContext } from "#ast";
 import { Tokeniser, TokenType, TokenWalker } from "#tokeniser";
 import { serialiseApp } from "#writer";
-import type { AppMetadata } from "@cinderblock-lang/runner";
+import type { AppMetadata } from "@cinderblock-lang/sosso-runtime";
 import { App } from "./App.ts";
 
 export type BinaryData = {

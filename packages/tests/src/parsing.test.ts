@@ -1,4 +1,4 @@
-import { Inline } from "@cinderblock-lang/sosso";
+import { Inline } from "@cinderblock-lang/sosso-sdk";
 import assert from "node:assert";
 import test, { describe } from "node:test";
 

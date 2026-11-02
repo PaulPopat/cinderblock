@@ -7,9 +7,8 @@ namespace std_array {
              current = current ++ (_s as T --> selector),
              index = index + 1,
             }
-            -> internal
-          ;
-          let (_s: null) = current;
+            -> internal,
+          let (_s: null) = current
       ;
 
     { index = 0, current = [] as TResult[] } -> internal
@@ -20,7 +19,7 @@ namespace std_array {
       actual =
           {
             _s = [1, 2, 3],
-            selector = let (_s: int) = _s + 1;,
+            selector = let (_s: int) = _s + 1,
           }
           -> select,
       expected = [2, 3, 4],
@@ -37,9 +36,8 @@ namespace std_array {
               : current,
              index = index + 1,
             }
-            -> internal
-          ;
-          let (_s: null) = current;
+            -> internal,
+          let (_s: null) = current
       ;
 
     { index = 0, current = [] as T[] } -> internal
@@ -50,7 +48,7 @@ namespace std_array {
       actual =
           {
             _s = [1, 2, 3, 4],
-            predicate = let (_s: int) = (_s == 2) || (_s == 4);,
+            predicate = let (_s: int) = (_s == 2) || (_s == 4),
           }
           -> where,
       expected = [2, 4],
@@ -63,9 +61,8 @@ namespace std_array {
           let (_s: T) =
             _s --> predicate
               ? _s
-              : { index = index + 1 } -> internal
-          ;
-          let (_s: null) = null;
+              : { index = index + 1 } -> internal,
+          let (_s: null) = null
       ;
 
     { index = 0 } -> internal
@@ -76,7 +73,7 @@ namespace std_array {
       actual =
           {
             _s = [1, 2, 3, 4],
-            predicate = let (_s: int) = (_s == 2) || (_s == 4);,
+            predicate = let (_s: int) = (_s == 2) || (_s == 4),
           }
           -> first,
       expected = 2,
@@ -88,7 +85,7 @@ namespace std_array {
       actual =
           {
             _s = [1, 2, 3, 4],
-            predicate = let (_s: int) = (_s == 5);,
+            predicate = let (_s: int) = (_s == 5),
           }
           -> first,
       expected = null,
@@ -107,9 +104,8 @@ namespace std_array {
               current = {  _s = _s, current = current } -> action,
               index = index + 1,
             }
-            -> internal
-          ;
-          let (_s: null) = current;
+            -> internal,
+          let (_s: null) = current
       ;
 
     { index = 0, current = initial } -> internal
@@ -121,7 +117,7 @@ namespace std_array {
           {
             _s = [1, 2, 3, 4],
             initial = 0,
-            action = let (_s: int, current: int) = _s + current;,
+            action = let (_s: int, current: int) = _s + current,
           }
           -> aggregate,
       expected = 10,

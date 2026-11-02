@@ -1,5 +1,5 @@
 import { compileCinderblock, type BinaryData } from "@cinderblock-lang/legacy-compiler";
-import { CinderBlockBinary } from "@cinderblock-lang/runner";
+import { CinderBlockBinary } from "@cinderblock-lang/sosso-runtime";
 
 export class Inline {
   readonly #data: BinaryData;

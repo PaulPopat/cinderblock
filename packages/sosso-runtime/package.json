@@ -1,5 +1,5 @@
 {
-  "name": "@cinderblock-lang/runner",
+  "name": "@cinderblock-lang/sosso-runtime",
   "scripts": {
     "typecheck": "tsc --noEmit",
     "emsdk": "docker run --rm -v $(pwd):$(pwd) -u $(id -u):$(id -g) -w $(pwd) emscripten/emsdk",

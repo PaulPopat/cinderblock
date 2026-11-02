@@ -1,20 +1,9 @@
 import * as vscode from "vscode";
-import {
-  CompilerError,
-  EntityLet,
-  EntityStruct,
-  ExpressionAccess,
-  ExpressionReference,
-  ExpressionTuplePart,
-  Range,
-  Type,
-  TypeReference,
-  TypeTuple,
-} from "@cinderblock-lang/legacy-compiler";
+import { CompilerError } from "@cinderblock-lang/legacy-compiler";
 import path from "node:path";
-import { Project } from "@cinderblock-lang/sosso";
+import { Project } from "@cinderblock-lang/sosso-sdk";
 
-export class AppExtension implements vscode.DefinitionProvider, vscode.HoverProvider, vscode.Disposable {
+export class AppExtension implements vscode.Disposable {
   #project: Project | undefined = undefined;
   readonly #cleanup: Array<vscode.Disposable> = [];
   readonly #diagnostics: vscode.DiagnosticCollection;
@@ -23,8 +12,8 @@ export class AppExtension implements vscode.DefinitionProvider, vscode.HoverProv
 
   constructor(workspacePath: vscode.Uri) {
     this.#workspacePath = workspacePath;
-    this.#cleanup.push(vscode.languages.registerDefinitionProvider({ language: "cinderblock", scheme: "file" }, this));
-    this.#cleanup.push(vscode.languages.registerHoverProvider({ language: "cinderblock", scheme: "file" }, this));
+    // this.#cleanup.push(vscode.languages.registerDefinitionProvider({ language: "cinderblock", scheme: "file" }, this));
+    // this.#cleanup.push(vscode.languages.registerHoverProvider({ language: "cinderblock", scheme: "file" }, this));
     this.#diagnostics = vscode.languages.createDiagnosticCollection("cinderblock");
     this.#cleanup.push(this.#diagnostics);
 
@@ -57,12 +46,12 @@ export class AppExtension implements vscode.DefinitionProvider, vscode.HoverProv
     }
   }
 
-  check() {
+  async check() {
     this.#diagnostics.clear();
 
     try {
       this.#project = this.#tryCreateProject();
-      this.#project?.binaryData;
+      await this.#project?.compile();
     } catch (err) {
       if (!(err instanceof CompilerError)) return;
 
@@ -87,50 +76,50 @@ export class AppExtension implements vscode.DefinitionProvider, vscode.HoverProv
     return this.#project?.types.find((t) => t.entry && t.range.within(relativePath, position.line + 1, position.character + 1))?.entry;
   }
 
-  async provideDefinition(
-    document: vscode.TextDocument,
-    position: vscode.Position,
-    token: vscode.CancellationToken,
-  ): Promise<vscode.Definition | vscode.DefinitionLink[] | null | undefined> {
-    const found = await this.#resolve(document, position);
-    if (!found) return;
+  // async provideDefinition(
+  //   document: vscode.TextDocument,
+  //   position: vscode.Position,
+  //   token: vscode.CancellationToken,
+  // ): Promise<vscode.Definition | vscode.DefinitionLink[] | null | undefined> {
+  //   const found = await this.#resolve(document, position);
+  //   if (!found) return;
 
-    const goTo = (range: Range) => ({
-      uri: vscode.Uri.joinPath(this.#workspacePath, range.from.file),
-      range: new vscode.Range(
-        new vscode.Position(range.from.line - 1, range.from.character - 1),
-        new vscode.Position(range.from.line - 1, range.to.character - 1),
-      ),
-    });
+  //   const goTo = (range: Range) => ({
+  //     uri: vscode.Uri.joinPath(this.#workspacePath, range.from.file),
+  //     range: new vscode.Range(
+  //       new vscode.Position(range.from.line - 1, range.from.character - 1),
+  //       new vscode.Position(range.from.line - 1, range.to.character - 1),
+  //     ),
+  //   });
 
-    if (found instanceof ExpressionReference) return goTo(found.subject.range);
-    if (found instanceof TypeReference) {
-      const range = found.subject?.range;
-      if (range) return goTo(range);
-    }
-  }
+  //   if (found instanceof ExpressionReference) return goTo(found.subject.range);
+  //   if (found instanceof TypeReference) {
+  //     const range = found.subject?.range;
+  //     if (range) return goTo(range);
+  //   }
+  // }
 
-  async provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Hover | undefined> {
-    const found = await this.#resolve(document, position);
-    if (!found) return;
+  // async provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Hover | undefined> {
+  //   const found = await this.#resolve(document, position);
+  //   if (!found) return;
 
-    const display = (type: Type, range: Range) => {
-      const contents = new vscode.MarkdownString(undefined, true);
-      contents.appendCodeblock(type.representation(0), "cinderblock");
-      return new vscode.Hover(
-        contents,
-        new vscode.Range(
-          new vscode.Position(range.from.line - 1, range.from.character - 1),
-          new vscode.Position(range.from.line - 1, range.to.character - 1),
-        ),
-      );
-    };
+  //   const display = (type: Type, range: Range) => {
+  //     const contents = new vscode.MarkdownString(undefined, true);
+  //     contents.appendCodeblock(type.representation(0), "cinderblock");
+  //     return new vscode.Hover(
+  //       contents,
+  //       new vscode.Range(
+  //         new vscode.Position(range.from.line - 1, range.from.character - 1),
+  //         new vscode.Position(range.from.line - 1, range.to.character - 1),
+  //       ),
+  //     );
+  //   };
 
-    if (found instanceof ExpressionReference) return display(found.subject.type, found.range);
-    if (found instanceof TypeReference) return display(found, found.range);
-    if (found instanceof EntityLet) return display(found.type, found.range);
-    if (found instanceof EntityStruct) return display(new TypeTuple(found.location, found.done, () => found, found.args), found.range);
-    if (found instanceof ExpressionTuplePart) return display(found.value.resolution, found.range);
-    if (found instanceof ExpressionAccess) return display(found.resolution, found.range);
-  }
+  //   if (found instanceof ExpressionReference) return display(found.subject.type, found.range);
+  //   if (found instanceof TypeReference) return display(found, found.range);
+  //   if (found instanceof EntityLet) return display(found.type, found.range);
+  //   if (found instanceof EntityStruct) return display(new TypeTuple(found.location, found.done, () => found, found.args), found.range);
+  //   if (found instanceof ExpressionTuplePart) return display(found.value.resolution, found.range);
+  //   if (found instanceof ExpressionAccess) return display(found.resolution, found.range);
+  // }
 }

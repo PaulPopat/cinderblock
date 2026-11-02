@@ -10,14 +10,14 @@ namespace std_dictionary {
 
   let find (_s: entry (TValue: infer T)[], key: string): T | null =
     _s
-    --> { predicate = let (_s: entry (TValue: T)) = _s.key == key; }
+    --> { predicate = let (_s: entry (TValue: T)) = _s.key == key }
     -> array_first
   ;
 
   let set (_s: entry (TValue: infer T)[], key: string, value: T): entry (TValue: T)[] =
     (
       _s
-      --> { predicate = let (_s: entry (TValue: T)) = _s.key != key; }
+      --> { predicate = let (_s: entry (TValue: T)) = _s.key != key }
       -> array_where
     ) ++ { key = key, value = value }
   ;

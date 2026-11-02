@@ -11,7 +11,7 @@
   "description": "The runner for the CinderBlock programming language",
   "author": "Paul Popat",
   "devDependencies": {
-    "@cinderblock-lang/runner": "*"
+    "@cinderblock-lang/sosso-runtime": "*"
   },
   "imports": {},
   "exports": {

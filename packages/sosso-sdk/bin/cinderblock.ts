@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { Project } from "#app";
-import { CinderBlockBinary } from "@cinderblock-lang/runner";
+import { CinderBlockBinary } from "@cinderblock-lang/sosso-runtime";
 import path from "node:path";
 
 async function main() {
